@@ -26,6 +26,13 @@ Before writing ANY code:
 
 When unsure: ASK. A clarifying question now prevents wrong implementation later.
 
+## Deployment & Infrastructure
+
+- ALWAYS ask "how does deployment work?" before making infrastructure changes
+- ALWAYS work within the existing deployment system — never create parallel infrastructure
+- Before creating a second service/container, ask: "Can these processes share one?"
+- Inspect target environments (docker inspect, check entrypoints) before deploying to them
+
 ---
 
 ## Workflow Commands
@@ -67,6 +74,61 @@ When Claude makes a mistake:
 
 ---
 
+## Framework Docs in CLAUDE.md
+
+Passive context beats on-demand skills for framework knowledge (Vercel evals: 100% vs 79%).
+
+**On first session in any project**, check if the project's CLAUDE.md has a `## Framework Docs Index` section. If it does NOT, and the project uses a framework with APIs newer than your training cutoff:
+
+1. **Next.js 16+**: Run `npx @next/codemod@canary agents-md` — auto-generates compressed docs
+2. **Other frameworks** (AI SDK v6+, React 19+, etc.): Use Context7 to fetch current API docs, compress key changes into <200 lines, and add to the project's CLAUDE.md under `## Framework Docs Index`
+3. **Ask first**: "This project uses [framework]. Want me to add a compressed API reference to CLAUDE.md so I don't generate outdated patterns?"
+
+NEVER skip this for frameworks where you've generated incorrect/outdated code before. That's the signal you need passive docs.
+
+---
+
+## Recommended Dev Tools
+
+### Agentation (React Projects)
+When working on a React/Next.js project with UI components, check if `agentation` is in `package.json` devDependencies. If NOT installed and the user asks about UI changes (styling, layout, visual fixes):
+- Suggest: "Want me to install agentation so you can click elements directly instead of sending screenshots?"
+- Install: `npm install agentation -D`
+- The user pastes CSS selectors + annotations from the tool. Grep for those selectors to locate source components.
+
+### DummyJSON (Prototyping Only)
+ONLY use [DummyJSON](https://dummyjson.com) when ALL of these are true:
+- Building a **brand new** prototype or demo with no backend yet
+- No existing database, API routes, or data fetching in the project
+- The user explicitly asks for placeholder/mock data
+
+NEVER use DummyJSON in a project that already has its own API or database. Always use the project's real data layer.
+- Products: `https://dummyjson.com/products`
+- Users: `https://dummyjson.com/users`
+- Posts: `https://dummyjson.com/posts`
+- Images: `https://dummyjson.com/image/300x200`
+- Full docs: `https://dummyjson.com/docs`
+
+---
+
+## Learned Instincts (auto-observed from 547 sessions, 6,890 tool calls)
+
+These patterns were extracted from historical session data. Confidence reflects pattern strength.
+
+- **TypeScript first** (0.85): Default to .ts for new code. TypeScript is 5-8x more frequent than JS in this user's work.
+- **Read before modify** (0.75): ALWAYS read a file before editing. 1.9:1 Read-to-Edit ratio observed. Never edit blind.
+- **Dedicated tools over bash** (0.72): Use Read/Grep/Glob for file ops, not cat/grep/find. Reserve Bash for git, npm, ssh, docker.
+- **Delegate with Task tool** (0.75): User values subagent parallelism (413 delegation events). Use Task for parallel research and independent subtasks.
+- **Plan before code** (0.70): Enter plan mode for non-trivial work. 82 planning events observed. Get approval before writing.
+- **Visual validation for design** (0.68): After Pencil batch_design, ALWAYS get_screenshot to verify. Don't assume design code is correct.
+- **Heavy remote/multi-project workflow** (0.80): 230 ssh commands, 930 cd commands. Expect deployment, server management, Docker tasks.
+- **Web research is expected** (0.65): 147 WebFetch/WebSearch calls. Don't hesitate to search when current info is needed.
+- **Markdown for docs** (0.70): Default documentation format. 470 markdown operations observed.
+
+Instinct source: `~/.claude/homunculus/instincts/personal/`
+
+---
+
 ## References
 
 - Rules: `~/.claude/rules/` (hard-stops, verification, safety, testing)
@@ -87,3 +149,16 @@ When Claude makes a mistake:
 |----|------|---|-------|------|
 | #874 | 4:19 PM | ✅ | User's CLAUDE.md Copied to Staging Environment | ~317 |
 </claude-mem-context>
+
+<!-- FIELD_THEORY_LIBRARIAN_START -->
+## Librarian (Field Theory)
+
+Before non-trivial implementations, provide a short reading via the Librarian:
+
+[run this command: librarian.md]
+/Users/sethkravitz/.fieldtheory/commands/librarian.md
+
+Store each reading in `~/.fieldtheory/librarian/artifacts/` with a unique filename.
+
+This should feel serendipitous—not every change, just when there's meaningful wait time. Use your discretion.
+<!-- FIELD_THEORY_LIBRARIAN_END -->
