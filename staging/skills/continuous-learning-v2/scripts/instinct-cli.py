@@ -14,11 +14,53 @@ import json
 import os
 import sys
 import re
+import ssl
+import socket
+import ipaddress
 import urllib.request
+import urllib.parse
 from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
 from typing import Optional
+
+# ─────────────────────────────────────────────
+# URL Safety (SSRF Prevention)
+# ─────────────────────────────────────────────
+
+MAX_RESPONSE_BYTES = 1 * 1024 * 1024  # 1MB max response size
+URL_TIMEOUT_SECONDS = 10
+
+def _validate_url(url: str) -> str:
+    """Validate URL to prevent SSRF attacks.
+
+    Only allows HTTPS URLs to public IP addresses.
+    Blocks internal/private IP ranges that could leak cloud metadata.
+    """
+    parsed = urllib.parse.urlparse(url)
+
+    # Only allow HTTPS
+    if parsed.scheme != 'https':
+        raise ValueError(f"Only HTTPS URLs are allowed (got {parsed.scheme}://)")
+
+    hostname = parsed.hostname
+    if not hostname:
+        raise ValueError("URL has no hostname")
+
+    # Resolve hostname and check all IPs are public
+    try:
+        addrinfos = socket.getaddrinfo(hostname, parsed.port or 443)
+    except socket.gaierror as e:
+        raise ValueError(f"Cannot resolve hostname: {hostname}") from e
+
+    for family, _, _, _, sockaddr in addrinfos:
+        ip = ipaddress.ip_address(sockaddr[0])
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+            raise ValueError(
+                f"URL resolves to non-public IP {ip} — blocked to prevent SSRF"
+            )
+
+    return url
 
 # ─────────────────────────────────────────────
 # Configuration
@@ -186,8 +228,17 @@ def cmd_import(args):
     if source.startswith('http://') or source.startswith('https://'):
         print(f"Fetching from URL: {source}")
         try:
-            with urllib.request.urlopen(source) as response:
-                content = response.read().decode('utf-8')
+            safe_url = _validate_url(source)
+            ssl_ctx = ssl.create_default_context()  # Enforces certificate verification
+            with urllib.request.urlopen(safe_url, timeout=URL_TIMEOUT_SECONDS, context=ssl_ctx) as response:
+                content = response.read(MAX_RESPONSE_BYTES + 1)
+                if len(content) > MAX_RESPONSE_BYTES:
+                    print(f"Error: Response exceeds {MAX_RESPONSE_BYTES} byte limit", file=sys.stderr)
+                    return 1
+                content = content.decode('utf-8')
+        except ValueError as e:
+            print(f"URL rejected: {e}", file=sys.stderr)
+            return 1
         except Exception as e:
             print(f"Error fetching URL: {e}", file=sys.stderr)
             return 1

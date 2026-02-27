@@ -203,9 +203,12 @@ class PostgresHybridSearch:
             where = "1=1"
             params = [query_embedding, query, limit * 3, vector_weight]
             if filter_metadata:
+                import re as _re
                 for key, val in filter_metadata.items():
+                    # Validate key names to prevent SQL injection via dict keys
+                    if not _re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', key):
+                        raise ValueError(f"Invalid metadata key: {key}")
                     params.append(val)
-                    # WARNING: key must be a trusted, application-controlled value — never user input
                     where += f" AND metadata->>'{key}' = ${len(params)}"
             results = await conn.fetch(f"""
                 WITH vs AS (

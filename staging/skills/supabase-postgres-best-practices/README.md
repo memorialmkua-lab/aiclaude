@@ -28,42 +28,27 @@ npm run build
    - `monitor-` Monitoring & Diagnostics (LOW-MEDIUM)
    - `advanced-` Advanced Features (LOW)
 
-2. **Copy the template**:
-   ```bash
-   cp references/_template.md references/query-your-reference-name.md
-   ```
+2. **Create a new reference file** in `references/` with the appropriate prefix (e.g., `query-`, `conn-`, `schema-`).
 
-3. **Fill in the content** following the template structure
+3. **Fill in the content** following the structure of existing reference files.
 
-4. **Validate and build**:
-   ```bash
-   npm run validate
-   npm run build
-   ```
-
-5. **Review** the generated `AGENTS.md`
+4. **Review** the result and update `SKILL.md` if needed.
 
 ## Skill Structure
 
 ```
 skills/supabase-postgres-best-practices/
-├── SKILL.md           # Agent-facing skill manifest (Agent Skills spec)
-├── AGENTS.md          # [GENERATED] Compiled references document
+├── SKILL.md           # Agent-facing skill manifest (read this first)
+├── AGENTS.md          # Navigation guide
+├── CLAUDE.md          # Navigation guide (copy of AGENTS.md)
 ├── README.md          # This file
 └── references/
-    ├── _template.md      # Reference template
-    ├── _sections.md      # Section definitions
-    ├── _contributing.md  # Writing guidelines
-    └── *.md              # Individual references
-
-packages/skills-build/
-├── src/               # Generic build system source
-└── package.json       # NPM scripts
+    └── *.md              # Individual reference files by category
 ```
 
 ## Reference File Structure
 
-See `references/_template.md` for the complete template. Key elements:
+Key elements for each reference file:
 
 ````markdown
 ---
@@ -95,7 +80,7 @@ tags: relevant, keywords
 ```
 ## Writing Guidelines
 
-See `references/_contributing.md` for detailed guidelines. Key principles:
+Key principles:
 
 1. **Show concrete transformations** - "Change X to Y", not abstract advice
 2. **Error-first structure** - Show the problem before the solution

@@ -33,8 +33,9 @@ create policy orders_user_policy on orders
 -- Force RLS even for table owners
 alter table orders force row level security;
 
--- Set user context and query
-set app.current_user_id = '123';
+-- Set user context and query (SET LOCAL is transaction-scoped, preventing
+-- other code in the same session from inheriting or overriding this value)
+SET LOCAL app.current_user_id = '123';
 select * from orders;  -- Only returns orders for user 123
 ```
 

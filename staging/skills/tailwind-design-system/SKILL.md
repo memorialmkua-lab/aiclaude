@@ -424,6 +424,10 @@ function LoginForm() {
     resolver: zodResolver(schema),
   })
 
+  const onSubmit = (data: z.infer<typeof schema>) => {
+    // Handle form submission with validated data
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">

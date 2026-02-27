@@ -1,15 +1,11 @@
 ---
 name: github-actions-templates
-description: Create production-ready GitHub Actions workflows for automated testing, building, and deploying applications. Use when setting up CI/CD with GitHub Actions, automating development workflows, or creating reusable workflow templates.
+description: Use when setting up CI/CD with GitHub Actions, creating workflows for testing, building, or deploying applications
 ---
 
 # GitHub Actions Templates
 
-Production-ready GitHub Actions workflow patterns for testing, building, and deploying applications.
-
-## Purpose
-
-Create efficient, secure GitHub Actions workflows for continuous integration and deployment across various tech stacks.
+Production-ready GitHub Actions workflow patterns. All actions pinned to SHA digests for supply-chain security.
 
 ## When to Use
 
@@ -19,9 +15,7 @@ Create efficient, secure GitHub Actions workflows for continuous integration and
 - Run security scans
 - Implement matrix builds for multiple environments
 
-## Common Workflow Patterns
-
-### Pattern 1: Test Workflow
+## Pattern 1: Test Workflow
 
 ```yaml
 name: Test
@@ -38,13 +32,13 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x, 22.x]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
@@ -59,14 +53,12 @@ jobs:
         run: npm test
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@0561704f0f02c16a585d4c7555e57fa2e44cf909 # v5
         with:
           files: ./coverage/lcov.info
 ```
 
-**Reference:** See `assets/test-workflow.yml`
-
-### Pattern 2: Build and Push Docker Image
+## Pattern 2: Build and Push Docker Image
 
 ```yaml
 name: Build and Push
@@ -88,10 +80,10 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Log in to Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -99,7 +91,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
@@ -109,7 +101,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: .
           push: true
@@ -119,9 +111,7 @@ jobs:
           cache-to: type=gha,mode=max
 ```
 
-**Reference:** See `assets/deploy-workflow.yml`
-
-### Pattern 3: Deploy to Kubernetes
+## Pattern 3: Deploy to Kubernetes
 
 ```yaml
 name: Deploy to Kubernetes
@@ -135,10 +125,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c # v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -160,7 +150,7 @@ jobs:
           kubectl describe deployment my-app -n production
 ```
 
-### Pattern 4: Matrix Build
+## Pattern 4: Matrix Build (Python)
 
 ```yaml
 name: Matrix Build
@@ -174,13 +164,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -193,22 +183,44 @@ jobs:
         run: pytest
 ```
 
-**Reference:** See `assets/matrix-build.yml`
+## Pattern 5: Security Scanning
 
-## Workflow Best Practices
+```yaml
+name: Security Scan
 
-1. **Use specific action versions** (@v4, not @latest)
-2. **Cache dependencies** to speed up builds
-3. **Use secrets** for sensitive data
-4. **Implement status checks** on PRs
-5. **Use matrix builds** for multi-version testing
-6. **Set appropriate permissions**
-7. **Use reusable workflows** for common patterns
-8. **Implement approval gates** for production
-9. **Add notification steps** for failures
-10. **Use self-hosted runners** for sensitive workloads
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-## Reusable Workflows
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518 # v0.34.1
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "trivy-results.sarif"
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@c4a7bc332abaec03596ff2803dd7f3ca3a238975 # v3
+        with:
+          sarif_file: "trivy-results.sarif"
+
+      - name: Run Snyk Security Scan
+        uses: snyk/actions/node@9adf32b1121593767fc3c057af55b55db032dc04 # v1.0.0
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+```
+
+## Pattern 6: Reusable Workflows
 
 ```yaml
 # .github/workflows/reusable-test.yml
@@ -228,64 +240,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ inputs.node-version }}
       - run: npm ci
       - run: npm test
 ```
 
-**Use reusable workflow:**
+**Calling a reusable workflow:**
 
 ```yaml
 jobs:
   call-test:
     uses: ./.github/workflows/reusable-test.yml
     with:
-      node-version: "20.x"
+      node-version: "22.x"
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
 
-## Security Scanning
-
-```yaml
-name: Security Scan
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  security:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: "fs"
-          scan-ref: "."
-          format: "sarif"
-          output: "trivy-results.sarif"
-
-      - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: "trivy-results.sarif"
-
-      - name: Run Snyk Security Scan
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-```
-
-## Deployment with Approvals
+## Pattern 7: Deploy with Approvals
 
 ```yaml
 name: Deploy to Production
@@ -302,16 +277,16 @@ jobs:
       url: https://app.example.com
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Deploy application
         run: |
           echo "Deploying to production..."
-          # Deployment commands here
+          # Add deployment commands here
 
       - name: Notify Slack
         if: success()
-        uses: slackapi/slack-github-action@v1
+        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
         with:
           webhook-url: ${{ secrets.SLACK_WEBHOOK }}
           payload: |
@@ -320,15 +295,15 @@ jobs:
             }
 ```
 
-## Reference Files
+## Best Practices
 
-- `assets/test-workflow.yml` - Testing workflow template
-- `assets/deploy-workflow.yml` - Deployment workflow template
-- `assets/matrix-build.yml` - Matrix build template
-- `references/common-workflows.md` - Common workflow patterns
-
-## Related Skills
-
-- `gitlab-ci-patterns` - For GitLab CI workflows
-- `deployment-pipeline-design` - For pipeline architecture
-- `secrets-management` - For secrets handling
+1. **Pin actions to SHA digests** -- version tags can be moved; SHAs are immutable
+2. **Add version comment after SHA** -- `@<sha> # v4` for readability
+3. **Cache dependencies** to speed up builds
+4. **Use secrets** for sensitive data (never hardcode)
+5. **Set minimal permissions** on each job
+6. **Use matrix builds** for multi-version testing
+7. **Use reusable workflows** for shared patterns across repos
+8. **Implement environment approval gates** for production deploys
+9. **Keep Node.js versions current** -- test on active LTS (20.x) and current (22.x)
+10. **Review action updates** -- when updating SHAs, audit the changelog between versions

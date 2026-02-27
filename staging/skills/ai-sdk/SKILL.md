@@ -37,17 +37,19 @@ for await (const chunk of result.textStream) {
 }
 ```
 
-### generateObject — Structured output
+### Structured output with `Output`
 ```typescript
-import { generateObject } from 'ai';
+import { generateText, Output } from 'ai';
 import { z } from 'zod';
 
-const { object } = await generateObject({
+const { output } = await generateText({
   model: 'anthropic/claude-sonnet-4-5-20250929',
-  schema: z.object({
-    name: z.string(),
-    age: z.number(),
-    interests: z.array(z.string()),
+  output: Output.object({
+    schema: z.object({
+      name: z.string(),
+      age: z.number(),
+      interests: z.array(z.string()),
+    }),
   }),
   prompt: 'Generate a fictional user profile.',
 });
@@ -272,9 +274,20 @@ const modelMessages = await convertToModelMessages(messages, {
 ```typescript
 'use client';
 import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport } from 'ai';
+import { useState } from 'react';
 
 export function Chat() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const [input, setInput] = useState('');
+  const { messages, sendMessage } = useChat({
+    transport: new DefaultChatTransport({ api: '/api/chat' }),
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage({ text: input });
+    setInput('');
+  };
 
   return (
     <div>
@@ -282,7 +295,7 @@ export function Chat() {
         <div key={m.id}>{m.role}: {m.content}</div>
       ))}
       <form onSubmit={handleSubmit}>
-        <input value={input} onChange={handleInputChange} />
+        <input value={input} onChange={e => setInput(e.target.value)} />
       </form>
     </div>
   );
@@ -391,7 +404,7 @@ so they can run simultaneously.
 |------|----------|-------------|
 | Single LLM call | `generateText()` | `model`, `prompt`, `tools` |
 | Streaming call | `streamText()` | `model`, `prompt`, `tools` |
-| Structured output | `generateObject()` | `model`, `schema`, `prompt` |
+| Structured output | `generateText()` + `Output` | `model`, `output`, `prompt` |
 | Agent loop | `new ToolLoopAgent()` | `model`, `instructions`, `tools` |
 | Define tool | `tool()` | `description`, `inputSchema`, `execute` |
 | Subagent | `ToolLoopAgent` as `tool()` | `toModelOutput` for context isolation |

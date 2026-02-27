@@ -43,19 +43,11 @@ Reference these guidelines when:
 
 ## How to Use
 
-Read individual rule files for detailed explanations and SQL examples:
-
-```
-references/query-missing-indexes.md
-references/schema-partial-indexes.md
-references/_sections.md
-```
+Read individual rule files in `references/` for detailed explanations and SQL examples. Files are organized by prefix matching the categories above (e.g., `conn-pooling.md`, `security-rls-basics.md`, `lock-deadlock-prevention.md`).
 
 Each rule file contains:
 - Brief explanation of why it matters
-- Incorrect SQL example with explanation
-- Correct SQL example with explanation
-- Optional EXPLAIN output or metrics
+- SQL examples with correct and incorrect patterns
 - Additional context and references
 - Supabase-specific notes (when applicable)
 

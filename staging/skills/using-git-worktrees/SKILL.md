@@ -61,7 +61,7 @@ git check-ignore -q .worktrees 2>/dev/null || git check-ignore -q worktrees 2>/d
 
 **If NOT ignored:**
 
-Per Jesse's rule "Fix broken things immediately":
+Fix it immediately:
 1. Add appropriate line to .gitignore
 2. Commit the change
 3. Proceed with worktree creation
@@ -204,7 +204,6 @@ Ready to implement auth feature
 
 **Called by:**
 - **brainstorming** (Phase 4) - REQUIRED when design is approved and implementation follows
-- **subagent-driven-development** - REQUIRED before executing any tasks
 - **executing-plans** - REQUIRED before executing any tasks
 - Any skill needing isolated workspace
 

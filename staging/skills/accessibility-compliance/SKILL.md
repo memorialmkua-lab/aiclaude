@@ -110,7 +110,7 @@ function AccessibleButton({
       {isLoading ? (
         <>
           <span className="sr-only">Loading</span>
-          <Spinner aria-hidden="true" />
+          <span className="animate-spin inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full" aria-hidden="true" />
         </>
       ) : (
         children
@@ -311,9 +311,12 @@ function Layout({ children }) {
 function useAnnounce() {
   const [message, setMessage] = React.useState("");
 
+  const [priority, setPriority] = React.useState<"polite" | "assertive">("polite");
+
   const announce = React.useCallback(
-    (text: string, priority: "polite" | "assertive" = "polite") => {
+    (text: string, level: "polite" | "assertive" = "polite") => {
       setMessage(""); // Clear first to ensure re-announcement
+      setPriority(level);
       setTimeout(() => setMessage(text), 100);
     },
     [],
@@ -322,7 +325,7 @@ function useAnnounce() {
   const Announcer = () => (
     <div
       role="status"
-      aria-live="polite"
+      aria-live={priority}
       aria-atomic="true"
       className="sr-only"
     >
@@ -355,6 +358,15 @@ function SearchResults({ results, isLoading }) {
 ## Color Contrast Requirements
 
 ```typescript
+// Relative luminance calculation per WCAG 2.2
+function getLuminance(hex: string): number {
+  const rgb = hex.replace("#", "").match(/.{2}/g)!.map((c) => {
+    const sRGB = parseInt(c, 16) / 255;
+    return sRGB <= 0.04045 ? sRGB / 12.92 : Math.pow((sRGB + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+}
+
 // Contrast ratio utilities
 function getContrastRatio(foreground: string, background: string): number {
   const fgLuminance = getLuminance(foreground);

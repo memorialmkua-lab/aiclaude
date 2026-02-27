@@ -277,8 +277,8 @@ When using `auth.api.signInEmail` on the server, check for 2FA redirect:
 ```ts
 const response = await auth.api.signInEmail({
   body: {
-    email: "user@example.com",
-    password: "password",
+    email: credentials.email,
+    password: credentials.password,
   },
 });
 

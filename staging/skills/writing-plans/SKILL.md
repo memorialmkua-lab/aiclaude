@@ -7,24 +7,24 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Write comprehensive implementation plans assuming the engineer has zero context for the codebase. Document everything they need: which files to touch for each task, complete code, testing strategy, relevant docs, and how to verify. Deliver the plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
 
-Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+Assume the implementer is a skilled developer but knows nothing about the toolset or problem domain. Assume they need explicit test design guidance.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
-**Context:** This should be run in a dedicated worktree (created by brainstorming skill).
+**Context:** Run in a dedicated worktree (set up with using-git-worktrees skill).
 
 **Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
 
 ## Bite-Sized Task Granularity
 
 **Each step is one action (2-5 minutes):**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
-- "Commit" - step
+- "Write the failing test" -- step
+- "Run it to make sure it fails" -- step
+- "Implement the minimal code to make the test pass" -- step
+- "Run the tests and make sure they pass" -- step
+- "Commit" -- step
 
 ## Plan Document Header
 
@@ -33,7 +33,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> **For Claude:** Use the executing-plans skill to implement this plan task-by-task.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -46,7 +46,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Task Structure
 
-````markdown
+```markdown
 ### Task N: [Component Name]
 
 **Files:**
@@ -56,11 +56,11 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Step 1: Write the failing test**
 
-```python
-def test_specific_behavior():
-    result = function(input)
-    assert result == expected
-```
+    ```python
+    def test_specific_behavior():
+        result = function(input)
+        assert result == expected
+    ```
 
 **Step 2: Run test to verify it fails**
 
@@ -69,10 +69,10 @@ Expected: FAIL with "function not defined"
 
 **Step 3: Write minimal implementation**
 
-```python
-def function(input):
-    return expected
-```
+    ```python
+    def function(input):
+        return expected
+    ```
 
 **Step 4: Run test to verify it passes**
 
@@ -81,17 +81,18 @@ Expected: PASS
 
 **Step 5: Commit**
 
-```bash
-git add tests/path/test.py src/path/file.py
-git commit -m "feat: add specific feature"
+    ```bash
+    git add tests/path/test.py src/path/file.py
+    git commit -m "feat: add specific feature"
+    ```
 ```
-````
 
 ## Remember
+
 - Exact file paths always
 - Complete code in plan (not "add validation")
 - Exact commands with expected output
-- Reference relevant skills with @ syntax
+- Reference related skills by name (e.g., executing-plans, requesting-code-review)
 - DRY, YAGNI, TDD, frequent commits
 
 ## Execution Handoff
@@ -100,17 +101,12 @@ After saving the plan, offer execution choice:
 
 **"Plan complete and saved to `docs/plans/<filename>.md`. Two execution options:**
 
-**1. Subagent-Driven (this session)** - I dispatch fresh subagent per task, review between tasks, fast iteration
+**1. Subagent-Driven (this session)** -- I dispatch a fresh subagent per task with spec + code quality review between tasks. Fast iteration.
 
-**2. Parallel Session (separate)** - Open new session with executing-plans, batch execution with checkpoints
+**2. Manual Mode (this session or separate)** -- I execute tasks in batches of 3, pause for your review between batches.
 
 **Which approach?"**
 
-**If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:subagent-driven-development
-- Stay in this session
-- Fresh subagent per task + code review
-
-**If Parallel Session chosen:**
-- Guide them to open new session in worktree
-- **REQUIRED SUB-SKILL:** New session uses superpowers:executing-plans
+**If either is chosen:**
+- Use the executing-plans skill in the appropriate mode (Subagent or Manual)
+- Follow the executing-plans workflow exactly
