@@ -58,12 +58,15 @@ Use this skill when:
 
 ### Quick Mode (inline)
 
-Before writing a utility or adding functionality, mentally run through:
+Before writing a utility or adding functionality, run through these checks:
 
-1. Is this a common problem? → Search npm/PyPI
-2. Is there an MCP for this? → Check `~/.claude/settings.json` and search
-3. Is there a skill for this? → Check `~/.claude/skills/`
-4. Is there a GitHub template? → Search GitHub
+1. **Existing skill?** → `ls ~/.claude/skills/` or check the slash commands list
+2. **Existing package?** → `npx skills find [keyword]` or `WebSearch "npm [keyword]"`
+3. **Existing MCP?** → `grep -i "[keyword]" ~/.claude/settings.json`
+4. **Existing code in project?** → `Grep pattern="[keyword]" glob="*.ts"` in the codebase
+5. **GitHub reference?** → `WebSearch "[keyword] github template [language]"`
+
+If any check returns a viable result, use it instead of writing custom code.
 
 ### Full Mode (agent)
 

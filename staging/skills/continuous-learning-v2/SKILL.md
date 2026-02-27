@@ -100,32 +100,7 @@ Session Activity
 
 ### 1. Enable Observation Hooks
 
-Add to your `~/.claude/settings.json`.
-
-**If installed as a plugin** (recommended):
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [{
-      "matcher": "*",
-      "hooks": [{
-        "type": "command",
-        "command": "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh pre"
-      }]
-    }],
-    "PostToolUse": [{
-      "matcher": "*",
-      "hooks": [{
-        "type": "command",
-        "command": "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh post"
-      }]
-    }]
-  }
-}
-```
-
-**If installed manually** to `~/.claude/skills`:
+Add to your `~/.claude/settings.json`:
 
 ```json
 {
@@ -147,6 +122,8 @@ Add to your `~/.claude/settings.json`.
   }
 }
 ```
+
+> If installed as a plugin, replace `~/.claude/skills/` with `${CLAUDE_PLUGIN_ROOT}/skills/`.
 
 ### 2. Initialize Directory Structure
 

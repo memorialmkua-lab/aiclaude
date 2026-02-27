@@ -1,210 +1,107 @@
 ---
 name: iterative-retrieval
-description: Pattern for progressively refining context retrieval to solve the subagent context problem
+description: Pattern for progressively refining context retrieval when exploring unfamiliar codebases. Auto-activates when spawning subagents, encountering missing context, or needing to understand code before modifying it.
+user-invokable: false
 ---
 
 # Iterative Retrieval Pattern
 
-Solves the "context problem" in multi-agent workflows where subagents don't know what context they need until they start working.
+Solves the "context problem" where you don't know what files are relevant until you start looking.
 
-## When to Activate
+## When This Activates
 
-- Spawning subagents that need codebase context they cannot predict upfront
-- Building multi-agent workflows where context is progressively refined
-- Encountering "context too large" or "missing context" failures in agent tasks
-- Designing RAG-like retrieval pipelines for code exploration
-- Optimizing token usage in agent orchestration
+- Exploring an unfamiliar codebase or module
+- Spawning subagents that need codebase context
+- Encountering "missing context" or wrong assumptions about code structure
+- Starting any non-trivial modification where the relevant files aren't obvious
 
-## The Problem
-
-Subagents are spawned with limited context. They don't know:
-- Which files contain relevant code
-- What patterns exist in the codebase
-- What terminology the project uses
-
-Standard approaches fail:
-- **Send everything**: Exceeds context limits
-- **Send nothing**: Agent lacks critical information
-- **Guess what's needed**: Often wrong
-
-## The Solution: Iterative Retrieval
-
-A 4-phase loop that progressively refines context:
+## The Loop (Max 3 Cycles)
 
 ```
-┌─────────────────────────────────────────────┐
-│                                             │
-│   ┌──────────┐      ┌──────────┐            │
-│   │ DISPATCH │─────▶│ EVALUATE │            │
-│   └──────────┘      └──────────┘            │
-│        ▲                  │                 │
-│        │                  ▼                 │
-│   ┌──────────┐      ┌──────────┐            │
-│   │   LOOP   │◀─────│  REFINE  │            │
-│   └──────────┘      └──────────┘            │
-│                                             │
-│        Max 3 cycles, then proceed           │
-└─────────────────────────────────────────────┘
+DISPATCH (broad search) → EVALUATE (score relevance) → REFINE (narrow terms) → LOOP
 ```
 
-### Phase 1: DISPATCH
+### Cycle 1: Cast a wide net
 
-Initial broad query to gather candidate files:
+Use Glob to find structural candidates, then Grep for domain keywords:
 
-```javascript
-// Start with high-level intent
-const initialQuery = {
-  patterns: ['src/**/*.ts', 'lib/**/*.ts'],
-  keywords: ['authentication', 'user', 'session'],
-  excludes: ['*.test.ts', '*.spec.ts']
-};
-
-// Dispatch to retrieval agent
-const candidates = await retrieveFiles(initialQuery);
+```
+Glob pattern="src/**/*.ts" — find all TypeScript files in the area
+Grep pattern="authentication|session|token" — find files mentioning the domain
 ```
 
-### Phase 2: EVALUATE
+Read the top 3-5 most promising files. While reading, note:
+- What terminology does this codebase actually use? (e.g., "throttle" not "rate limit")
+- What related modules are imported?
+- What types/interfaces define the domain?
 
-Assess retrieved content for relevance:
+### Cycle 2: Follow the thread
 
-```javascript
-function evaluateRelevance(files, task) {
-  return files.map(file => ({
-    path: file.path,
-    relevance: scoreRelevance(file.content, task),
-    reason: explainRelevance(file.content, task),
-    missingContext: identifyGaps(file.content, task)
-  }));
-}
+Use what you learned in Cycle 1 to search more precisely:
+
+```
+Grep pattern="RefreshTokenManager" — exact class/function names found in Cycle 1
+Grep pattern="from.*session" glob="*.ts" — trace imports to find related files
+Glob pattern="src/middleware/**" — explore directories discovered in imports
 ```
 
-Scoring criteria:
-- **High (0.8-1.0)**: Directly implements target functionality
-- **Medium (0.5-0.7)**: Contains related patterns or types
-- **Low (0.2-0.4)**: Tangentially related
-- **None (0-0.2)**: Not relevant, exclude
+Read new files. Assess: do you have enough context to proceed?
+- **Yes (3+ high-relevance files found)**: Stop. Proceed with the task.
+- **No (critical gaps remain)**: One more cycle.
 
-### Phase 3: REFINE
+### Cycle 3: Fill specific gaps
 
-Update search criteria based on evaluation:
+Target the exact missing piece:
 
-```javascript
-function refineQuery(evaluation, previousQuery) {
-  return {
-    // Add new patterns discovered in high-relevance files
-    patterns: [...previousQuery.patterns, ...extractPatterns(evaluation)],
-
-    // Add terminology found in codebase
-    keywords: [...previousQuery.keywords, ...extractKeywords(evaluation)],
-
-    // Exclude confirmed irrelevant paths
-    excludes: [...previousQuery.excludes, ...evaluation
-      .filter(e => e.relevance < 0.2)
-      .map(e => e.path)
-    ],
-
-    // Target specific gaps
-    focusAreas: evaluation
-      .flatMap(e => e.missingContext)
-      .filter(unique)
-  };
-}
+```
+Grep pattern="interface.*Config" — find configuration types
+Grep pattern="export.*from" path="src/index.ts" — check public API surface
+Read the specific file that defines the type you need
 ```
 
-### Phase 4: LOOP
-
-Repeat with refined criteria (max 3 cycles):
-
-```javascript
-async function iterativeRetrieve(task, maxCycles = 3) {
-  let query = createInitialQuery(task);
-  let bestContext = [];
-
-  for (let cycle = 0; cycle < maxCycles; cycle++) {
-    const candidates = await retrieveFiles(query);
-    const evaluation = evaluateRelevance(candidates, task);
-
-    // Check if we have sufficient context
-    const highRelevance = evaluation.filter(e => e.relevance >= 0.7);
-    if (highRelevance.length >= 3 && !hasCriticalGaps(evaluation)) {
-      return highRelevance;
-    }
-
-    // Refine and continue
-    query = refineQuery(evaluation, query);
-    bestContext = mergeContext(bestContext, highRelevance);
-  }
-
-  return bestContext;
-}
-```
+**After 3 cycles, proceed with what you have.** Diminishing returns past this point.
 
 ## Practical Examples
 
-### Example 1: Bug Fix Context
+### Bug Fix: "Authentication token expiry"
 
 ```
-Task: "Fix the authentication token expiry bug"
-
 Cycle 1:
-  DISPATCH: Search for "token", "auth", "expiry" in src/**
-  EVALUATE: Found auth.ts (0.9), tokens.ts (0.8), user.ts (0.3)
-  REFINE: Add "refresh", "jwt" keywords; exclude user.ts
+  Grep "token|auth|expiry" in src/** → auth.ts, tokens.ts, user.ts
+  Read auth.ts → imports SessionManager, uses "refresh" concept
+  Read tokens.ts → defines TokenPayload interface
+  Read user.ts → low relevance (user profile, not auth)
 
 Cycle 2:
-  DISPATCH: Search refined terms
-  EVALUATE: Found session-manager.ts (0.95), jwt-utils.ts (0.85)
-  REFINE: Sufficient context (2 high-relevance files)
+  Grep "SessionManager|refresh" → session-manager.ts, jwt-utils.ts
+  Read both → found the expiry logic in session-manager.ts:142
+  Sufficient context. Proceed.
 
 Result: auth.ts, tokens.ts, session-manager.ts, jwt-utils.ts
 ```
 
-### Example 2: Feature Implementation
+### Feature: "Add rate limiting to API endpoints"
 
 ```
-Task: "Add rate limiting to API endpoints"
-
 Cycle 1:
-  DISPATCH: Search "rate", "limit", "api" in routes/**
-  EVALUATE: No matches - codebase uses "throttle" terminology
-  REFINE: Add "throttle", "middleware" keywords
+  Grep "rate|limit" in routes/** → no matches
+  Key learning: codebase uses "throttle" terminology
 
 Cycle 2:
-  DISPATCH: Search refined terms
-  EVALUATE: Found throttle.ts (0.9), middleware/index.ts (0.7)
-  REFINE: Need router patterns
+  Grep "throttle|middleware" → throttle.ts, middleware/index.ts
+  Read both → middleware pattern established, need router setup
 
 Cycle 3:
-  DISPATCH: Search "router", "express" patterns
-  EVALUATE: Found router-setup.ts (0.8)
-  REFINE: Sufficient context
+  Grep "router|app.use" → router-setup.ts
+  Sufficient context. Proceed.
 
 Result: throttle.ts, middleware/index.ts, router-setup.ts
 ```
 
-## Integration with Agents
+## Rules
 
-Use in agent prompts:
-
-```markdown
-When retrieving context for this task:
-1. Start with broad keyword search
-2. Evaluate each file's relevance (0-1 scale)
-3. Identify what context is still missing
-4. Refine search criteria and repeat (max 3 cycles)
-5. Return files with relevance >= 0.7
-```
-
-## Best Practices
-
-1. **Start broad, narrow progressively** - Don't over-specify initial queries
-2. **Learn codebase terminology** - First cycle often reveals naming conventions
-3. **Track what's missing** - Explicit gap identification drives refinement
-4. **Stop at "good enough"** - 3 high-relevance files beats 10 mediocre ones
-5. **Exclude confidently** - Low-relevance files won't become relevant
-
-## Related
-
-- [The Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - Subagent orchestration section
-- `continuous-learning` skill - For patterns that improve over time
-- Agent definitions in `~/.claude/agents/`
+1. **Start broad, narrow progressively** — don't over-specify initial searches
+2. **Learn the codebase's vocabulary** — Cycle 1 often reveals naming conventions
+3. **Track what's missing** — explicitly note gaps to drive the next cycle
+4. **Stop at "good enough"** — 3 high-relevance files beats 10 mediocre ones
+5. **Exclude confidently** — files scored low in Cycle 1 won't become relevant later

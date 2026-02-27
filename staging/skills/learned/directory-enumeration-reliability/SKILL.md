@@ -1,8 +1,7 @@
 ---
 name: directory-enumeration-reliability
 description: "Glob skips symlinks; use ls -la or ls -d for directory enumeration that includes symlinked entries"
-user-invocable: false
-origin: auto-extracted
+user-invokable: false
 ---
 
 # Directory Enumeration: Glob Skips Symlinks

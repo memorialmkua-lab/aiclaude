@@ -1,6 +1,6 @@
 ---
 name: Coding Standards
-description: Concrete patterns for writing high-quality code
+description: TypeScript and async patterns for writing high-quality code. Use when writing TypeScript, reviewing TypeScript code, fixing async bugs, or refactoring functions. Covers error handling, null safety, type patterns, function design, and async/await best practices.
 use-when: Writing code, reviewing code, fixing bugs, refactoring
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
@@ -267,34 +267,3 @@ const result = await withTimeout(fetchData(), 5000);
 | `forEach` with async | `for...of` or `Promise.all` | Correct behavior |
 | Unhandled rejections | try/catch or Result type | Reliability |
 
----
-
-## Verification Checklist
-
-Before any PR or commit:
-
-```bash
-# Type check
-npx tsc --noEmit
-
-# Lint
-npm run lint
-
-# Tests (if applicable)
-npm test
-
-# Check for debug code
-git diff | grep -E "(console\.log|debugger)"
-```
-
-After changing function signatures:
-```bash
-# Find all callers
-grep -r "functionName" --include="*.ts" --include="*.tsx"
-```
-
-After deleting files:
-```bash
-# Find orphaned imports
-grep -r "from.*deletedFile" --include="*.ts" --include="*.tsx"
-```

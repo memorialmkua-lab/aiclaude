@@ -13,6 +13,7 @@
 # Output: stdout text → injected into Claude's context as system reminder
 
 INDEX_FILE="${HOME}/.claude/hooks/skill-router/skill-index.json"
+LOG_FILE="${HOME}/.claude/hooks/skill-router/recommendations.jsonl"
 
 # Read stdin (hook receives JSON with session context)
 input=$(cat)
@@ -94,8 +95,25 @@ if [ -n "$results" ]; then
   recommendation="${recommendation}
 Consider loading these skills with the Skill tool if not already loaded."
 
+  # Log recommendation for analysis
+  prompt_trunc=$(echo "$prompt" | head -c 200)
+  skills_json=$(echo "$top_matches" | while IFS='|' read -r c n d desc w; do
+    [ -z "$c" ] && continue
+    printf '{"skill":"%s","matches":%s,"words":"%s"},' "$n" "$c" "$(echo "$w" | sed 's/^ //')"
+  done | sed 's/,$//')
+  printf '{"ts":"%s","prompt":"%s","recommended":[%s]}\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    "$(echo "$prompt_trunc" | jq -Rs '.' | sed 's/^"//;s/"$//')" \
+    "$skills_json" >> "$LOG_FILE" 2>/dev/null
+
   # Output to stdout — this gets injected into Claude's context
   echo "$recommendation"
+else
+  # Log no-match events too (for false-negative analysis)
+  prompt_trunc=$(echo "$prompt" | head -c 200)
+  printf '{"ts":"%s","prompt":"%s","recommended":[]}\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    "$(echo "$prompt_trunc" | jq -Rs '.' | sed 's/^"//;s/"$//')" >> "$LOG_FILE" 2>/dev/null
 fi
 
 exit 0
