@@ -442,6 +442,17 @@ Use `/security-scan` in Claude Code to run it, or add to CI with the [GitHub Act
 
 [GitHub](https://github.com/affaan-m/agentshield) | [npm](https://www.npmjs.com/package/ecc-agentshield)
 
+### 🚀 PUIUX Pilot — Auto-Configure Claude Code
+
+[PUIUX Pilot](https://github.com/PUIUX-Cloud/puiux-pilot) scans your project, detects the stack (95+ project types), and auto-configures Claude Code hooks, MCPs, and skills. Dry-run by default, atomic writes, backup + rollback, clean eject. Also includes quality scoring (0-100, A-F) and cross-tool config translation (CLAUDE.md ↔ .cursorrules ↔ .windsurfrules ↔ copilot).
+
+```bash
+npm i -g puiux-pilot
+puiux-pilot init            # dry-run: shows what it would do
+puiux-pilot init --apply    # apply changes
+puiux-pilot score           # quality score
+```
+
 ### 🔬 Plankton — Code Quality Integration
 
 [Plankton](https://github.com/alexfazio/plankton) is a recommended companion for code quality enforcement. It provides automated code review, linting orchestration, and quality gates that pair well with the ECC skill and hook system. Use it alongside AgentShield for security + quality coverage.
