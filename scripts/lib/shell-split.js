@@ -25,6 +25,13 @@ function splitShellSegments(command) {
       continue;
     }
 
+    // Backslash escape outside quotes
+    if (ch === '\\' && i + 1 < command.length) {
+      current += ch + command[i + 1];
+      i++;
+      continue;
+    }
+
     // Opening quote
     if (ch === '"' || ch === "'") {
       quote = ch;

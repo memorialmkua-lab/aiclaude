@@ -74,6 +74,17 @@ test('escaped single quote inside single quotes', () => {
   assert.strictEqual(segs.length, 2);
 });
 
+// Escaped operators outside quotes
+console.log('\nEscaped operators outside quotes:');
+test('escaped && outside quotes not split', () => {
+  const segs = splitShellSegments('tmux new-session -d bash -lc cd /app \\&\\& npm run dev');
+  assert.strictEqual(segs.length, 1);
+});
+test('escaped ; outside quotes not split', () => {
+  const segs = splitShellSegments('echo hello \\; echo bye');
+  assert.strictEqual(segs.length, 1);
+});
+
 // Complex real-world cases
 console.log('\nReal-world cases:');
 test('tmux new-session with quoted compound command', () => {
