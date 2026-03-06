@@ -1,4 +1,4 @@
-**语言：** 英语 | [繁體中文](../zh-TW/README.md) | [简体中文](../../README.md)
+**语言：** [English](../../README.md) | [繁體中文](../zh-TW/README.md) | [简体中文](README.md)
 
 # Everything Claude Code
 
