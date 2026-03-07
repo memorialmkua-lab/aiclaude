@@ -1,70 +1,75 @@
 ---
 name: strategic-compact
-description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
+description: Prevents auto-compaction from interrupting work by reading real-time context window percentage and issuing tiered warnings/blocks.
 origin: ECC
 ---
 
-# Strategic Compact Skill
+# Context Pressure System
 
-Suggests manual `/compact` at strategic points in your workflow rather than relying on arbitrary auto-compaction.
-
-## When to Activate
-
-- Running long sessions that approach context limits (200K+ tokens)
-- Working on multi-phase tasks (research → plan → implement → test)
-- Switching between unrelated tasks within the same session
-- After completing a major milestone and starting new work
-- When responses slow down or become less coherent (context pressure)
-
-## Why Strategic Compaction?
-
-Auto-compaction triggers at arbitrary points:
-- Often mid-task, losing important context
-- No awareness of logical task boundaries
-- Can interrupt complex multi-step operations
-
-Strategic compaction at logical boundaries:
-- **After exploration, before execution** — Compact research context, keep implementation plan
-- **After completing a milestone** — Fresh start for next phase
-- **Before major context shifts** — Clear exploration context before different task
+Prevents auto-compaction from interrupting mid-operation by monitoring actual context window usage and intervening before it's too late.
 
 ## How It Works
 
-The `suggest-compact.sh` script runs on PreToolUse (Edit/Write) and:
+The `context-pressure.sh` hook runs on PreToolUse (Edit, Write, Agent, TaskCreate) and reads the real context window percentage from `/tmp/claude-context-pct` (written by the StatusLine `context-monitor.sh` after every assistant message).
 
-1. **Tracks tool calls** — Counts tool invocations in session
-2. **Threshold detection** — Suggests at configurable threshold (default: 50 calls)
-3. **Periodic reminders** — Reminds every 25 calls after threshold
+### Tiered Responses
 
-## Hook Setup
+| Context % | Edit/Write | Agent/TaskCreate |
+|-----------|-----------|-----------------|
+| <70% | Silent | Silent |
+| 70-84% | Advisory: "consider compacting at next break" | Same |
+| 85-91% | Strong warning: "do NOT start new multi-step work, save plan and /compact" | Same |
+| 92%+ | **BLOCKED** (exit 2) — prevents mid-write auto-compaction | Critical warning (not blocked) |
 
-Add to your `~/.claude/settings.json`:
+### Why Block at 92%?
+
+Auto-compaction can interrupt a Write mid-operation, producing a truncated file. Blocking the Write gives Claude the chance to save state and `/compact` cleanly before continuing. Agent/TaskCreate aren't blocked because they're less likely to produce corrupt output.
+
+### Fallback
+
+When the bridge file is missing or stale (>10 min old), falls back to counting tool calls per session. Suggests at 50 calls, then every 25 calls after.
+
+## Architecture
+
+Three components work together:
+
+1. **`context-monitor.sh`** (StatusLine hook) — Reads `context_window.used_percentage` from Claude Code after every message, writes integer to `/tmp/claude-context-pct`
+2. **`context-pressure.sh`** (PreToolUse hook) — Reads the bridge file, issues tiered responses
+3. **`pre-compact.py`** (PreCompact hook) — When compaction happens, saves structured handoff to `~/.claude/compaction/handoff.md`
+4. **`compact-recovery.sh`** (SessionStart hook) — Injects handoff context after compaction
+
+## Hook Config
+
+Already wired in `~/.claude/settings.json`:
 
 ```json
 {
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit",
-        "hooks": [{ "type": "command", "command": "~/.claude/skills/strategic-compact/suggest-compact.sh" }]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [{ "type": "command", "command": "~/.claude/skills/strategic-compact/suggest-compact.sh" }]
-      }
-    ]
+    "PreToolUse": [{
+      "matcher": "tool == \"Edit\" || tool == \"Write\" || tool == \"Agent\" || tool == \"TaskCreate\"",
+      "hooks": [{
+        "type": "command",
+        "command": "~/.claude/hooks/strategic-compact/context-pressure.sh",
+        "timeout": 5000
+      }]
+    }]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/hooks/compaction/context-monitor.sh"
   }
 }
 ```
 
-## Configuration
+## When a Block Fires
 
-Environment variables:
-- `COMPACT_THRESHOLD` — Tool calls before first suggestion (default: 50)
+If your Edit/Write gets blocked at 92%+:
+
+1. Save your current plan/state to a file (e.g., `/tmp/claude-plan.md`)
+2. Run `/compact` with a summary of what you were doing
+3. After compaction, re-read the plan file and resume
 
 ## Compaction Decision Guide
-
-Use this table to decide when to compact:
 
 | Phase Transition | Compact? | Why |
 |-----------------|----------|-----|
@@ -77,8 +82,6 @@ Use this table to decide when to compact:
 
 ## What Survives Compaction
 
-Understanding what persists helps you compact with confidence:
-
 | Persists | Lost |
 |----------|------|
 | CLAUDE.md instructions | Intermediate reasoning and analysis |
@@ -86,18 +89,3 @@ Understanding what persists helps you compact with confidence:
 | Memory files (`~/.claude/memory/`) | Multi-step conversation context |
 | Git state (commits, branches) | Tool call history and counts |
 | Files on disk | Nuanced user preferences stated verbally |
-
-## Best Practices
-
-1. **Compact after planning** — Once plan is finalized in TodoWrite, compact to start fresh
-2. **Compact after debugging** — Clear error-resolution context before continuing
-3. **Don't compact mid-implementation** — Preserve context for related changes
-4. **Read the suggestion** — The hook tells you *when*, you decide *if*
-5. **Write before compacting** — Save important context to files or memory before compacting
-6. **Use `/compact` with a summary** — Add a custom message: `/compact Focus on implementing auth middleware next`
-
-## Related
-
-- [The Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) — Token optimization section
-- Memory persistence hooks — For state that survives compaction
-- `continuous-learning` skill — Extracts patterns before session ends

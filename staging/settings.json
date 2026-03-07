@@ -245,11 +245,11 @@
         ]
       },
       {
-        "matcher": "tool == \"Edit\" || tool == \"Write\"",
+        "matcher": "tool == \"Edit\" || tool == \"Write\" || tool == \"Agent\" || tool == \"TaskCreate\"",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/strategic-compact/suggest-compact.sh",
+            "command": "~/.claude/hooks/strategic-compact/context-pressure.sh",
             "timeout": 5000
           }
         ]
@@ -269,16 +269,6 @@
           {
             "type": "command",
             "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh pre",
-            "timeout": 3000
-          }
-        ]
-      },
-      {
-        "matcher": "Agent|TaskCreate",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/ci/context-gate.sh",
             "timeout": 3000
           }
         ]
