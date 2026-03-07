@@ -77,7 +77,9 @@ When adding rules to this file or rules/:
 When Claude makes a mistake:
 1. Fix it immediately
 2. Reflect: "What general pattern caused this?"
-3. Write to `~/.claude/learned/$(date +%Y-%m-%d).md`
+3. Write to `~/.claude/learned/$(date +%Y-%m-%d).md` with source attribution:
+   - If the pattern was observed (test failure, build error): `[source: observed]`
+   - If the pattern is Claude's inference: `[source: claude_inference]`
 4. Weekly: `consolidate-instincts.py --execute` promotes patterns to rules (runs automatically via LaunchAgent)
 
 ---
@@ -187,6 +189,12 @@ When compacting, ALWAYS preserve:
 - Which skills are currently loaded
 - Any environment-specific gotchas discovered
 - Dead ends: approaches that were tried and failed (prevents re-attempting)
+
+**Provenance rule for compaction summaries:**
+- Tag facts derived from tool output as `[verified]`
+- Tag your own reasoning/conclusions as `[claude_inference]`
+- NEVER present your own conclusions as verified facts in compaction summaries
+- After compaction, treat `[claude_inference]` entries with skepticism — re-verify before acting on them
 
 After compaction, re-read `~/.claude/compaction/handoff.md` for session state recovery.
 

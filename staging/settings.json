@@ -132,6 +132,46 @@
         "hooks": [
           {
             "type": "command",
+            "command": "~/.claude/hooks/rm-to-trash-rewriter.sh",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "tool == \"Bash\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/plain-rm-catcher.sh",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "tool == \"Bash\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/force-push-blocker.sh",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "tool == \"Bash\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/skill-install-warning.sh",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "tool == \"Bash\"",
+        "hooks": [
+          {
+            "type": "command",
             "command": "~/.claude/hooks/dangerous-command-blocker.sh",
             "timeout": 5000
           }
@@ -172,6 +212,16 @@
           {
             "type": "command",
             "command": "#!/bin/bash\necho '[Hook] BLOCKED: Piping to shell interpreter is not allowed' >&2\necho '[Hook] Download the script first, review it, then run it separately' >&2\nexit 2"
+          }
+        ]
+      },
+      {
+        "matcher": "tool == \"Write\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/memory-write-warning.sh",
+            "timeout": 3000
           }
         ]
       },
@@ -306,6 +356,16 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/skill-router/index-skills.sh",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/skill-security-audit.sh",
             "timeout": 10000
           }
         ]

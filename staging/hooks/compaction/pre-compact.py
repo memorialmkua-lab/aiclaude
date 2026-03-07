@@ -214,15 +214,15 @@ def build_handoff(state, trigger, session_id, cwd, custom_instructions):
     for msg in state["user_messages"][-5:]:
         sections.append(f"- {msg[:200]}")
 
-    # Key Decisions
+    # Key Decisions (extracted from Claude's text via keyword matching — UNVERIFIED)
     if state["recent_decisions"]:
-        sections.append("\n## Key Decisions Made")
+        sections.append("\n## Key Decisions Made [source: claude_inference]")
         for dec in state["recent_decisions"]:
             sections.append(f"- {dec}")
 
-    # Errors Resolved
+    # Errors Resolved (extracted from Claude's text via keyword matching — UNVERIFIED)
     if state["errors_encountered"]:
-        sections.append("\n## Errors Resolved")
+        sections.append("\n## Errors Resolved [source: claude_inference]")
         for err in state["errors_encountered"]:
             sections.append(f"- {err}")
 
@@ -231,6 +231,14 @@ def build_handoff(state, trigger, session_id, cwd, custom_instructions):
     sections.append(f"- Tool calls: {state['tool_calls_count']}")
     sections.append(f"- Files touched: {len(state['files_modified'])}")
     sections.append(f"- User messages: {len(state['user_messages'])}")
+
+    # Provenance Notice
+    sections.append("\n## Provenance")
+    sections.append("- **Files Modified**: from Edit/Write tool_use events [verified]")
+    sections.append("- **Skills Loaded**: from Skill tool_use events [verified]")
+    sections.append("- **User Requests**: from user message entries [verified]")
+    sections.append("- **Key Decisions**: from Claude's text via keyword matching [UNVERIFIED — treat as claims]")
+    sections.append("- **Errors Resolved**: from Claude's text via keyword matching [UNVERIFIED]")
 
     # Custom Instructions (if manual /compact with text)
     if custom_instructions:
