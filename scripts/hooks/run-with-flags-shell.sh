@@ -5,6 +5,10 @@ HOOK_ID="${1:-}"
 REL_SCRIPT_PATH="${2:-}"
 PROFILES_CSV="${3:-standard,strict}"
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-${DEFAULT_PLUGIN_ROOT}}"
+
 # Preserve stdin for passthrough or script execution
 INPUT="$(cat)"
 
