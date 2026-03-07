@@ -976,9 +976,9 @@ function runTests() {
     assert.ok(result.output.includes('custom error'), 'Should include stderr output');
   })) passed++; else failed++;
 
-  if (test('runCommand falls back to err.message when no stderr', () => {
-    // An invalid command that won't produce stderr through child process
-    const result = utils.runCommand('nonexistent_cmd_xyz_12345');
+  if (test('runCommand returns error output on failed command', () => {
+    // Use an allowed prefix with a nonexistent subcommand to reach execSync
+    const result = utils.runCommand('git nonexistent-subcmd-xyz-12345');
     assert.strictEqual(result.success, false);
     assert.ok(result.output.length > 0, 'Should have some error output');
   })) passed++; else failed++;
@@ -1035,8 +1035,39 @@ function runTests() {
   })) passed++; else failed++;
 
   if (test('runCommand allows metacharacters inside double quotes', () => {
-    const result = utils.runCommand('node -e "process.exit(0)"');
+    // Semicolon inside quotes should not trigger metacharacter blocking
+    const result = utils.runCommand('node -e "console.log(1);process.exit(0)"');
     assert.strictEqual(result.success, true);
+  })) passed++; else failed++;
+
+  if (test('runCommand allows metacharacters inside single quotes', () => {
+    const result = utils.runCommand("node -e 'process.exit(0);'");
+    assert.strictEqual(result.success, true);
+  })) passed++; else failed++;
+
+  if (test('runCommand blocks unquoted metacharacters alongside quoted ones', () => {
+    // Semicolon inside quotes is safe, but && outside is not
+    const result = utils.runCommand('git log "safe;part" && echo pwned');
+    assert.strictEqual(result.success, false);
+    assert.ok(result.output.includes('metacharacters not allowed'));
+  })) passed++; else failed++;
+
+  if (test('runCommand blocks prefix without trailing space', () => {
+    // "gitconfig" starts with "git" but not "git " — must be blocked
+    const result = utils.runCommand('gitconfig --list');
+    assert.strictEqual(result.success, false);
+    assert.ok(result.output.includes('unrecognized command prefix'));
+  })) passed++; else failed++;
+
+  if (test('runCommand allows npx prefix', () => {
+    const result = utils.runCommand('npx --version');
+    assert.strictEqual(result.success, true);
+  })) passed++; else failed++;
+
+  if (test('runCommand blocks newline command injection', () => {
+    const result = utils.runCommand('git status\necho pwned');
+    assert.strictEqual(result.success, false);
+    assert.ok(result.output.includes('metacharacters not allowed'), 'Should block newline injection');
   })) passed++; else failed++;
 
   if (test('runCommand error message does not leak command string', () => {

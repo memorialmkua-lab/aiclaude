@@ -132,14 +132,23 @@ except Exception as e:
 PARSED_OK=$(echo "$PARSED" | python3 -c "import json,sys; print(json.load(sys.stdin).get('parsed', False))" 2>/dev/null || echo "False")
 
 if [ "$PARSED_OK" != "True" ]; then
-  # Fallback: log raw input for debugging
+  # Fallback: log raw input for debugging (scrub secrets before persisting)
   timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
   export TIMESTAMP="$timestamp"
-  echo "$INPUT_JSON" | python3 -c "
-import json, sys, os
+  echo "$INPUT_JSON" | python3 -c '
+import json, sys, os, re
+
+_SECRET_RE = re.compile(
+    r"(?i)(api[_-]?key|token|secret|password|authorization|credentials?|auth)"
+    r"""(["'"'"'\s:=]+)"""
+    r"([A-Za-z]+\s+)?"
+    r"([A-Za-z0-9_\-/.+=]{8,})"
+)
+
 raw = sys.stdin.read()[:2000]
-print(json.dumps({'timestamp': os.environ['TIMESTAMP'], 'event': 'parse_error', 'raw': raw}))
-" >> "$OBSERVATIONS_FILE"
+raw = _SECRET_RE.sub(lambda m: m.group(1) + m.group(2) + (m.group(3) or "") + "[REDACTED]", raw)
+print(json.dumps({"timestamp": os.environ["TIMESTAMP"], "event": "parse_error", "raw": raw}))
+' >> "$OBSERVATIONS_FILE"
   exit 0
 fi
 
@@ -180,8 +189,7 @@ _SECRET_RE = re.compile(
     r"(?i)(api[_-]?key|token|secret|password|authorization|credentials?|auth)"
     r"""(["'"'"'\s:=]+)"""
     r"([A-Za-z]+\s+)?"
-    r"([A-Za-z0-9_\-/.+=]{8,})",
-    re.IGNORECASE
+    r"([A-Za-z0-9_\-/.+=]{8,})"
 )
 
 def scrub(val):

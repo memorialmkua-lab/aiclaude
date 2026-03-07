@@ -345,7 +345,9 @@ function runCommand(cmd, options = {}) {
     return { success: false, output: 'runCommand blocked: unrecognized command prefix' };
   }
 
-  // Reject shell command-chaining operators outside of quoted strings
+  // Reject shell command-chaining operators outside of quoted strings.
+  // Note: quote-stripping doesn't handle escaped quotes (e.g., "foo\"bar"),
+  // accepted trade-off given trusted internal callers + allowlist above.
   const unquoted = cmd.replace(/"[^"]*"/g, '').replace(/'[^']*'/g, '');
   if (/[;|&`$\n]/.test(unquoted)) {
     return { success: false, output: 'runCommand blocked: shell metacharacters not allowed' };
