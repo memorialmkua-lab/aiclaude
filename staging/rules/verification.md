@@ -64,6 +64,15 @@ A test that only passes proves nothing. It must fail without the fix.
 - If the diff touches more than one logical concern, split into separate commits
 - Clean up any research workspaces (`/tmp/claude-research-*`) before session ends
 
+## When You Find Issues
+
+If you discover critical bugs, security vulnerabilities, or significant errors during any task — even if unrelated to the current work:
+- Do NOT just report them and move on
+- Investigate the root cause
+- Create a concrete plan to fix them
+- Ask the user: "I found these issues. Want me to fix them now or after the current task?"
+- NEVER treat "not my fault" or "pre-existing" as a reason to ignore problems
+
 ## Core Principles
 
 1. **Verify, don't assume** - The more confident you feel, the MORE you must verify

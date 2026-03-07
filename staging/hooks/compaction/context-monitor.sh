@@ -26,10 +26,15 @@ fi
 # Integer comparison
 used_int=${used%.*}
 
+# Bridge: write percentage to file so PreToolUse hooks can read it
+echo -n "$used_int" > /tmp/claude-context-pct 2>/dev/null
+
 if [ "$used_int" -ge 85 ]; then
-  echo "ctx ${used_int}% [compact soon]"
+  echo "ctx ${used_int}% [COMPACT NOW - quality degraded]"
 elif [ "$used_int" -ge 70 ]; then
-  echo "ctx ${used_int}%"
+  echo "ctx ${used_int}% [quality degrading]"
+elif [ "$used_int" -ge 60 ]; then
+  echo "ctx ${used_int}% [approaching threshold]"
 else
   echo "ctx ${used_int}%"
 fi

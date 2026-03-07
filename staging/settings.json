@@ -263,6 +263,16 @@
             "timeout": 3000
           }
         ]
+      },
+      {
+        "matcher": "Agent|TaskCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ci/context-gate.sh",
+            "timeout": 3000
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -313,6 +323,17 @@
             "type": "command",
             "command": "~/.claude/hooks/learning/session-tracker.sh",
             "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ci/async-test-runner.sh",
+            "async": true,
+            "timeout": 120000
           }
         ]
       }
