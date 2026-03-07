@@ -428,7 +428,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/skill-router/route-skills.sh",
+            "command": "~/.claude/hooks/skill-router/forced-eval.sh",
             "timeout": 5000
           }
         ]

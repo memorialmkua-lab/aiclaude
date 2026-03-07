@@ -1,13 +1,9 @@
 # Skill Usage
 
-ALWAYS check for matching skills before responding to any task. Invoke the Skill tool BEFORE generating responses, including clarifying questions.
+When the Skill Router injects a SKILL ACTIVATION CHECK, follow it exactly:
+1. Evaluate each candidate: YES or NO with a one-line reason
+2. Load every YES skill via the Skill tool
+3. Only then proceed with implementation
 
-## Red Flags — STOP and Check Skills
-
-| Thought | Reality |
-|---------|---------|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
-| "I need more context first" | Skill check comes BEFORE clarifying questions. |
-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
-| "The skill is overkill" | Simple things become complex. Use it. |
-| "I'll just do this one thing first" | Check BEFORE doing anything. |
+If no router check appears (simple questions, clarifications), proceed normally.
+Skills loaded earlier in the session do not need reloading.
