@@ -2,6 +2,8 @@
 'use strict';
 
 const MAX_STDIN = 1024 * 1024;
+const { splitShellSegments } = require('../lib/shell-split');
+
 const DEV_COMMAND_WORDS = new Set([
   'npm',
   'pnpm',
@@ -15,40 +17,25 @@ const DEV_COMMAND_WORDS = new Set([
   'tmux'
 ]);
 const SKIPPABLE_PREFIX_WORDS = new Set(['env', 'command', 'builtin', 'exec', 'noglob', 'sudo']);
-
-function splitShellSegments(command) {
-  const segments = [];
-  let current = '';
-  let quote = null;
-
-  for (let i = 0; i < command.length; i++) {
-    const ch = command[i];
-    if (quote) {
-      if (ch === quote) quote = null;
-      current += ch;
-      continue;
-    }
-
-    if (ch === '"' || ch === "'") {
-      quote = ch;
-      current += ch;
-      continue;
-    }
-
-    const next = command[i + 1] || '';
-    if (ch === ';' || (ch === '&' && next === '&') || (ch === '|' && next === '|') || (ch === '&' && next !== '&')) {
-      if (current.trim()) segments.push(current.trim());
-      current = '';
-      if ((ch === '&' && next === '&') || (ch === '|' && next === '|')) i++;
-      continue;
-    }
-
-    current += ch;
-  }
-
-  if (current.trim()) segments.push(current.trim());
-  return segments;
-}
+const PREFIX_OPTION_VALUE_WORDS = {
+  env: new Set(['-u', '-C', '-S', '--unset', '--chdir', '--split-string']),
+  sudo: new Set([
+    '-u',
+    '-g',
+    '-h',
+    '-p',
+    '-r',
+    '-t',
+    '-C',
+    '--user',
+    '--group',
+    '--host',
+    '--prompt',
+    '--role',
+    '--type',
+    '--close-from'
+  ])
+};
 
 function readToken(input, startIndex) {
   let index = startIndex;
@@ -97,8 +84,21 @@ function readToken(input, startIndex) {
   return { token, end: index };
 }
 
+function shouldSkipOptionValue(wrapper, optionToken) {
+  if (!wrapper || !optionToken || optionToken.includes('=')) return false;
+  const optionSet = PREFIX_OPTION_VALUE_WORDS[wrapper];
+  if (!optionSet) return false;
+  return optionSet.has(optionToken);
+}
+
+function isOptionToken(token) {
+  return token.startsWith('-') && token.length > 1;
+}
+
 function getLeadingCommandWord(segment) {
   let index = 0;
+  let activeWrapper = null;
+  let skipNextValue = false;
 
   while (index < segment.length) {
     const parsed = readToken(segment, index);
@@ -107,8 +107,31 @@ function getLeadingCommandWord(segment) {
 
     const token = parsed.token;
     if (!token) continue;
+
+    if (skipNextValue) {
+      skipNextValue = false;
+      continue;
+    }
+
+    if (token === '--') {
+      activeWrapper = null;
+      continue;
+    }
+
     if (/^[A-Za-z_][A-Za-z0-9_]*=.*/.test(token)) continue;
-    if (SKIPPABLE_PREFIX_WORDS.has(token)) continue;
+
+    if (SKIPPABLE_PREFIX_WORDS.has(token)) {
+      activeWrapper = token;
+      continue;
+    }
+
+    if (activeWrapper && isOptionToken(token)) {
+      if (shouldSkipOptionValue(activeWrapper, token)) {
+        skipNextValue = true;
+      }
+      continue;
+    }
+
     return token;
   }
 

@@ -311,6 +311,24 @@ async function runTests() {
     assert.ok(!result.stderr.includes('BLOCKED'), 'Should not emit a BLOCKED message');
   })) passed++; else failed++;
 
+  if (await asyncTest('dev server blocker handles env/sudo prefixed dev commands', async () => {
+    const blockingCommand = hooks.hooks.PreToolUse[0].hooks[0].command;
+    const envResult = await runHookCommand(blockingCommand, {
+      tool_input: { command: 'env -i npm run dev' }
+    });
+    const sudoResult = await runHookCommand(blockingCommand, {
+      tool_input: { command: 'sudo -u root npm run dev' }
+    });
+
+    if (process.platform === 'win32') {
+      assert.strictEqual(envResult.code, 0, 'On Windows, hook should not block (exit 0)');
+      assert.strictEqual(sudoResult.code, 0, 'On Windows, hook should not block (exit 0)');
+    } else {
+      assert.strictEqual(envResult.code, 2, 'Env-prefixed dev command should be blocked');
+      assert.strictEqual(sudoResult.code, 2, 'Sudo-prefixed dev command should be blocked');
+    }
+  })) passed++; else failed++;
+
   if (await asyncTest('hooks handle missing files gracefully', async () => {
     const testDir = createTestDir();
     const transcriptPath = path.join(testDir, 'nonexistent.jsonl');
