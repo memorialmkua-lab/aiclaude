@@ -26,11 +26,26 @@ MAX_IDLE="${OBSERVER_MAX_IDLE_SECONDS:-1800}"
 # ── Gate 1: Time Window ───────────────────────────────────────────────────────
 # Skip observer cycles outside configured active hours (local system time).
 # Uses HHMM integer comparison. Works on BSD date (macOS) and GNU date (Linux).
+# Supports overnight windows such as 2200-0600.
 # Set both ACTIVE_START and ACTIVE_END to 0 to disable this gate.
 if [ "$ACTIVE_START" -ne 0 ] || [ "$ACTIVE_END" -ne 0 ]; then
   current_hhmm=$(date +%k%M | tr -d ' ')
-  if [ $(( 10#${current_hhmm:-0} )) -lt $(( 10#${ACTIVE_START:-800} )) ] || \
-     [ $(( 10#${current_hhmm:-0} )) -ge $(( 10#${ACTIVE_END:-2300} )) ]; then
+  current_hhmm_num=$(( 10#${current_hhmm:-0} ))
+  active_start_num=$(( 10#${ACTIVE_START:-800} ))
+  active_end_num=$(( 10#${ACTIVE_END:-2300} ))
+
+  within_active_hours=0
+  if [ "$active_start_num" -lt "$active_end_num" ]; then
+    if [ "$current_hhmm_num" -ge "$active_start_num" ] && [ "$current_hhmm_num" -lt "$active_end_num" ]; then
+      within_active_hours=1
+    fi
+  else
+    if [ "$current_hhmm_num" -ge "$active_start_num" ] || [ "$current_hhmm_num" -lt "$active_end_num" ]; then
+      within_active_hours=1
+    fi
+  fi
+
+  if [ "$within_active_hours" -ne 1 ]; then
     echo "session-guardian: outside active hours (${current_hhmm}, window ${ACTIVE_START}-${ACTIVE_END})" >&2
     exit 1
   fi
@@ -38,11 +53,14 @@ fi
 
 # ── Gate 2: Project Cooldown Log ─────────────────────────────────────────────
 # Prevent the same project being observed faster than OBSERVER_INTERVAL_SECONDS.
-# Key: git root path. Falls back to $PWD outside a git repo.
-# Uses mkdir-based lock for safe concurrent access. Fails open on lock contention.
+# Key: PROJECT_DIR when provided by the observer, otherwise git root path.
+# Uses mkdir-based lock for safe concurrent access. Skips the cycle on lock contention.
 # stderr uses basename only — never prints the full absolute path.
 
-project_root="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
+project_root="${PROJECT_DIR:-}"
+if [ -z "$project_root" ] || [ ! -d "$project_root" ]; then
+  project_root="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
+fi
 project_name="$(basename "$project_root")"
 now="$(date +%s)"
 
@@ -53,13 +71,14 @@ mkdir -p "$(dirname "$LOG_PATH")" || {
 
 _lock_dir="${LOG_PATH}.lock"
 if ! mkdir "$_lock_dir" 2>/dev/null; then
-  # Another observer holds the lock — fail open, let this cycle proceed
-  echo "session-guardian: log locked by concurrent process, proceeding" >&2
+  # Another observer holds the lock — skip this cycle to avoid double-spawns
+  echo "session-guardian: log locked by concurrent process, skipping cycle" >&2
+  exit 1
 else
   trap 'rm -rf "$_lock_dir"' EXIT INT TERM
 
   last_spawn=0
-  last_spawn=$(grep -F "$project_root" "$LOG_PATH" 2>/dev/null | tail -n1 | awk '{print $NF}') || true
+  last_spawn=$(awk -F '\t' -v key="$project_root" '$1 == key { value = $2 } END { if (value != "") print value }' "$LOG_PATH" 2>/dev/null) || true
   last_spawn="${last_spawn:-0}"
   [[ "$last_spawn" =~ ^[0-9]+$ ]] || last_spawn=0
 
@@ -73,7 +92,7 @@ else
 
   # Update log: remove old entry for this project, append new timestamp (tab-delimited)
   tmp_log="$(mktemp "$(dirname "$LOG_PATH")/observer-last-run.XXXXXX")"
-  grep -vF "$project_root" "$LOG_PATH" > "$tmp_log" 2>/dev/null || true
+  awk -F '\t' -v key="$project_root" '$1 != key' "$LOG_PATH" > "$tmp_log" 2>/dev/null || true
   printf '%s\t%s\n' "$project_root" "$now" >> "$tmp_log"
   mv "$tmp_log" "$LOG_PATH"
 
@@ -109,7 +128,7 @@ get_idle_seconds() {
           Add-Type -MemberDefinition '[DllImport(\"user32.dll\")] public static extern bool GetLastInputInfo(ref LASTINPUTINFO p); [StructLayout(LayoutKind.Sequential)] public struct LASTINPUTINFO { public uint cbSize; public int dwTime; }' -Name WinAPI -Namespace PInvoke; \
           \$l = New-Object PInvoke.WinAPI+LASTINPUTINFO; \$l.cbSize = 8; \
           [PInvoke.WinAPI]::GetLastInputInfo([ref]\$l) | Out-Null; \
-          [Math]::Max(0, [long]([Environment]::TickCount - [long]\$l.dwTime) / 1000) \
+          [int][Math]::Max(0, [long]([Environment]::TickCount - [long]\$l.dwTime) / 1000) \
         } catch { 0 }" \
         2>/dev/null | tr -d '\r') || true
       printf '%s\n' "${_raw:-0}" | head -n1

@@ -33,14 +33,14 @@ analyze_observations() {
     return
   fi
 
-  # session-guardian: gate observer cycle (cooldown log — see session-guardian.sh)
-  if ! bash "$(dirname "$0")/session-guardian.sh"; then
-    echo "[$(date)] Observer cycle skipped by session-guardian" >> "$LOG_FILE"
+  if ! command -v claude >/dev/null 2>&1; then
+    echo "[$(date)] claude CLI not found, skipping analysis" >> "$LOG_FILE"
     return
   fi
 
-  if ! command -v claude >/dev/null 2>&1; then
-    echo "[$(date)] claude CLI not found, skipping analysis" >> "$LOG_FILE"
+  # session-guardian: gate observer cycle (active hours, cooldown, idle detection)
+  if ! bash "$(dirname "$0")/session-guardian.sh"; then
+    echo "[$(date)] Observer cycle skipped by session-guardian" >> "$LOG_FILE"
     return
   fi
 
