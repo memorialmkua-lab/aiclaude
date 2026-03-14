@@ -380,7 +380,7 @@ $projects = Project::query()->active()->paginate(25);
 
 return response()->json([
     'success' => true,
-    'data' => ProjectResource::collection($projects),
+    'data' => ProjectResource::collection($projects->items()),
     'error' => null,
     'meta' => [
         'page' => $projects->currentPage(),

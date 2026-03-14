@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
 ```php
 use Illuminate\Support\Facades\Hash;
 
-$user->update(['password' => Hash::make($request->input('password'))]);
+$user->update(['password' => Hash::make($request->validated('password'))]);
 ```
 
 ## Authorization: Policies and Gates

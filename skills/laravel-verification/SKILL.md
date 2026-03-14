@@ -149,6 +149,8 @@ Minimal flow:
 
 ```bash
 php -v
+composer --version
+php artisan --version
 composer validate
 vendor/bin/pint --test
 vendor/bin/phpstan analyse
