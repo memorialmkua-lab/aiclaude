@@ -36,11 +36,11 @@ Choose layers based on scope:
 
 ### Database Strategy
 
-- `RefreshDatabase` for most tests (migrate + rollback)
-- `DatabaseTransactions` for faster unit/feature tests without migrations
-- `DatabaseMigrations` when you need fresh migrations per test
+- `RefreshDatabase` for most feature/integration tests (runs migrations, then wraps each test in a transaction when supported)
+- `DatabaseTransactions` when the schema is already migrated and you only need per-test rollback
+- `DatabaseMigrations` when you need a full migrate/fresh for every test and can afford the cost
 
-Use `RefreshDatabase` when schemas change often or you need full migration coverage; use `DatabaseTransactions` for speed when schema is stable and migrations are already run.
+Use `RefreshDatabase` as the default for tests that touch the database; switch to `DatabaseTransactions` only when you manage migrations separately and want faster per-test isolation.
 
 ## Examples
 
@@ -203,5 +203,6 @@ $response->assertOk();
 ```php
 use Illuminate\Support\Facades\Gate;
 
-Gate::forUser($user)->authorize('update', $project);
+$this->assertTrue(Gate::forUser($user)->allows('update', $project));
+$this->assertFalse(Gate::forUser($otherUser)->allows('update', $project));
 ```

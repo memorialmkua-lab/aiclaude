@@ -116,7 +116,6 @@ php artisan view:cache
 ## Phase 7: Queue and Scheduler Checks
 
 ```bash
-php artisan queue:work --once
 php artisan schedule:list
 php artisan queue:failed
 ```
@@ -125,6 +124,12 @@ If Horizon is used:
 
 ```bash
 php artisan horizon:status
+```
+
+If `queue:monitor` is available, use it to check backlog without processing jobs:
+
+```bash
+php artisan queue:monitor default --max=100
 ```
 
 ## Examples
@@ -140,7 +145,7 @@ php artisan test
 composer audit
 php artisan migrate --pretend
 php artisan config:cache
-php artisan queue:work --once
+php artisan queue:failed
 ```
 
 CI-style pipeline:

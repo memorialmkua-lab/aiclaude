@@ -159,7 +159,6 @@ final class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'integer', 'exists:users,id'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.sku' => ['required', 'string'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
@@ -169,7 +168,7 @@ final class StoreOrderRequest extends FormRequest
     public function toDto(): CreateOrderData
     {
         return new CreateOrderData(
-            userId: (int) $this->validated('user_id'),
+            userId: (int) $this->user()->id,
             items: $this->validated('items'),
         );
     }
@@ -222,7 +221,6 @@ test('user can place order', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->postJson('/api/orders', [
-        'user_id' => $user->id,
         'items' => [['sku' => 'sku-1', 'quantity' => 2]],
     ]);
 
@@ -245,7 +243,6 @@ final class OrdersControllerTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->postJson('/api/orders', [
-            'user_id' => $user->id,
             'items' => [['sku' => 'sku-1', 'quantity' => 2]],
         ]);
 

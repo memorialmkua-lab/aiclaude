@@ -116,11 +116,14 @@ Route::middleware('auth:sanctum')->prefix('conversations')->group(function () {
     Route::post('/', [ConversationController::class, 'store'])->name('conversations.store');
 
     Route::scopeBindings()->group(function () {
-        Route::delete('/{conversation}', [ConversationController::class, 'destroy'])
-            ->name('conversations.destroy');
+        Route::get('/{conversation}', [ConversationController::class, 'show'])
+            ->name('conversations.show');
 
         Route::post('/{conversation}/messages', [MessageController::class, 'store'])
             ->name('conversation-messages.store');
+
+        Route::get('/{conversation}/messages/{message}', [MessageController::class, 'show'])
+            ->name('conversation-messages.show');
     });
 });
 ```
@@ -128,10 +131,10 @@ Route::middleware('auth:sanctum')->prefix('conversations')->group(function () {
 If the model class name differs from the route param, define explicit binding:
 
 ```php
-use App\Models\Conversation;
+use App\Models\AiConversation;
 use Illuminate\Support\Facades\Route;
 
-Route::model('conversation', Conversation::class);
+Route::model('conversation', AiConversation::class);
 ```
 
 ## Service Container Bindings
@@ -343,8 +346,8 @@ final class StoreOrderRequest extends FormRequest
     public function toDto(): CreateOrderData
     {
         return new CreateOrderData(
-            customerId: (int) $this->input('customer_id'),
-            items: $this->input('items'),
+            customerId: (int) $this->validated('customer_id'),
+            items: $this->validated('items'),
         );
     }
 }
