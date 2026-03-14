@@ -84,7 +84,7 @@ final class ProjectIndexTest extends TestCase
     public function test_projects_index_returns_paginated_results(): void
     {
         $user = User::factory()->create();
-        Project::factory()->count(3)->create();
+        Project::factory()->count(3)->for($user)->create();
 
         $response = $this->actingAs($user)->getJson('/api/projects');
 

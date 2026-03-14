@@ -156,6 +156,11 @@ final class OrderPolicy
 ```php
 final class StoreOrderRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return (bool) $this->user();
+    }
+
     public function rules(): array
     {
         return [
@@ -167,11 +172,8 @@ final class StoreOrderRequest extends FormRequest
 
     public function toDto(): CreateOrderData
     {
-        $user = $this->user();
-        abort_unless($user, 401);
-
         return new CreateOrderData(
-            userId: (int) $user->id,
+            userId: (int) $this->user()->id,
             items: $this->validated('items'),
         );
     }

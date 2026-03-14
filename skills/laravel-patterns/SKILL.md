@@ -28,6 +28,8 @@ Production-grade Laravel architecture patterns for scalable, maintainable applic
 
 ### Project Structure
 
+Use a feature-oriented layout that keeps HTTP concerns separate from domain logic.
+
 ### Recommended Layout
 
 ```
