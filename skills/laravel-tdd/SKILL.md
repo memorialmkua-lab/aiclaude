@@ -89,7 +89,7 @@ final class ProjectIndexTest extends TestCase
         $response = $this->actingAs($user)->getJson('/api/projects');
 
         $response->assertOk();
-        $response->assertJsonStructure(['data', 'links', 'meta']);
+        $response->assertJsonStructure(['success', 'data', 'error', 'meta']);
     }
 }
 ```

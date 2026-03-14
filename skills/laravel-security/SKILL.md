@@ -130,6 +130,11 @@ For SPA authentication with Sanctum, ensure stateful requests are configured:
 ```php
 final class UploadInvoiceRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return true;
+    }
+
     public function rules(): array
     {
         return [
