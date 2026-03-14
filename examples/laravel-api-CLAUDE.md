@@ -161,6 +161,11 @@ final class StoreOrderRequest extends FormRequest
         return (bool) $this->user();
     }
 
+    protected function failedAuthorization(): void
+    {
+        throw new \Illuminate\Auth\AuthenticationException();
+    }
+
     public function rules(): array
     {
         return [
@@ -183,9 +188,11 @@ final class StoreOrderRequest extends FormRequest
 ### API Resource
 
 ```php
+use Illuminate\Http\Request;
+
 final class OrderResource extends JsonResource
 {
-    public function toArray($request): array
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,

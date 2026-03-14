@@ -36,7 +36,7 @@ Choose layers based on scope:
 
 ### Database Strategy
 
-- `RefreshDatabase` for most feature/integration tests (runs migrations once per test class, then wraps each test in a transaction when supported; in-memory databases may re-migrate per test)
+- `RefreshDatabase` for most feature/integration tests (runs migrations once per test run, then wraps each test in a transaction when supported; in-memory databases may re-migrate per test)
 - `DatabaseTransactions` when the schema is already migrated and you only need per-test rollback
 - `DatabaseMigrations` when you need a full migrate/fresh for every test and can afford the cost
 
