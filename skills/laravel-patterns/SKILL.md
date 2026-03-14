@@ -346,6 +346,11 @@ Keep validation in form requests and transform inputs to DTOs.
 ```php
 final class StoreOrderRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return (bool) $this->user();
+    }
+
     public function rules(): array
     {
         return [

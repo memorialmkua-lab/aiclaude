@@ -132,7 +132,7 @@ final class UploadInvoiceRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return (bool) $this->user()?->can('upload-invoice');
     }
 
     public function rules(): array
