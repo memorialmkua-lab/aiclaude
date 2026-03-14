@@ -132,10 +132,10 @@ If `queue:monitor` is available, use it to check backlog without processing jobs
 php artisan queue:monitor default --max=100
 ```
 
-Active verification (staging only): dispatch a no-op job to a dedicated queue and run a single worker to process it.
+Active verification (staging only): dispatch a no-op job to a dedicated queue and run a single worker to process it (ensure a non-`sync` queue connection is configured).
 
 ```bash
-php artisan tinker --execute="dispatch(new App\\Jobs\\QueueHealthcheck())"
+php artisan tinker --execute="dispatch((new App\\Jobs\\QueueHealthcheck())->onQueue('healthcheck'))"
 php artisan queue:work --once --queue=healthcheck
 ```
 
