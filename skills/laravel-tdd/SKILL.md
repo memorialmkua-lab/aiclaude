@@ -40,7 +40,7 @@ Choose layers based on scope:
 - `DatabaseTransactions` when the schema is already migrated and you only need per-test rollback
 - `DatabaseMigrations` when you need a full migrate/fresh for every test and can afford the cost
 
-Use `RefreshDatabase` as the default for tests that touch the database; switch to `DatabaseTransactions` only when you manage migrations separately and want faster per-test isolation.
+Use `RefreshDatabase` as the default for tests that touch the database: for databases with transaction support, it runs migrations once per test run (via a static flag) and wraps each test in a transaction; for `:memory:` SQLite or connections without transactions, it migrates before each test. Use `DatabaseTransactions` when the schema is already migrated and you only need per-test rollbacks.
 
 ## Examples
 
@@ -97,6 +97,7 @@ final class ProjectIndexTest extends TestCase
 ### Pest Example
 
 ```php
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

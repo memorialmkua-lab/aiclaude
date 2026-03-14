@@ -19,7 +19,7 @@ Production-grade Laravel architecture patterns for scalable, maintainable applic
 ## How It Works
 
 - Structure the app around clear boundaries (controllers -> services/actions -> models).
-- Use explicit bindings and route model scoping to keep routing safe and predictable.
+- Use explicit bindings and scoped bindings to keep routing predictable; still enforce authorization for access control.
 - Favor typed models, casts, and scopes to keep domain logic consistent.
 - Keep IO-heavy work in queues and cache expensive reads.
 - Centralize config in `config/*` and keep environments explicit.
@@ -138,7 +138,7 @@ Route::middleware('auth:sanctum')->prefix('conversations')->group(function () {
 });
 ```
 
-If you need custom binding logic or want a parameter to resolve to a different model class, define explicit binding:
+If you want a parameter to resolve to a different model class, define explicit binding. For custom binding logic, use `Route::bind()` or implement `resolveRouteBinding()` on the model.
 
 ```php
 use App\Models\AiConversation;

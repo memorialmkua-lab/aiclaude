@@ -135,8 +135,11 @@ php artisan queue:monitor default --max=100
 Active verification (staging only): dispatch a no-op job to a dedicated queue and run a single worker to process it.
 
 ```bash
+php artisan tinker --execute="dispatch(new App\\Jobs\\QueueHealthcheck())"
 php artisan queue:work --once --queue=healthcheck
 ```
+
+Verify the job produced the expected side effect (log entry, healthcheck table row, or metric).
 
 Only run this on non-production environments where processing a test job is safe.
 
