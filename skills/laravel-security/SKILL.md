@@ -150,7 +150,7 @@ final class UploadInvoiceRequest extends FormRequest
 ```
 
 ```php
-$path = $request->file('invoice')->store('invoices');
+$path = $request->file('invoice')->store('invoices', 'local');
 ```
 
 ## Rate Limiting
@@ -206,7 +206,7 @@ final class SecurityHeaders
 
         $response->headers->add([
             'Content-Security-Policy' => "default-src 'self'",
-            'Strict-Transport-Security' => 'max-age=31536000; includeSubDomains; preload',
+            'Strict-Transport-Security' => 'max-age=31536000', // add includeSubDomains/preload only when all subdomains are HTTPS
             'X-Frame-Options' => 'DENY',
             'X-Content-Type-Options' => 'nosniff',
             'Referrer-Policy' => 'no-referrer',

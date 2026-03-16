@@ -255,16 +255,29 @@ $this->assertFalse(Gate::forUser($otherUser)->allows('update', $project));
 When using Inertia.js, assert on the component name and props with the Inertia testing helpers.
 
 ```php
+use App\Models\User;
 use Inertia\Testing\AssertableInertia;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-$response = $this->actingAs($user)->get('/dashboard');
+final class DashboardInertiaTest extends TestCase
+{
+    use RefreshDatabase;
 
-$response->assertOk();
-$response->assertInertia(fn (AssertableInertia $page) => $page
-    ->component('Dashboard')
-    ->where('user.id', $user->id)
-    ->has('projects')
-);
+    public function test_dashboard_inertia_props(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        $response->assertOk();
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Dashboard')
+            ->where('user.id', $user->id)
+            ->has('projects')
+        );
+    }
+}
 ```
 
 Prefer `assertInertia` over raw JSON assertions to keep tests aligned with Inertia responses.

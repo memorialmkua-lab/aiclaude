@@ -353,7 +353,7 @@ final class StoreOrderRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return true; // Authorization handled by auth middleware/policies
     }
 
     public function rules(): array
