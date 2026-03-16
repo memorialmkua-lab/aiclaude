@@ -119,19 +119,19 @@ function parseAgentsDocExpectations(agentsContent) {
     {
       category: 'agents',
       mode: 'exact',
-      regex: /^agents\/\s+[—-]\s+(\d+)\s+specialized subagents$/im,
+      regex: /^\s*agents\/\s*[—–-]\s*(\d+)\s+specialized subagents\s*$/im,
       source: 'AGENTS.md project structure'
     },
     {
       category: 'skills',
       mode: 'minimum',
-      regex: /^skills\/\s+[—-]\s+(\d+)(\+)?\s+workflow skills and domain knowledge$/im,
+      regex: /^\s*skills\/\s*[—–-]\s*(\d+)(\+)?\s+workflow skills and domain knowledge\s*$/im,
       source: 'AGENTS.md project structure'
     },
     {
       category: 'commands',
       mode: 'exact',
-      regex: /^commands\/\s+[—-]\s+(\d+)\s+slash commands$/im,
+      regex: /^\s*commands\/\s*[—–-]\s*(\d+)\s+slash commands\s*$/im,
       source: 'AGENTS.md project structure'
     }
   ];

@@ -174,6 +174,34 @@ function runCatalogValidator(overrides = {}) {
   }
 }
 
+function writeCatalogFixture(testDir, options = {}) {
+  const {
+    readmeCounts = { agents: 1, skills: 1, commands: 1 },
+    summaryCounts = { agents: 1, skills: 1, commands: 1 },
+    structureLines = [
+      'agents/          — 1 specialized subagents',
+      'skills/          — 1 workflow skills and domain knowledge',
+      'commands/        — 1 slash commands',
+    ],
+  } = options;
+
+  const readmePath = path.join(testDir, 'README.md');
+  const agentsPath = path.join(testDir, 'AGENTS.md');
+
+  fs.mkdirSync(path.join(testDir, 'agents'), { recursive: true });
+  fs.mkdirSync(path.join(testDir, 'commands'), { recursive: true });
+  fs.mkdirSync(path.join(testDir, 'skills', 'demo-skill'), { recursive: true });
+
+  fs.writeFileSync(path.join(testDir, 'agents', 'planner.md'), '---\nmodel: sonnet\ntools: Read\n---\n# Planner');
+  fs.writeFileSync(path.join(testDir, 'commands', 'plan.md'), '---\ndescription: Plan\n---\n# Plan');
+  fs.writeFileSync(path.join(testDir, 'skills', 'demo-skill', 'SKILL.md'), '---\nname: demo-skill\ndescription: Demo skill\norigin: ECC\n---\n# Demo Skill');
+
+  fs.writeFileSync(readmePath, `Access to ${readmeCounts.agents} agents, ${readmeCounts.skills} skills, and ${readmeCounts.commands} commands.\n| Feature | Claude Code | Cursor IDE | Codex CLI | OpenCode |\n|---------|------------|------------|-----------|----------|\n| Agents | ✅ ${readmeCounts.agents} agents | Shared | Shared | 1 |\n| Commands | ✅ ${readmeCounts.commands} commands | Shared | Shared | 1 |\n| Skills | ✅ ${readmeCounts.skills} skills | Shared | Shared | 1 |\n`);
+  fs.writeFileSync(agentsPath, `This is a **production-ready AI coding plugin** providing ${summaryCounts.agents} specialized agents, ${summaryCounts.skills} skills, ${summaryCounts.commands} commands, and automated hook workflows for software development.\n\n\`\`\`\n${structureLines.join('\n')}\n\`\`\`\n`);
+
+  return { readmePath, agentsPath };
+}
+
 function runTests() {
   console.log('\n=== Testing CI Validators ===\n');
 
@@ -309,19 +337,15 @@ function runTests() {
 
   if (test('fails when README and AGENTS catalog counts drift', () => {
     const testDir = createTestDir();
-    const readmePath = path.join(testDir, 'README.md');
-    const agentsPath = path.join(testDir, 'AGENTS.md');
-
-    fs.mkdirSync(path.join(testDir, 'agents'), { recursive: true });
-    fs.mkdirSync(path.join(testDir, 'commands'), { recursive: true });
-    fs.mkdirSync(path.join(testDir, 'skills', 'demo-skill'), { recursive: true });
-
-    fs.writeFileSync(path.join(testDir, 'agents', 'planner.md'), '---\nmodel: sonnet\ntools: Read\n---\n# Planner');
-    fs.writeFileSync(path.join(testDir, 'commands', 'plan.md'), '---\ndescription: Plan\n---\n# Plan');
-    fs.writeFileSync(path.join(testDir, 'skills', 'demo-skill', 'SKILL.md'), '---\nname: demo-skill\ndescription: Demo skill\norigin: ECC\n---\n# Demo Skill');
-
-    fs.writeFileSync(readmePath, 'Access to 99 agents, 99 skills, and 99 commands.\n| Feature | Claude Code | Cursor IDE | Codex CLI | OpenCode |\n|---------|------------|------------|-----------|----------|\n| Agents | ✅ 99 agents | Shared | Shared | 1 |\n| Commands | ✅ 99 commands | Shared | Shared | 1 |\n| Skills | ✅ 99 skills | Shared | Shared | 1 |\n');
-    fs.writeFileSync(agentsPath, 'This is a **production-ready AI coding plugin** providing 99 specialized agents, 99 skills, 99 commands, and automated hook workflows for software development.\n\n```\nagents/          — 99 specialized subagents\nskills/          — 99 workflow skills and domain knowledge\ncommands/        — 99 slash commands\n```\n');
+    const { readmePath, agentsPath } = writeCatalogFixture(testDir, {
+      readmeCounts: { agents: 99, skills: 99, commands: 99 },
+      summaryCounts: { agents: 99, skills: 99, commands: 99 },
+      structureLines: [
+        'agents/          — 99 specialized subagents',
+        'skills/          — 99 workflow skills and domain knowledge',
+        'commands/        — 99 slash commands',
+      ],
+    });
 
     const result = runCatalogValidator({
       ROOT: testDir,
@@ -331,6 +355,26 @@ function runTests() {
 
     assert.strictEqual(result.code, 1, 'Should fail when catalog counts drift');
     assert.ok((result.stdout + result.stderr).includes('Documentation count mismatches found:'), 'Should report mismatches');
+    cleanupTestDir(testDir);
+  })) passed++; else failed++;
+
+  if (test('accepts AGENTS project structure entries with varied spacing and dash styles', () => {
+    const testDir = createTestDir();
+    const { readmePath, agentsPath } = writeCatalogFixture(testDir, {
+      structureLines: [
+        '  agents/   -   1 specialized subagents   ',
+        '\tskills/\t–\t1+ workflow skills and domain knowledge\t',
+        ' commands/ — 1 slash commands ',
+      ],
+    });
+
+    const result = runCatalogValidator({
+      ROOT: testDir,
+      README_PATH: readmePath,
+      AGENTS_PATH: agentsPath,
+    });
+
+    assert.strictEqual(result.code, 0, `Should accept formatting variations, got stderr: ${result.stderr}`);
     cleanupTestDir(testDir);
   })) passed++; else failed++;
 
