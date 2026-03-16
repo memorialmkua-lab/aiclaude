@@ -74,13 +74,15 @@ DevFleet runs up to 3 concurrent agents by default (configurable via `DEVFLEET_M
 3. Remaining missions auto-dispatch as dependencies resolve (they have `auto_dispatch=true`).
 4. Report back with project ID and mission count so the user knows what was launched.
 5. Poll with `get_mission_status` or `get_dashboard()` periodically until all missions reach a terminal state (`completed`, `failed`, or `cancelled`).
-6. `get_report(mission_id=...)` for each terminal mission; summarize successes and call out failures/cancellations with next steps.
+6. `get_report(mission_id=...)` for each terminal mission — summarize successes and call out failures with errors and next steps.
 
 ### Manual: step-by-step control
 
 1. `create_project(name="My Project")` → returns `project_id`.
 2. `create_mission(project_id=project_id, title="...", prompt="...", auto_dispatch=true)` for the first (root) mission → capture `root_mission_id`.
    `create_mission(project_id=project_id, title="...", prompt="...", auto_dispatch=true, depends_on=["<root_mission_id>"])` for each subsequent task.
+3. `dispatch_mission(mission_id=...)` on the first mission to start the chain.
+4. `get_report(mission_id=...)` when done.
 
 ### Sequential with review
 
