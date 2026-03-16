@@ -1,7 +1,7 @@
 ---
 name: agent-eval
 description: Head-to-head comparison of coding agents (Claude Code, Aider, Codex, etc.) on custom tasks with pass rate, cost, time, and consistency metrics
-origin: community
+origin: ECC
 tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
@@ -15,6 +15,12 @@ A lightweight CLI tool for comparing coding agents head-to-head on reproducible 
 - Measuring agent performance before adopting a new tool or model
 - Running regression checks when an agent updates its model or tooling
 - Producing data-backed agent selection decisions for a team
+
+## Installation
+
+```bash
+pip install git+https://github.com/joaquinhuigomez/agent-eval.git
+```
 
 ## Core Concepts
 
@@ -37,11 +43,12 @@ judge:
   - type: grep
     pattern: "exponential_backoff|retry"
     files: src/http_client.py
+commit: "abc1234"  # pin to specific commit for reproducibility
 ```
 
 ### Git Worktree Isolation
 
-Each agent run gets its own git worktree — no Docker required. Runs are fully isolated so agents cannot interfere with each other or corrupt the base repo.
+Each agent run gets its own git worktree — no Docker required. This provides reproducibility isolation so agents cannot interfere with each other or corrupt the base repo.
 
 ### Metrics Collected
 
@@ -50,7 +57,7 @@ Each agent run gets its own git worktree — no Docker required. Runs are fully 
 | Pass rate | Did the agent produce code that passes the judge? |
 | Cost | API spend per task (when available) |
 | Time | Wall-clock seconds to completion |
-| Consistency | pass@k — how often does it pass across repeated runs? |
+| Consistency | Pass rate across repeated runs (e.g., 3/3 = 100%) |
 
 ## Workflow
 
@@ -90,8 +97,8 @@ Task: add-retry-logic (3 runs each)
 ┌──────────────┬───────────┬────────┬────────┬─────────────┐
 │ Agent        │ Pass Rate │ Cost   │ Time   │ Consistency │
 ├──────────────┼───────────┼────────┼────────┼─────────────┤
-│ claude-code  │ 3/3       │ $0.12  │ 45s    │ pass@3 100% │
-│ aider        │ 2/3       │ $0.08  │ 38s    │ pass@3  67% │
+│ claude-code  │ 3/3       │ $0.12  │ 45s    │ 100%        │
+│ aider        │ 2/3       │ $0.08  │ 38s    │  67%        │
 └──────────────┴───────────┴────────┴────────┴─────────────┘
 ```
 
@@ -134,13 +141,6 @@ judge:
 - **Include at least one deterministic judge** (tests, build) per task — LLM judges add noise
 - **Track cost alongside pass rate** — a 95% agent at 10x the cost may not be the right choice
 - **Version your task definitions** — they are test fixtures, treat them as code
-
-## When to Use
-
-- Evaluating whether to switch from one coding agent to another
-- Benchmarking a new model release against your baseline
-- Building internal evidence for tool adoption decisions
-- Running periodic regression checks on agent quality
 
 ## Links
 
