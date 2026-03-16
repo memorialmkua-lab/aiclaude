@@ -72,7 +72,9 @@ DevFleet runs up to 3 concurrent agents by default (configurable via `DEVFLEET_M
 1. `plan_project(prompt="...")` → shows plan with missions and dependencies.
 2. Dispatch the first mission (the one with empty `depends_on`).
 3. Remaining missions auto-dispatch as dependencies resolve (they have `auto_dispatch=true`).
-4. Report back with project ID and mission count.
+4. Report back with project ID and mission count so the user knows what was launched.
+5. Poll with `get_mission_status` or `get_dashboard()` periodically until all missions are `completed`.
+6. `get_report(mission_id=...)` for each completed mission and summarize results to the user.
 
 ### Manual: step-by-step control
 
