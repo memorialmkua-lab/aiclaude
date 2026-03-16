@@ -361,7 +361,42 @@ function executeRepairOperation(repoRoot, operation) {
 }
 
 function executeUninstallOperation(operation) {
-  if (operation.kind === 'copy-file' || operation.kind === 'render-template') {
+  if (operation.kind === 'copy-file') {
+    if (!fs.existsSync(operation.destinationPath)) {
+      return {
+        removedPaths: [],
+        cleanupTargets: [],
+      };
+    }
+
+    fs.rmSync(operation.destinationPath, { force: true });
+    return {
+      removedPaths: [operation.destinationPath],
+      cleanupTargets: [operation.destinationPath],
+    };
+  }
+
+  if (operation.kind === 'render-template') {
+    const previousContent = getOperationPreviousContent(operation);
+    if (previousContent !== null) {
+      ensureParentDir(operation.destinationPath);
+      fs.writeFileSync(operation.destinationPath, previousContent);
+      return {
+        removedPaths: [],
+        cleanupTargets: [],
+      };
+    }
+
+    const previousJson = getOperationPreviousJson(operation);
+    if (previousJson !== undefined) {
+      ensureParentDir(operation.destinationPath);
+      fs.writeFileSync(operation.destinationPath, formatJson(previousJson));
+      return {
+        removedPaths: [],
+        cleanupTargets: [],
+      };
+    }
+
     if (!fs.existsSync(operation.destinationPath)) {
       return {
         removedPaths: [],

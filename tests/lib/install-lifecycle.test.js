@@ -613,6 +613,66 @@ function runTests() {
     }
   })) passed++; else failed++;
 
+  if (test('uninstall restores rendered template files from recorded previous content', () => {
+    const tempDir = createTempDir('install-lifecycle-');
+
+    try {
+      const targetRoot = path.join(tempDir, '.claude');
+      const statePath = path.join(targetRoot, 'ecc', 'install-state.json');
+      const destinationPath = path.join(targetRoot, 'plugin.json');
+      fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
+      fs.writeFileSync(destinationPath, '{"generated":true}\n');
+
+      writeInstallState(statePath, createInstallState({
+        adapter: { id: 'claude-home', target: 'claude', kind: 'home' },
+        targetRoot,
+        installStatePath: statePath,
+        request: {
+          profile: 'core',
+          modules: ['platform-configs'],
+          includeComponents: [],
+          excludeComponents: [],
+          legacyLanguages: [],
+          legacyMode: false,
+        },
+        resolution: {
+          selectedModules: ['platform-configs'],
+          skippedModules: [],
+        },
+        source: {
+          repoVersion: '1.8.0',
+          repoCommit: 'abc123',
+          manifestVersion: 1,
+        },
+        operations: [
+          {
+            kind: 'render-template',
+            moduleId: 'platform-configs',
+            sourceRelativePath: '.claude/plugin.json.template',
+            destinationPath,
+            strategy: 'render-template',
+            ownership: 'managed',
+            scaffoldOnly: false,
+            renderedContent: '{"generated":true}\n',
+            previousContent: '{"existing":true}\n',
+          },
+        ],
+      }));
+
+      const result = uninstallInstalledStates({
+        homeDir: tempDir,
+        projectRoot: tempDir,
+        targets: ['claude'],
+      });
+
+      assert.strictEqual(result.summary.uninstalledCount, 1);
+      assert.strictEqual(fs.readFileSync(destinationPath, 'utf8'), '{"existing":true}\n');
+      assert.ok(!fs.existsSync(statePath));
+    } finally {
+      cleanup(tempDir);
+    }
+  })) passed++; else failed++;
+
   if (test('uninstall restores files removed during install when previous content is recorded', () => {
     const homeDir = createTempDir('install-lifecycle-home-');
     const projectRoot = createTempDir('install-lifecycle-project-');
