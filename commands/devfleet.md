@@ -58,13 +58,8 @@ mcp__devfleet__get_mission_status(mission_id="<id>")
 
 Prefer polling with `get_mission_status` over `wait_for_mission` for long-running missions, so the user sees progress updates.
 
-5. **Read the report** when missions complete:
+5. **Read the report** for each completed mission:
 
-```
-mcp__devfleet__get_report(mission_id="<id>")
-```
-
-Reports contain: files_changed, what_done, what_open, what_tested, what_untested, next_steps, errors_encountered.
 
 ## All Available Tools
 
