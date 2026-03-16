@@ -79,9 +79,8 @@ DevFleet runs up to 3 concurrent agents by default (configurable via `DEVFLEET_M
 ### Manual: step-by-step control
 
 1. `create_project(name="My Project")` → returns `project_id`.
-2. `create_mission(project_id=project_id, title="...", prompt="...", auto_dispatch=true, depends_on=["<prev_mission_id>"])` for each task.
-3. `dispatch_mission(mission_id=...)` on the first mission to start the chain.
-4. `get_report(mission_id=...)` when done.
+2. `create_mission(project_id=project_id, title="...", prompt="...", auto_dispatch=true)` for the first (root) mission → capture `root_mission_id`.
+   `create_mission(project_id=project_id, title="...", prompt="...", auto_dispatch=true, depends_on=["<root_mission_id>"])` for each subsequent task.
 
 ### Sequential with review
 
