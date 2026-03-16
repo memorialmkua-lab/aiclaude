@@ -53,5 +53,15 @@ $scriptPath = Resolve-LinkedScriptPath -InitialPath $PSCommandPath
 $scriptDir = Split-Path -Parent $scriptPath
 $installerScript = Join-Path -Path (Join-Path -Path $scriptDir -ChildPath 'scripts') -ChildPath 'install-apply.js'
 
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    Write-Error 'Node.js was not found in PATH. Please install Node.js and try again.'
+    exit 1
+}
+
+if (-not (Test-Path -LiteralPath $installerScript)) {
+    Write-Error "Installer script not found: $installerScript"
+    exit 1
+}
+
 & node $installerScript @args
 exit $LASTEXITCODE
