@@ -25,7 +25,7 @@ The Node/TypeScript SDK may expose `tool()` / `resource()` or `registerTool()` /
 
 ### Connecting with stdio
 
-For local clients, create a stdio transport and pass it to your server’s connect method. The exact API varies by SDK version (e.g. constructor vs factory). See the [MCP Node SDK](https://github.com/modelcontextprotocol/typescript-sdk) or query Context7 for "MCP stdio server" for the current pattern.
+For local clients, create a stdio transport and pass it to your server’s connect method. The exact API varies by SDK version (e.g. constructor vs factory). See the official MCP documentation or query Context7 for "MCP stdio server" for the current pattern.
 
 Keep server logic (tools + resources) independent of transport so you can plug in stdio or HTTP in the entrypoint.
 
@@ -45,31 +45,10 @@ npm install @modelcontextprotocol/sdk zod
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-const server = new McpServer({
-  name: "my-server",
-  version: "1.0.0",
-});
-
-// Tool with schema (Zod or JSON Schema)
-server.tool({
-  name: "echo",
-  description: "Echo a message",
-  inputSchema: z.object({
-    message: z.string().describe("Message to echo"),
-  }),
-}, async ({ message }) => ({ content: [{ type: "text", text: message }] }));
-
-// Resource handler — include uri when the API provides it
-server.resource({
-  uri: "myapp://config",
-  name: "App config",
-  description: "Current app configuration",
-}, async (uri) => ({
-  contents: [{ uri, mimeType: "application/json", text: JSON.stringify({ theme: "dark" }) }],
-}));
+const server = new McpServer({ name: "my-server", version: "1.0.0" });
 ```
 
-If your SDK uses `registerTool` / `registerResource` with an object and inline `handler`, use that form; the exact signature depends on the SDK version.
+Register tools and resources using the API your SDK version provides: some versions use `server.tool(name, description, schema, handler)` (positional args), others use `server.tool({ name, description, inputSchema }, handler)` or `registerTool()`. Same for resources — include a `uri` in the handler when the API provides it. Check the official MCP docs or Context7 for the current `@modelcontextprotocol/sdk` signatures to avoid copy-paste errors.
 
 Use **Zod** (or the SDK’s preferred schema format) for input validation.
 
