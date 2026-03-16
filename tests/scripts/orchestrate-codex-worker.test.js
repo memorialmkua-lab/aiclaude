@@ -24,6 +24,22 @@ function test(desc, fn) {
   }
 }
 
+function cleanupTestDir(testDir) {
+  const retryableCodes = new Set(['EPERM', 'EBUSY', 'ENOTEMPTY']);
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      fs.rmSync(testDir, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      if (!retryableCodes.has(error.code) || attempt === 4) {
+        throw error;
+      }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+    }
+  }
+}
+
 test('fails fast for an unreadable task file and records failure artifacts', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-orch-worker-'));
   const handoffFile = path.join(tempRoot, '.orchestration', 'docs', 'handoff.md');
@@ -55,7 +71,7 @@ test('fails fast for an unreadable task file and records failure artifacts', () 
       'Handoff file should explain the task-file failure'
     );
   } finally {
-    fs.rmSync(tempRoot, { recursive: true, force: true });
+    cleanupTestDir(tempRoot);
   }
 });
 

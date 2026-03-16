@@ -19,23 +19,78 @@
 #   3. git repo root path (fallback, machine-specific)
 #   4. "global" (no project context detected)
 
+_clv2_normalize_path() {
+  local input="$1"
+
+  if [ -z "$input" ]; then
+    printf '%s\n' ''
+    return 0
+  fi
+
+  case "$input" in
+    /*)
+      printf '%s\n' "$input"
+      return 0
+      ;;
+  esac
+
+  if command -v wslpath >/dev/null 2>&1; then
+    wslpath -a "$input" 2>/dev/null && return 0
+  fi
+
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -u "$input" 2>/dev/null && return 0
+  fi
+
+  case "$input" in
+    [A-Za-z]:\\*|[A-Za-z]:/*)
+      local drive="${input%%:*}"
+      local rest="${input#?:}"
+      drive=$(printf '%s' "$drive" | tr '[:upper:]' '[:lower:]')
+      rest="${rest//\\//}"
+      printf '/mnt/%s%s\n' "$drive" "$rest"
+      return 0
+      ;;
+  esac
+
+  printf '%s\n' "$input"
+}
+
+if [ -n "${HOME:-}" ]; then
+  HOME="$(_clv2_normalize_path "$HOME")"
+  export HOME
+elif [ -n "${USERPROFILE:-}" ]; then
+  HOME="$(_clv2_normalize_path "$USERPROFILE")"
+  export HOME
+fi
+
+if [ -n "${USERPROFILE:-}" ]; then
+  USERPROFILE="$(_clv2_normalize_path "$USERPROFILE")"
+  export USERPROFILE
+fi
+
+if [ -n "${CLAUDE_PROJECT_DIR:-}" ]; then
+  CLAUDE_PROJECT_DIR="$(_clv2_normalize_path "$CLAUDE_PROJECT_DIR")"
+  export CLAUDE_PROJECT_DIR
+fi
+
 _CLV2_HOMUNCULUS_DIR="${HOME}/.claude/homunculus"
 _CLV2_PROJECTS_DIR="${_CLV2_HOMUNCULUS_DIR}/projects"
 _CLV2_REGISTRY_FILE="${_CLV2_HOMUNCULUS_DIR}/projects.json"
 
 _clv2_resolve_python_cmd() {
   if [ -n "${CLV2_PYTHON_CMD:-}" ] && command -v "$CLV2_PYTHON_CMD" >/dev/null 2>&1; then
-    printf '%s\n' "$CLV2_PYTHON_CMD"
+    command -v "$CLV2_PYTHON_CMD"
     return 0
   fi
 
   if command -v python3 >/dev/null 2>&1; then
-    printf '%s\n' python3
+    command -v python3
     return 0
   fi
 
   if command -v python >/dev/null 2>&1; then
-    printf '%s\n' python
+    command -v python
     return 0
   fi
 

@@ -68,7 +68,7 @@ function runValidatorWithDir(validatorName, dirConstant, overridePath) {
   let source = fs.readFileSync(validatorPath, 'utf8');
 
   // Remove the shebang line
-  source = source.replace(/^#!.*\n/, '');
+  source = source.replace(/^#![^\r\n]*[\r\n]+/, '').trimStart();
 
   // Replace the directory constant with our override path
   const dirRegex = new RegExp(`const ${dirConstant} = .*?;`);
