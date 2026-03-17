@@ -23,7 +23,8 @@ ECC remaps its component structure to match Antigravity's expected layout:
 | `rules/` | `.agent/rules/` | Language rules and coding standards (flattened) |
 | `commands/` | `.agent/workflows/` | Slash commands become Antigravity workflows |
 | `agents/` | `.agent/skills/` | Agent definitions become Antigravity skills |
-| `skills/` | `.agent/skills/` | Skill definitions (via `.agents/skills/`) |
+
+> **Note**: The `skills/` directory is not directly mapped by the installer. Skill files in `.agents/skills/` are part of the repo's static layout and must be manually mirrored if you want them in the Antigravity runtime.
 
 ### Key Differences from Claude Code
 
@@ -56,7 +57,7 @@ your-project/
 
 ## The `openai.yaml` Agent Config
 
-Each skill in `.agents/skills/` includes an `agents/openai.yaml` file that configures the skill for Antigravity:
+Each skill directory under `.agents/skills/` contains an `agents/openai.yaml` file at the path `.agents/skills/<skill-name>/agents/openai.yaml` that configures the skill for Antigravity:
 
 ```yaml
 interface:
@@ -87,7 +88,11 @@ node scripts/list-installed.js --target antigravity
 ### Repair a Broken Install
 
 ```bash
+# First, diagnose what's wrong
 node scripts/doctor.js --target antigravity
+
+# Then, restore missing or drifted files
+node scripts/repair.js --target antigravity
 ```
 
 ### Uninstall
@@ -105,8 +110,8 @@ The installer writes `.agent/ecc-install-state.json` to track which files ECC ow
 If you're contributing a new skill and want it available on Antigravity:
 
 1. Create the skill under `skills/your-skill-name/SKILL.md` as usual
-2. Add the Antigravity agent config at `.agents/skills/your-skill-name/agents/openai.yaml`
-3. Mirror the `SKILL.md` content to `.agents/skills/your-skill-name/SKILL.md`
+2. Add the Antigravity agent config at `.agents/skills/your-skill-name/agents/openai.yaml` — the installer auto-deploys the `agents/` directory into `.agent/skills/` at runtime
+3. Manually mirror the `SKILL.md` content to `.agents/skills/your-skill-name/SKILL.md` — this is needed because the installer maps `agents/` → `.agent/skills/` but does not auto-transform `skills/`
 4. Mention in your PR that you added Antigravity support
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full contribution guide.
@@ -115,7 +120,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full contribution guide.
 
 | Feature | Claude Code | Cursor | Codex | Antigravity |
 |---------|-------------|--------|-------|-------------|
-| Install target | `claude-home` | `cursor-project` | `codex-home` | `antigravity-project` |
+| Install target | `claude-home` | `cursor-project` | `codex-home` | `antigravity` |
 | Config root | `~/.claude/` | `.cursor/` | `~/.codex/` | `.agent/` |
 | Scope | User-level | Project-level | User-level | Project-level |
 | Rules format | Nested dirs | Flat | Flat | Flat |
