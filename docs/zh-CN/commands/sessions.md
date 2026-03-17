@@ -26,8 +26,9 @@
 
 ```bash
 node -e "
-const sm = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-manager');
-const aa = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-aliases');
+const _r=((e,p,f,h)=>{if(e&&e.trim())return e;const m='scripts/lib/session-manager.js';const cs=[p.join(h,'.claude'),p.join(h,'.claude','plugins','everything-claude-code'),p.join(h,'.claude','plugins','everything-claude-code@everything-claude-code'),p.join(h,'.claude','plugins','marketplace','everything-claude-code')];for(const c of cs)if(f.existsSync(p.join(c,m)))return c;const cd=p.join(h,'.claude','plugins','cache','everything-claude-code');try{for(const e of f.readdirSync(cd)){const n=p.join(cd,e);if(f.existsSync(p.join(n,m)))return n;try{for(const i of f.readdirSync(n)){const x=p.join(n,i);if(f.existsSync(p.join(x,m)))return x}}catch(_){}}}catch(_){}return p.join(h,'.claude')})(process.env.CLAUDE_PLUGIN_ROOT,require('path'),require('fs'),require('os').homedir());
+const sm = require(_r+'/scripts/lib/session-manager');
+const aa = require(_r+'/scripts/lib/session-aliases');
 const path = require('path');
 
 const result = sm.getAllSessions({ limit: 20 });
@@ -68,8 +69,9 @@ for (const s of result.sessions) {
 
 ```bash
 node -e "
-const sm = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-manager');
-const aa = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-aliases');
+const _r=((e,p,f,h)=>{if(e&&e.trim())return e;const m='scripts/lib/session-manager.js';const cs=[p.join(h,'.claude'),p.join(h,'.claude','plugins','everything-claude-code'),p.join(h,'.claude','plugins','everything-claude-code@everything-claude-code'),p.join(h,'.claude','plugins','marketplace','everything-claude-code')];for(const c of cs)if(f.existsSync(p.join(c,m)))return c;const cd=p.join(h,'.claude','plugins','cache','everything-claude-code');try{for(const e of f.readdirSync(cd)){const n=p.join(cd,e);if(f.existsSync(p.join(n,m)))return n;try{for(const i of f.readdirSync(n)){const x=p.join(n,i);if(f.existsSync(p.join(x,m)))return x}}catch(_){}}}catch(_){}return p.join(h,'.claude')})(process.env.CLAUDE_PLUGIN_ROOT,require('path'),require('fs'),require('os').homedir());
+const sm = require(_r+'/scripts/lib/session-manager');
+const aa = require(_r+'/scripts/lib/session-aliases');
 const id = process.argv[1];
 
 // First try to resolve as alias
@@ -142,8 +144,9 @@ if (session.metadata.worktree) {
 
 ```bash
 node -e "
-const sm = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-manager');
-const aa = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-aliases');
+const _r=((e,p,f,h)=>{if(e&&e.trim())return e;const m='scripts/lib/session-manager.js';const cs=[p.join(h,'.claude'),p.join(h,'.claude','plugins','everything-claude-code'),p.join(h,'.claude','plugins','everything-claude-code@everything-claude-code'),p.join(h,'.claude','plugins','marketplace','everything-claude-code')];for(const c of cs)if(f.existsSync(p.join(c,m)))return c;const cd=p.join(h,'.claude','plugins','cache','everything-claude-code');try{for(const e of f.readdirSync(cd)){const n=p.join(cd,e);if(f.existsSync(p.join(n,m)))return n;try{for(const i of f.readdirSync(n)){const x=p.join(n,i);if(f.existsSync(p.join(x,m)))return x}}catch(_){}}}catch(_){}return p.join(h,'.claude')})(process.env.CLAUDE_PLUGIN_ROOT,require('path'),require('fs'),require('os').homedir());
+const sm = require(_r+'/scripts/lib/session-manager');
+const aa = require(_r+'/scripts/lib/session-aliases');
 
 const sessionId = process.argv[1];
 const aliasName = process.argv[2];
@@ -183,7 +186,8 @@ if (result.success) {
 
 ```bash
 node -e "
-const aa = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-aliases');
+const _r=((e,p,f,h)=>{if(e&&e.trim())return e;const m='scripts/lib/session-manager.js';const cs=[p.join(h,'.claude'),p.join(h,'.claude','plugins','everything-claude-code'),p.join(h,'.claude','plugins','everything-claude-code@everything-claude-code'),p.join(h,'.claude','plugins','marketplace','everything-claude-code')];for(const c of cs)if(f.existsSync(p.join(c,m)))return c;const cd=p.join(h,'.claude','plugins','cache','everything-claude-code');try{for(const e of f.readdirSync(cd)){const n=p.join(cd,e);if(f.existsSync(p.join(n,m)))return n;try{for(const i of f.readdirSync(n)){const x=p.join(n,i);if(f.existsSync(p.join(x,m)))return x}}catch(_){}}}catch(_){}return p.join(h,'.claude')})(process.env.CLAUDE_PLUGIN_ROOT,require('path'),require('fs'),require('os').homedir());
+const aa = require(_r+'/scripts/lib/session-aliases');
 
 const aliasName = process.argv[1];
 if (!aliasName) {
@@ -213,8 +217,9 @@ if (result.success) {
 
 ```bash
 node -e "
-const sm = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-manager');
-const aa = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-aliases');
+const _r=((e,p,f,h)=>{if(e&&e.trim())return e;const m='scripts/lib/session-manager.js';const cs=[p.join(h,'.claude'),p.join(h,'.claude','plugins','everything-claude-code'),p.join(h,'.claude','plugins','everything-claude-code@everything-claude-code'),p.join(h,'.claude','plugins','marketplace','everything-claude-code')];for(const c of cs)if(f.existsSync(p.join(c,m)))return c;const cd=p.join(h,'.claude','plugins','cache','everything-claude-code');try{for(const e of f.readdirSync(cd)){const n=p.join(cd,e);if(f.existsSync(p.join(n,m)))return n;try{for(const i of f.readdirSync(n)){const x=p.join(n,i);if(f.existsSync(p.join(x,m)))return x}}catch(_){}}}catch(_){}return p.join(h,'.claude')})(process.env.CLAUDE_PLUGIN_ROOT,require('path'),require('fs'),require('os').homedir());
+const sm = require(_r+'/scripts/lib/session-manager');
+const aa = require(_r+'/scripts/lib/session-aliases');
 
 const id = process.argv[1];
 const resolved = aa.resolveAlias(id);
@@ -269,7 +274,8 @@ if (aliases.length > 0) {
 
 ```bash
 node -e "
-const aa = require((process.env.CLAUDE_PLUGIN_ROOT||require('path').join(require('os').homedir(),'.claude'))+'/scripts/lib/session-aliases');
+const _r=((e,p,f,h)=>{if(e&&e.trim())return e;const m='scripts/lib/session-manager.js';const cs=[p.join(h,'.claude'),p.join(h,'.claude','plugins','everything-claude-code'),p.join(h,'.claude','plugins','everything-claude-code@everything-claude-code'),p.join(h,'.claude','plugins','marketplace','everything-claude-code')];for(const c of cs)if(f.existsSync(p.join(c,m)))return c;const cd=p.join(h,'.claude','plugins','cache','everything-claude-code');try{for(const e of f.readdirSync(cd)){const n=p.join(cd,e);if(f.existsSync(p.join(n,m)))return n;try{for(const i of f.readdirSync(n)){const x=p.join(n,i);if(f.existsSync(p.join(x,m)))return x}}catch(_){}}}catch(_){}return p.join(h,'.claude')})(process.env.CLAUDE_PLUGIN_ROOT,require('path'),require('fs'),require('os').homedir());
+const aa = require(_r+'/scripts/lib/session-aliases');
 
 const aliases = aa.listAliases();
 console.log('Session Aliases (' + aliases.length + '):');
