@@ -141,7 +141,7 @@ Component Breakdown:
    → planner.md (213 lines, ~1,840 tokens)
    → architect.md (208 lines, ~1,780 tokens)
    → security-reviewer.md (205 lines, ~1,760 tokens)
-   Action: Split into focused sub-agents or trim redundant sections
+   Action: Split into focused sub-agents or trim redundant sections, save ~3,200 tokens
 
 2. MCP OVER-SUBSCRIPTION — 14 servers, 87 tools
    → github (~30 tools), supabase (~15 tools), vercel (~10 tools) — replaceable with CLI: gh, supabase, vercel
