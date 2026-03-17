@@ -24,7 +24,7 @@ ECC remaps its component structure to match Antigravity's expected layout:
 | `commands/` | `.agent/workflows/` | Slash commands become Antigravity workflows |
 | `agents/` | `.agent/skills/` | Agent definitions become Antigravity skills |
 
-> **Note**: The `skills/` directory is not directly mapped by the installer. Skill files in `.agents/skills/` are part of the repo's static layout and must be manually mirrored if you want them in the Antigravity runtime.
+> **Note on `.agents/` vs `.agent/`**: The ECC repo uses `.agents/` (with an 's') as its source directory for skill definitions and `openai.yaml` configs. The Antigravity runtime uses `.agent/` (without an 's') as its project config root. The installer copies from `.agents/` → `.agent/` during install. The `skills/` source path is not directly mapped by the installer — skill files in `.agents/skills/` must be manually mirrored to `.agent/skills/` if you want them in the Antigravity runtime.
 
 ### Key Differences from Claude Code
 
@@ -125,7 +125,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full contribution guide.
 | Scope | User-level | Project-level | User-level | Project-level |
 | Rules format | Nested dirs | Flat | Flat | Flat |
 | Commands | `commands/` | N/A | N/A | `workflows/` |
-| Agents/Skills | `agents/` | `skills/` | N/A | `skills/` |
+| Agents/Skills | `agents/` | N/A | N/A | `skills/` |
 | Install state | `ecc-install-state.json` | `ecc-install-state.json` | `ecc-install-state.json` | `ecc-install-state.json` |
 
 ## Troubleshooting
