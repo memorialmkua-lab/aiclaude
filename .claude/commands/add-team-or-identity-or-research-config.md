@@ -10,7 +10,7 @@ Use this workflow when working on **add-team-or-identity-or-research-config** in
 
 ## Goal
 
-Adds or updates team configuration, identity, or research playbook files.
+Adds or updates team configuration, identity, or research playbook by modifying the corresponding files in .claude/team, .claude/identity.json, or .claude/research.
 
 ## Common Files
 
@@ -31,7 +31,6 @@ Adds or updates team configuration, identity, or research playbook files.
 - Create or update .claude/team/everything-claude-code-team-config.json
 - Create or update .claude/identity.json
 - Create or update .claude/research/everything-claude-code-research-playbook.md
-- Optionally update .claude/commands/add-team-or-identity-or-research-config.md
 
 ## Notes
 
