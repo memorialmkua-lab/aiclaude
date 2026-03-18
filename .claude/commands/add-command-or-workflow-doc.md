@@ -10,7 +10,7 @@ Use this workflow when working on **add-command-or-workflow-doc** in `everything
 
 ## Goal
 
-Adds or updates documentation for commands or workflows, including feature development, database migration, and agent/skill addition.
+Adds documentation for a new command or workflow to the system.
 
 ## Common Files
 
@@ -25,8 +25,7 @@ Adds or updates documentation for commands or workflows, including feature devel
 
 ## Typical Commit Signals
 
-- Create or update .claude/commands/{command-name}.md
-- Optionally, update related configuration or reference files
+- Create a new markdown file in .claude/commands/ describing the command or workflow.
 
 ## Notes
 
