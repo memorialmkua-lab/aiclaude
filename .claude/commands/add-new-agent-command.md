@@ -10,7 +10,7 @@ Use this workflow when working on **add-new-agent-command** in `everything-claud
 
 ## Goal
 
-Adds a new agent command to the ECC bundle, documenting how to add new agents.
+Adds documentation or configuration for a new agent command to the system.
 
 ## Common Files
 
@@ -25,7 +25,7 @@ Adds a new agent command to the ECC bundle, documenting how to add new agents.
 
 ## Typical Commit Signals
 
-- Create or update '.claude/commands/add-new-agent-command.md' with instructions or implementation details.
+- Create or update '.claude/commands/add-new-agent-command.md' with details about the new agent command.
 
 ## Notes
 
