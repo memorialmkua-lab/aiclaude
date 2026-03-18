@@ -13,6 +13,9 @@ secrets.json
 config/secrets.yml
 .secrets
 
+# Notion triage config (contains real workspace page IDs)
+scripts/lib/notion-triage-config.json
+
 # OS files
 .DS_Store
 .DS_Store?

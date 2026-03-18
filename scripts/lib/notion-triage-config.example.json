@@ -1,0 +1,116 @@
+{
+  "notionApiVersion": "2022-06-28",
+  "personalContentPatterns": [
+    "golf", "pinehurst", "pine needles", "bay harbor",
+    "car insurance", "deductible", "gas money",
+    "fantasy football", "march madness",
+    "vacation", "airbnb"
+  ],
+  "clients": {
+    "par_excellence": {
+      "keywords": ["PAR", "CPQ", "Par Excellence", "configurator", "proposal", "Part 360", "GPO", "bundle"],
+      "implementations": {
+        "netsuite_cpq": {
+          "keywords": ["CPQ", "configurator", "proposal", "bundle", "Part 360", "GPO discount", "pricing rule"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE",
+          "techDocsId": "YOUR_NOTION_PAGE_ID_HERE",
+          "devNotesId": "YOUR_NOTION_PAGE_ID_HERE",
+          "testingId": "YOUR_NOTION_PAGE_ID_HERE"
+        },
+        "allocation": {
+          "keywords": ["allocation", "journal entry", "vendor reporting"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        }
+      }
+    },
+    "ben_guard": {
+      "keywords": ["Ben Guard", "Ship Central", "Airtable", "order-to-cash"],
+      "implementations": {
+        "netsuite_alignment": {
+          "keywords": ["alignment", "Ship Central", "Airtable", "order automation"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        }
+      }
+    },
+    "mcallisters": {
+      "keywords": ["McAllisters", "McAllister"],
+      "implementations": {
+        "wordpress_web_forms": {
+          "keywords": ["WordPress", "web form"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        },
+        "zoominfo": {
+          "keywords": ["ZoomInfo", "zoom info"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        },
+        "finance_phase2": {
+          "keywords": ["finance", "budget", "phase 2", "phase two"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        },
+        "as400_freightpop": {
+          "keywords": ["AS400", "FreightPop", "freight"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        },
+        "file_archive": {
+          "keywords": ["file archive", "file cabinet", "SFTP", "900 GB", "file migration"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        }
+      }
+    },
+    "dansons": {
+      "keywords": ["Dansons", "Danson"],
+      "implementations": {
+        "inbound_shipment": {
+          "keywords": ["inbound shipment", "Rocket Lane", "container", "delivery report"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        }
+      }
+    },
+    "first_light": {
+      "keywords": ["First Light", "Docket"],
+      "implementations": {
+        "docket_integration": {
+          "keywords": ["Docket", "data migration", "invoice", "sales line"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        }
+      }
+    },
+    "jockey_club": {
+      "keywords": ["Jockey Club", "JC", "TJC", "Aquabase", "Axis", "T-Lor", "PAYGO", "CLEGO"],
+      "implementations": {
+        "netsuite_golive": {
+          "keywords": ["go-live", "go live", "AR", "AP", "GL", "Braintree", "cutover"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        }
+      }
+    },
+    "acs": {
+      "keywords": ["ACS", "state contracting"],
+      "implementations": {
+        "state_contracting": {
+          "keywords": ["Virginia", "state contract", "contracting"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        }
+      }
+    },
+    "delaney_hillman": {
+      "keywords": ["Delaney", "Hillman"],
+      "implementations": {
+        "netsuite_migration": {
+          "keywords": ["migration", "instance", "discovery"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        }
+      }
+    },
+    "terillium_internal": {
+      "keywords": ["Terillium", "sprint", "PEM deal", "time script", "service item"],
+      "implementations": {
+        "general": {
+          "keywords": ["sprint", "planning", "internal", "PEM deal", "time script"],
+          "meetingNotesId": "YOUR_NOTION_PAGE_ID_HERE"
+        }
+      }
+    }
+  },
+  "fallbackFolderId": "YOUR_NOTION_PAGE_ID_HERE"
+}

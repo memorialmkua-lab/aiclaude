@@ -1,0 +1,55 @@
+name: Notion Meeting Note Triage
+
+on:
+  # Triggered by Zapier via GitHub API
+  repository_dispatch:
+    types: [notion-triage]
+
+  # Manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      page_id:
+        description: 'Notion page ID to triage (optional - omit to scan all)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run (preview only)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run triage
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          ARGS="--verbose"
+
+          # Handle page_id from repository_dispatch (Zapier) or workflow_dispatch (manual)
+          PAGE_ID="${{ github.event.client_payload.page_id || inputs.page_id }}"
+          if [ -n "$PAGE_ID" ]; then
+            ARGS="$ARGS --page-id $PAGE_ID --force"
+          fi
+
+          # Handle dry_run
+          DRY_RUN="${{ github.event.client_payload.dry_run || inputs.dry_run }}"
+          if [ "$DRY_RUN" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+
+          echo "Running: node scripts/notion-triage.js $ARGS"
+          node scripts/notion-triage.js $ARGS
