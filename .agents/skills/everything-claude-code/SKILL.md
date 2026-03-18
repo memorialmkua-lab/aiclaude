@@ -40,7 +40,7 @@ Follow these commit message conventions based on 8 analyzed commits.
 
 ### Message Guidelines
 
-- Average message length: ~77 characters
+- Average message length: ~78 characters
 - Keep first line concise and descriptive
 - Use imperative mood ("Add feature" not "Added feature")
 
@@ -48,7 +48,7 @@ Follow these commit message conventions based on 8 analyzed commits.
 *Commit message example*
 
 ```text
-feat: add everything-claude-code ECC bundle (.claude/commands/add-command-or-skill-or-agent-or-workflow.md)
+feat: add everything-claude-code ECC bundle (.claude/commands/add-team-or-identity-or-research-config.md)
 ```
 
 *Commit message example*
@@ -203,34 +203,32 @@ feat: add everything-claude-code ECC bundle (.codex/AGENTS.md)
 
 ### Add Command Or Skill Or Agent Or Workflow
 
-Adds a new command, skill, agent, or workflow to the system by creating a corresponding markdown file describing the addition.
+Adds a new command, skill, agent, or workflow to the ECC system by creating a corresponding markdown file describing the addition.
 
 **Frequency**: ~3 times per month
 
 **Steps**:
-1. Create a new markdown file in .claude/commands/ with a name matching add-command-or-skill-or-agent-or-workflow.md or similar.
-2. Document the new command, skill, agent, or workflow in the markdown file.
+1. Create or update '.claude/commands/add-command-or-skill-or-agent-or-workflow.md' with details of the new entity.
 
 **Files typically involved**:
 - `.claude/commands/add-command-or-skill-or-agent-or-workflow.md`
 
 **Example commit sequence**:
 ```
-Create a new markdown file in .claude/commands/ with a name matching add-command-or-skill-or-agent-or-workflow.md or similar.
-Document the new command, skill, agent, or workflow in the markdown file.
+Create or update '.claude/commands/add-command-or-skill-or-agent-or-workflow.md' with details of the new entity.
 ```
 
 ### Add Team Or Identity Or Research Config
 
-Adds configuration files for teams, identities, or research setups.
+Adds or updates team configuration, identity, or research playbook files for the ECC system.
 
 **Frequency**: ~3 times per month
 
 **Steps**:
-1. Create or update .claude/team/everything-claude-code-team-config.json for team config.
-2. Create or update .claude/identity.json for identity config.
-3. Create or update .claude/research/everything-claude-code-research-playbook.md for research config.
-4. Optionally, add a command description in .claude/commands/add-team-or-identity-or-research-config.md.
+1. Create or update '.claude/team/everything-claude-code-team-config.json' for team configuration.
+2. Create or update '.claude/identity.json' for identity settings.
+3. Create or update '.claude/research/everything-claude-code-research-playbook.md' for research playbooks.
+4. Optionally, document the process in '.claude/commands/add-team-or-identity-or-research-config.md'.
 
 **Files typically involved**:
 - `.claude/team/everything-claude-code-team-config.json`
@@ -240,41 +238,21 @@ Adds configuration files for teams, identities, or research setups.
 
 **Example commit sequence**:
 ```
-Create or update .claude/team/everything-claude-code-team-config.json for team config.
-Create or update .claude/identity.json for identity config.
-Create or update .claude/research/everything-claude-code-research-playbook.md for research config.
-Optionally, add a command description in .claude/commands/add-team-or-identity-or-research-config.md.
-```
-
-### Add Skill Documentation
-
-Adds or updates documentation for a skill in the system.
-
-**Frequency**: ~2 times per month
-
-**Steps**:
-1. Create or update SKILL.md in .agents/skills/everything-claude-code/ or .claude/skills/everything-claude-code/.
-2. Describe the skill, its usage, and relevant details.
-
-**Files typically involved**:
-- `.agents/skills/everything-claude-code/SKILL.md`
-- `.claude/skills/everything-claude-code/SKILL.md`
-
-**Example commit sequence**:
-```
-Create or update SKILL.md in .agents/skills/everything-claude-code/ or .claude/skills/everything-claude-code/.
-Describe the skill, its usage, and relevant details.
+Create or update '.claude/team/everything-claude-code-team-config.json' for team configuration.
+Create or update '.claude/identity.json' for identity settings.
+Create or update '.claude/research/everything-claude-code-research-playbook.md' for research playbooks.
+Optionally, document the process in '.claude/commands/add-team-or-identity-or-research-config.md'.
 ```
 
 ### Add Guardrails Or Controls
 
-Adds or updates system guardrails or enterprise controls documentation.
+Adds or updates guardrails or enterprise controls documentation for the ECC system.
 
-**Frequency**: ~2 times per month
+**Frequency**: ~3 times per month
 
 **Steps**:
-1. Create or update .claude/rules/everything-claude-code-guardrails.md for guardrails.
-2. Create or update .claude/enterprise/controls.md for enterprise controls.
+1. Create or update '.claude/rules/everything-claude-code-guardrails.md' for guardrails.
+2. Create or update '.claude/enterprise/controls.md' for enterprise controls.
 
 **Files typically involved**:
 - `.claude/rules/everything-claude-code-guardrails.md`
@@ -282,20 +260,43 @@ Adds or updates system guardrails or enterprise controls documentation.
 
 **Example commit sequence**:
 ```
-Create or update .claude/rules/everything-claude-code-guardrails.md for guardrails.
-Create or update .claude/enterprise/controls.md for enterprise controls.
+Create or update '.claude/rules/everything-claude-code-guardrails.md' for guardrails.
+Create or update '.claude/enterprise/controls.md' for enterprise controls.
 ```
 
-### Add Agent Config Or Documentation
+### Add Or Update Agent Skill
 
-Adds or updates agent configuration files or documentation in the codex system.
+Adds or updates agent skill documentation and configuration for the ECC system.
 
-**Frequency**: ~3 times per month
+**Frequency**: ~2 times per month
 
 **Steps**:
-1. Create or update agent config files in .codex/agents/*.toml.
-2. Update .codex/AGENTS.md to document the agent.
-3. Optionally, update .codex/config.toml.
+1. Create or update '.agents/skills/everything-claude-code/SKILL.md' for agent skill documentation.
+2. Optionally, update '.agents/skills/everything-claude-code/agents/openai.yaml' for agent configuration.
+3. Optionally, update '.claude/skills/everything-claude-code/SKILL.md' for Claude-specific skills.
+
+**Files typically involved**:
+- `.agents/skills/everything-claude-code/SKILL.md`
+- `.agents/skills/everything-claude-code/agents/openai.yaml`
+- `.claude/skills/everything-claude-code/SKILL.md`
+
+**Example commit sequence**:
+```
+Create or update '.agents/skills/everything-claude-code/SKILL.md' for agent skill documentation.
+Optionally, update '.agents/skills/everything-claude-code/agents/openai.yaml' for agent configuration.
+Optionally, update '.claude/skills/everything-claude-code/SKILL.md' for Claude-specific skills.
+```
+
+### Add Codex Agent Or Config
+
+Adds or updates agent TOML files or configuration in the .codex directory.
+
+**Frequency**: ~2 times per month
+
+**Steps**:
+1. Create or update '.codex/agents/<agent-name>.toml' for agent configuration.
+2. Update '.codex/AGENTS.md' to document available agents.
+3. Optionally, update '.codex/config.toml' for codex-wide settings.
 
 **Files typically involved**:
 - `.codex/agents/docs-researcher.toml`
@@ -306,20 +307,20 @@ Adds or updates agent configuration files or documentation in the codex system.
 
 **Example commit sequence**:
 ```
-Create or update agent config files in .codex/agents/*.toml.
-Update .codex/AGENTS.md to document the agent.
-Optionally, update .codex/config.toml.
+Create or update '.codex/agents/<agent-name>.toml' for agent configuration.
+Update '.codex/AGENTS.md' to document available agents.
+Optionally, update '.codex/config.toml' for codex-wide settings.
 ```
 
-### Add Instincts Or Ecc Tools
+### Add Instincts Or Tools
 
-Adds or updates system instincts or ECC tools configuration.
+Adds or updates instincts YAML or ECC tools JSON for the ECC system.
 
 **Frequency**: ~2 times per month
 
 **Steps**:
-1. Create or update .claude/homunculus/instincts/inherited/everything-claude-code-instincts.yaml for instincts.
-2. Create or update .claude/ecc-tools.json for ECC tools.
+1. Create or update '.claude/homunculus/instincts/inherited/everything-claude-code-instincts.yaml' for instincts.
+2. Create or update '.claude/ecc-tools.json' for ECC tools.
 
 **Files typically involved**:
 - `.claude/homunculus/instincts/inherited/everything-claude-code-instincts.yaml`
@@ -327,8 +328,8 @@ Adds or updates system instincts or ECC tools configuration.
 
 **Example commit sequence**:
 ```
-Create or update .claude/homunculus/instincts/inherited/everything-claude-code-instincts.yaml for instincts.
-Create or update .claude/ecc-tools.json for ECC tools.
+Create or update '.claude/homunculus/instincts/inherited/everything-claude-code-instincts.yaml' for instincts.
+Create or update '.claude/ecc-tools.json' for ECC tools.
 ```
 
 
