@@ -25,7 +25,7 @@ Adds documentation for a new command or workflow to the system.
 
 ## Typical Commit Signals
 
-- Create or update a markdown file in .claude/commands/ with the command or workflow documentation.
+- Create or update a markdown file under .claude/commands/ with the command or workflow documentation.
 
 ## Notes
 
