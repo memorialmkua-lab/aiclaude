@@ -8,8 +8,8 @@
   ],
   "commandFiles": [
     ".claude/commands/feature-development.md",
-    ".claude/commands/add-new-skill-or-agent.md",
-    ".claude/commands/feature-development-documentation.md"
+    ".claude/commands/add-command-or-workflow-doc.md",
+    ".claude/commands/add-new-skill-or-agent.md"
   ],
-  "updatedAt": "2026-03-18T10:07:57.011Z"
+  "updatedAt": "2026-03-18T10:08:57.173Z"
 }
