@@ -1,5 +1,5 @@
 # Instincts generated from https://github.com/affaan-m/everything-claude-code
-# Generated: 2026-03-18T10:05:04.761Z
+# Generated: 2026-03-18T10:06:22.782Z
 # Version: 2.0
 
 ---
@@ -15,13 +15,13 @@ source_repo: https://github.com/affaan-m/everything-claude-code
 
 ## Action
 
-Use conventional commit format with prefixes: fix, test, feat, docs, chore
+Use conventional commit format with prefixes: fix, test, feat, docs
 
 ## Evidence
 
 - 500 commits analyzed
 - Detected conventional commit pattern
-- Examples: fix: resolve 8 test failures on main (install pipeline, orchestrator, repair) (#564), feat(agents): add java-build-resolver for Maven/Gradle (#538)
+- Examples: feat: add everything-claude-code ECC bundle (.claude/commands/add-new-skill-or-agent.md), fix: resolve 8 test failures on main (install pipeline, orchestrator, repair) (#564)
 
 ---
 id: everything-claude-code-commit-length
@@ -40,7 +40,7 @@ Write moderate-length commit messages (~50 characters)
 
 ## Evidence
 
-- Average commit message length: 65 chars
+- Average commit message length: 66 chars
 - Based on 500 commits
 
 ---
@@ -164,30 +164,6 @@ Write unit, integration tests to match project standards
 - Coverage config: yes
 
 ---
-id: everything-claude-code-workflow-database-migration
-trigger: "when modifying the database schema or adding tables"
-confidence: 0.6
-domain: workflow
-source: repo-analysis
-source_repo: https://github.com/affaan-m/everything-claude-code
----
-
-# Everything Claude Code Workflow Database Migration
-
-## Action
-
-Follow the database-migration workflow:
-1. Create migration file
-2. Update schema definitions
-3. Generate/update types
-
-## Evidence
-
-- Workflow detected from commit patterns
-- Frequency: ~2x per month
-- Files: **/schema.*, migrations/*
-
----
 id: everything-claude-code-workflow-feature-development
 trigger: "when implementing a new feature"
 confidence: 0.9
@@ -208,38 +184,63 @@ Follow the feature-development workflow:
 ## Evidence
 
 - Workflow detected from commit patterns
-- Frequency: ~20x per month
-- Files: manifests/*, schemas/*, **/*.test.*
+- Frequency: ~25x per month
+- Files: manifests/*, **/*.test.*, **/api/**
 
 ---
-id: everything-claude-code-workflow-add-new-skill-or-agent
-trigger: "when doing add new skill or agent"
-confidence: 0.8
+id: everything-claude-code-workflow-add-new-skill
+trigger: "when doing add new skill"
+confidence: 0.75
 domain: workflow
 source: repo-analysis
 source_repo: https://github.com/affaan-m/everything-claude-code
 ---
 
-# Everything Claude Code Workflow Add New Skill Or Agent
+# Everything Claude Code Workflow Add New Skill
 
 ## Action
 
-Follow the add-new-skill-or-agent workflow:
-1. Create or update SKILL.md in skills/<skill-name>/ or agents/<agent-name>.md
-2. Add or update agent/skill documentation in AGENTS.md or rules/common/agents.md
-3. Optionally, add openai.yaml for agent harness integration
-4. Register new skill/agent in install manifests or documentation counts
+Follow the add-new-skill workflow:
+1. Create or update SKILL.md in skills/<skill-name>/SKILL.md
+2. Optionally add or update .agents/skills/<skill-name>/SKILL.md and/or .cursor/skills/<skill-name>/SKILL.md for cross-harness support
+3. Optionally add .agents/skills/<skill-name>/agents/openai.yaml for agent configuration
+4. Update install manifests if the skill should be included in install profiles
 
 ## Evidence
 
 - Workflow detected from commit patterns
-- Frequency: ~6x per month
-- Files: skills/*/SKILL.md, agents/*.md, AGENTS.md
+- Frequency: ~5x per month
+- Files: skills/*/SKILL.md, .agents/skills/*/SKILL.md, .cursor/skills/*/SKILL.md
+
+---
+id: everything-claude-code-workflow-add-new-agent
+trigger: "when doing add new agent"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/affaan-m/everything-claude-code
+---
+
+# Everything Claude Code Workflow Add New Agent
+
+## Action
+
+Follow the add-new-agent workflow:
+1. Create agent documentation in agents/<agent-name>.md
+2. Register the agent in AGENTS.md
+3. Optionally add .codex/agents/<agent-name>.toml for Codex harness
+4. Optionally add .agents/skills/<skill-name>/agents/openai.yaml if agent is tied to a skill
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: agents/*.md, AGENTS.md, .codex/agents/*.toml
 
 ---
 id: everything-claude-code-workflow-add-new-command
 trigger: "when doing add new command"
-confidence: 0.65
+confidence: 0.6
 domain: workflow
 source: repo-analysis
 source_repo: https://github.com/affaan-m/everything-claude-code
@@ -250,85 +251,60 @@ source_repo: https://github.com/affaan-m/everything-claude-code
 ## Action
 
 Follow the add-new-command workflow:
-1. Create commands/<command-name>.md
-2. Optionally, add .opencode/commands/<command-name>.md mirror
-3. Optionally, add tests for the command in tests/scripts/
-4. Update README.md or AGENTS.md if command count is tracked
-
-## Evidence
-
-- Workflow detected from commit patterns
-- Frequency: ~3x per month
-- Files: commands/*.md, .opencode/commands/*.md, tests/scripts/*.test.js
-
----
-id: everything-claude-code-workflow-language-support-expansion
-trigger: "when doing language support expansion"
-confidence: 0.6
-domain: workflow
-source: repo-analysis
-source_repo: https://github.com/affaan-m/everything-claude-code
----
-
-# Everything Claude Code Workflow Language Support Expansion
-
-## Action
-
-Follow the language-support-expansion workflow:
-1. Add agents/<language>-reviewer.md and/or agents/<language>-build-resolver.md
-2. Add commands/<language>-build.md, commands/<language>-review.md, commands/<language>-test.md
-3. Add rules/<language>/*.md (coding-style, hooks, patterns, security, testing)
-4. Add skills/<language>-patterns/SKILL.md and skills/<language>-testing/SKILL.md
-5. Add or update tests/hooks/ and tests/scripts/ for new language
-6. Register new agents/skills in AGENTS.md and install manifests
+1. Create command documentation in commands/<command-name>.md
+2. Optionally add OpenCode mirrors in .opencode/commands/
+3. Update documentation or registry if needed
 
 ## Evidence
 
 - Workflow detected from commit patterns
 - Frequency: ~2x per month
-- Files: agents/*-reviewer.md, agents/*-build-resolver.md, commands/*-build.md
+- Files: commands/*.md, .opencode/commands/*.md
 
 ---
-id: everything-claude-code-workflow-cross-harness-skill-sync
-trigger: "when doing cross harness skill sync"
+id: everything-claude-code-workflow-add-language-support
+trigger: "when doing add language support"
 confidence: 0.6
 domain: workflow
 source: repo-analysis
 source_repo: https://github.com/affaan-m/everything-claude-code
 ---
 
-# Everything Claude Code Workflow Cross Harness Skill Sync
+# Everything Claude Code Workflow Add Language Support
 
 ## Action
 
-Follow the cross-harness-skill-sync workflow:
-1. Copy or update SKILL.md in .agents/skills/<skill>/, .cursor/skills/<skill>/, and skills/<skill>/
-2. Optionally, update openai.yaml in .agents/skills/<skill>/agents/
-3. Align documentation with CONTRIBUTING template
+Follow the add-language-support workflow:
+1. Add agents for the language (agents/<language>-reviewer.md, agents/<language>-build-resolver.md)
+2. Add skills for patterns and testing (skills/<language>-patterns/SKILL.md, skills/<language>-testing/SKILL.md)
+3. Add slash commands (commands/<language>-build.md, commands/<language>-review.md, commands/<language>-test.md)
+4. Add rules for the language (rules/<language>/*.md)
+5. Register agents in AGENTS.md
+6. Optionally add OpenCode mirrors and prompts
 
 ## Evidence
 
 - Workflow detected from commit patterns
 - Frequency: ~2x per month
-- Files: .agents/skills/*/SKILL.md, .cursor/skills/*/SKILL.md, skills/*/SKILL.md
+- Files: agents/*-reviewer.md, agents/*-build-resolver.md, skills/*-patterns/SKILL.md
 
 ---
-id: everything-claude-code-workflow-install-manifest-update
-trigger: "when doing install manifest update"
+id: everything-claude-code-workflow-update-install-manifests
+trigger: "when doing update install manifests"
 confidence: 0.6
 domain: workflow
 source: repo-analysis
 source_repo: https://github.com/affaan-m/everything-claude-code
 ---
 
-# Everything Claude Code Workflow Install Manifest Update
+# Everything Claude Code Workflow Update Install Manifests
 
 ## Action
 
-Follow the install-manifest-update workflow:
-1. Edit manifests/install-components.json, install-modules.json, install-profiles.json
-2. Optionally, add new modules or update existing ones with new skills
-3. Run or update validation scripts/tests for manifests
+Follow the update-install-manifests workflow:
+1. Update manifests/install-components.json with new skills
+2. Update manifests/install-modules.json with new or extended modules
+3. Update manifests/install-profiles.json to reference updated modules
 
 ## Evidence
 
@@ -337,75 +313,26 @@ Follow the install-manifest-update workflow:
 - Files: manifests/install-components.json, manifests/install-modules.json, manifests/install-profiles.json
 
 ---
-id: everything-claude-code-workflow-localization-or-translation-sync
-trigger: "when doing localization or translation sync"
-confidence: 0.6
+id: everything-claude-code-workflow-address-pr-review-feedback
+trigger: "when doing address pr review feedback"
+confidence: 0.7
 domain: workflow
 source: repo-analysis
 source_repo: https://github.com/affaan-m/everything-claude-code
 ---
 
-# Everything Claude Code Workflow Localization Or Translation Sync
+# Everything Claude Code Workflow Address Pr Review Feedback
 
 ## Action
 
-Follow the localization-or-translation-sync workflow:
-1. Add or update docs/<lang>/* files (README.md, commands, agents, skills, rules, examples, etc.)
-2. Sync translated files with latest upstream changes
-3. Address review feedback for translation accuracy
+Follow the address-pr-review-feedback workflow:
+1. Edit relevant files to address review findings (e.g., documentation, code, config)
+2. Clarify or expand examples, fix typos, improve consistency
+3. Push follow-up commits referencing the PR or review round
 
 ## Evidence
 
 - Workflow detected from commit patterns
-- Frequency: ~2x per month
-- Files: docs/zh-CN/**/*, docs/ko-KR/**/*, docs/ja-JP/**/*
-
----
-id: everything-claude-code-workflow-fix-or-enhance-observer-hooks
-trigger: "when doing fix or enhance observer hooks"
-confidence: 0.6
-domain: workflow
-source: repo-analysis
-source_repo: https://github.com/affaan-m/everything-claude-code
----
-
-# Everything Claude Code Workflow Fix Or Enhance Observer Hooks
-
-## Action
-
-Follow the fix-or-enhance-observer-hooks workflow:
-1. Edit skills/continuous-learning-v2/hooks/observe.sh (or agents/observer-loop.sh)
-2. Update or add related test files in tests/hooks/hooks.test.js
-3. Optionally, update documentation or config for observer logic
-
-## Evidence
-
-- Workflow detected from commit patterns
-- Frequency: ~2x per month
-- Files: skills/continuous-learning-v2/hooks/observe.sh, skills/continuous-learning-v2/agents/observer-loop.sh, tests/hooks/hooks.test.js
-
----
-id: everything-claude-code-workflow-ci-catalog-or-count-sync
-trigger: "when doing ci catalog or count sync"
-confidence: 0.6
-domain: workflow
-source: repo-analysis
-source_repo: https://github.com/affaan-m/everything-claude-code
----
-
-# Everything Claude Code Workflow Ci Catalog Or Count Sync
-
-## Action
-
-Follow the ci-catalog-or-count-sync workflow:
-1. Update AGENTS.md, README.md with new counts
-2. Edit or add scripts/ci/catalog.js or similar validation scripts
-3. Update or add tests/ci/validators.test.js
-4. Edit .github/workflows/ci.yml if CI logic changes
-
-## Evidence
-
-- Workflow detected from commit patterns
-- Frequency: ~2x per month
-- Files: AGENTS.md, README.md, scripts/ci/catalog.js
+- Frequency: ~4x per month
+- Files: skills/*/SKILL.md, .agents/skills/*/SKILL.md, .cursor/skills/*/SKILL.md
 
