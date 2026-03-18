@@ -10,7 +10,7 @@ Use this workflow when working on **add-new-skill-command** in `everything-claud
 
 ## Goal
 
-Adds a new skill command to the system, documenting how to add new skills.
+Adds a new skill command to the system, documenting how to add a skill.
 
 ## Common Files
 
@@ -25,8 +25,7 @@ Adds a new skill command to the system, documenting how to add new skills.
 
 ## Typical Commit Signals
 
-- Create or update .claude/commands/add-new-skill-command.md
-- Commit the file
+- Create or update '.claude/commands/add-new-skill-command.md' with details of the new skill command.
 
 ## Notes
 
