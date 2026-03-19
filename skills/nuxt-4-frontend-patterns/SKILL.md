@@ -1,8 +1,8 @@
 ---
-
-## name: nuxt-4-frontend-patterns
+name: nuxt-4-frontend-patterns
 description: Nuxt 4 frontend patterns — hydration safety, performance optimization, route rules, lazy loading, plugin best practices, data fetching, and VueUse integration for production Vue 3/Nuxt apps.
 origin: ECC
+---
 
 # Nuxt 4 Frontend Patterns
 
