@@ -256,7 +256,7 @@ Control when components become interactive — reduces JavaScript work on initia
 ### Third-Party Script Management
 
 ```typescript
-// ✅ GOOD: controlled loading with useScript
+// Good: controlled loading with useScript
 const { proxy } = useScriptGoogleAnalytics({
   id: 'G-XXXXXXX',
   scriptOptions: { trigger: 'manual' },
@@ -348,7 +348,7 @@ export function useFormatDate() {
 // plugins/analytics.ts
 export default defineNuxtPlugin({
   name: 'analytics',
-  parallel: true, // ✅ Don't block other plugins
+  parallel: true, // Don't block other plugins
   async setup(nuxtApp) {
     // async init that won't block rendering
   },
@@ -433,15 +433,11 @@ useIntersectionObserver(target, ([entry]) => {
 ```vue
 <script setup lang="ts">
 const query = ref('')
-const results = ref<SearchResult[]>([])
 
 const debouncedSearch = useDebounceFn(async (term: string) => {
   if (!term) { results.value = []; return }
-  const { data } = await useFetch(`/api/search?q=${term}`)
-  results.value = data.value ?? []
+  results.value = await $fetch(`/api/search?q=${encodeURIComponent(term)}`) ?? []
 }, 300)
-
-watch(query, (val) => debouncedSearch(val))
 </script>
 
 <template>
