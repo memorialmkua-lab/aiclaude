@@ -80,7 +80,7 @@ String label = switch (status) {
 // GOOD
 return repository.findById(id)
     .map(ResponseDto::from)
-    .orElseThrow(() -> new EntityNotFoundException("Order", id));
+    .orElseThrow(() -> new OrderNotFoundException(id));
 
 // BAD — Optional as parameter
 public void process(Optional<String> name) {}
