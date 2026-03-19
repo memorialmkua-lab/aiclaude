@@ -15,6 +15,7 @@
 ![Go](https://img.shields.io/badge/-Go-00ADD8?logo=go&logoColor=white)
 ![Java](https://img.shields.io/badge/-Java-ED8B00?logo=openjdk&logoColor=white)
 ![Perl](https://img.shields.io/badge/-Perl-39457E?logo=perl&logoColor=white)
+![C#](https://img.shields.io/badge/-C%23-239120?logo=csharp&logoColor=white)
 ![Markdown](https://img.shields.io/badge/-Markdown-000000?logo=markdown&logoColor=white)
 
 > **50K+ stars** | **6K+ forks** | **30 contributors** | **5 languages supported** | **Anthropic Hackathon Winner**
@@ -159,16 +160,16 @@ cd everything-claude-code
 npm install        # or: pnpm install | yarn install | bun install
 
 # macOS/Linux
-./install.sh typescript    # or python or golang or swift or php
-# ./install.sh typescript python golang swift php
+./install.sh typescript    # or python or golang or swift or php or csharp
+# ./install.sh typescript python golang swift php csharp
 # ./install.sh --target cursor typescript
 # ./install.sh --target antigravity typescript
 ```
 
 ```powershell
 # Windows PowerShell
-.\install.ps1 typescript   # or python or golang or swift or php
-# .\install.ps1 typescript python golang swift php
+.\install.ps1 typescript   # or python or golang or swift or php or csharp
+# .\install.ps1 typescript python golang swift php csharp
 # .\install.ps1 --target cursor typescript
 # .\install.ps1 --target antigravity typescript
 
@@ -330,6 +331,9 @@ everything-claude-code/
 |   |-- perl-patterns/             # Modern Perl 5.36+ idioms and best practices (NEW)
 |   |-- perl-security/             # Perl security patterns, taint mode, safe I/O (NEW)
 |   |-- perl-testing/              # Perl TDD with Test2::V0, prove, Devel::Cover (NEW)
+|   |-- csharp-patterns/           # C# 12 / .NET 8+ idioms and best practices (NEW)
+|   |-- csharp-security/           # C# / ASP.NET Core security patterns (NEW)
+|   |-- csharp-testing/            # C# TDD with xUnit, NSubstitute, Coverlet (NEW)
 |   |-- autonomous-loops/           # Autonomous loop patterns: sequential pipelines, PR loops, DAG orchestration (NEW)
 |   |-- plankton-code-quality/      # Write-time code quality enforcement with Plankton hooks (NEW)
 |
@@ -383,6 +387,7 @@ everything-claude-code/
 |   |-- golang/              # Go specific
 |   |-- swift/               # Swift specific
 |   |-- php/                 # PHP specific (NEW)
+|   |-- csharp/              # C# / .NET specific (NEW)
 |
 |-- hooks/            # Trigger-based automations
 |   |-- README.md                 # Hook documentation, recipes, and customization guide
@@ -587,6 +592,7 @@ This gives you instant access to all commands, agents, skills, and hooks.
 > cp -r everything-claude-code/rules/python/* ~/.claude/rules/
 > cp -r everything-claude-code/rules/golang/* ~/.claude/rules/
 > cp -r everything-claude-code/rules/php/* ~/.claude/rules/
+> cp -r everything-claude-code/rules/csharp/* ~/.claude/rules/
 >
 > # Option B: Project-level rules (applies to current project only)
 > mkdir -p .claude/rules
@@ -613,6 +619,7 @@ cp -r everything-claude-code/rules/typescript/* ~/.claude/rules/   # pick your s
 cp -r everything-claude-code/rules/python/* ~/.claude/rules/
 cp -r everything-claude-code/rules/golang/* ~/.claude/rules/
 cp -r everything-claude-code/rules/php/* ~/.claude/rules/
+cp -r everything-claude-code/rules/csharp/* ~/.claude/rules/
 
 # Copy commands
 cp everything-claude-code/commands/*.md ~/.claude/commands/
@@ -697,6 +704,7 @@ rules/
   golang/          # Go specific patterns and tools
   swift/           # Swift specific patterns and tools
   php/             # PHP specific patterns and tools
+  csharp/          # C# / .NET specific patterns and tools
 ```
 
 See [`rules/README.md`](rules/README.md) for installation and structure details.
@@ -876,7 +884,7 @@ Please contribute! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Ideas for Contributions
 
-- Language-specific skills (Rust, C#, Kotlin, Java) — Go, Python, Perl, Swift, and TypeScript already included
+- Language-specific skills (Rust, Kotlin, Java) — Go, Python, Perl, Swift, C#, and TypeScript already included
 - Framework-specific configs (Rails, FastAPI, NestJS) — Django, Spring Boot, Laravel already included
 - DevOps agents (Kubernetes, Terraform, AWS, Docker)
 - Testing strategies (different frameworks, visual regression)
@@ -893,13 +901,13 @@ ECC provides **full Cursor IDE support** with hooks, rules, agents, skills, comm
 ```bash
 # macOS/Linux
 ./install.sh --target cursor typescript
-./install.sh --target cursor python golang swift php
+./install.sh --target cursor python golang swift php csharp
 ```
 
 ```powershell
 # Windows PowerShell
 .\install.ps1 --target cursor typescript
-.\install.ps1 --target cursor python golang swift php
+.\install.ps1 --target cursor python golang swift php csharp
 ```
 
 ### What's Included
@@ -908,7 +916,7 @@ ECC provides **full Cursor IDE support** with hooks, rules, agents, skills, comm
 |-----------|-------|---------|
 | Hook Events | 15 | sessionStart, beforeShellExecution, afterFileEdit, beforeMCPExecution, beforeSubmitPrompt, and 10 more |
 | Hook Scripts | 16 | Thin Node.js scripts delegating to `scripts/hooks/` via shared adapter |
-| Rules | 34 | 9 common (alwaysApply) + 25 language-specific (TypeScript, Python, Go, Swift, PHP) |
+| Rules | 39 | 9 common (alwaysApply) + 30 language-specific (TypeScript, Python, Go, Swift, PHP, C#) |
 | Agents | Shared | Via AGENTS.md at root (read by Cursor natively) |
 | Skills | Shared + Bundled | Via AGENTS.md at root and `.cursor/skills/` for translated additions |
 | Commands | Shared | `.cursor/commands/` if installed |
@@ -1155,7 +1163,7 @@ ECC is the **first plugin to maximize every major AI coding tool**. Here's how e
 | **Skills** | 102 | Shared | 10 (native format) | 37 |
 | **Hook Events** | 8 types | 15 types | None yet | 11 types |
 | **Hook Scripts** | 20+ scripts | 16 scripts (DRY adapter) | N/A | Plugin hooks |
-| **Rules** | 34 (common + lang) | 34 (YAML frontmatter) | Instruction-based | 13 instructions |
+| **Rules** | 39 (common + lang) | 39 (YAML frontmatter) | Instruction-based | 13 instructions |
 | **Custom Tools** | Via hooks | Via hooks | N/A | 6 native tools |
 | **MCP Servers** | 14 | Shared (mcp.json) | 4 (command-based) | Full |
 | **Config Format** | settings.json | hooks.json + rules/ | config.toml | opencode.json |
