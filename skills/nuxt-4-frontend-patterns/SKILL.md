@@ -273,9 +273,6 @@ proxy.gtag('config', 'G-XXXXXXX')
 <script setup lang="ts">
 import { shallowRef } from 'vue'
 
-const appTitle = 'My App'
-
-// Use shallowRef for large objects that don't need deep reactivity
 // Use shallowRef for large objects that don't need deep reactivity
 interface Item { id: string; name: string; selected: boolean }
 const items = shallowRef<Item[]>([])
@@ -284,7 +281,7 @@ const items = shallowRef<Item[]>([])
 <template>
   <!-- v-once: render static content once, skip future updates -->
   <header v-once>
-    <h1>{{ appTitle }}</h1>
+    <h1>My App:</h1>
   </header>
 
   <!-- v-memo: skip re-render unless dependencies change -->
@@ -392,7 +389,7 @@ All VueUse composables are auto-imported — no manual imports needed.
 ```vue
 <script setup lang="ts">
 // Not good: raw localStorage causes hydration mismatch
-const theme = ref(localStorage.getItem('theme') || 'light')
+// const theme = ref(localStorage.getItem('theme') || 'light')
 
 // Good: useLocalStorage is SSR-safe via @vueuse/nuxt
 const theme = useLocalStorage('theme', 'light')
@@ -446,7 +443,15 @@ const debouncedSearch = useDebounceFn(async (term: string) => {
   results.value = await $fetch(`/api/search?q=${encodeURIComponent(term)}`) ?? []
 }, 300)
 
-watch(query, (term) => debouncedSearch(term))
+const error = ref<string | null>(null)
+
+watch(query, async (term) => {
+  try {
+    await debouncedSearch(term)
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Search failed'
+  }
+})
 </script>
 ```
 
@@ -462,7 +467,7 @@ watch(query, (term) => debouncedSearch(term))
 </template>
 ```
 
-**`useBreakpoints` with `ssrWidth` (when JS logic is truly needed):**
+**`useBreakpoints` with `ssrWidth` (when JS logic is really needed):**
 
 ```vue
 <script setup lang="ts">
