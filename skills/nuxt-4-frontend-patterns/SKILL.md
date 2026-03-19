@@ -476,38 +476,17 @@ whenever(ctrl_k, () => {
 </script>
 ```
 
-### Common VueUse Composables for Nuxt
-
-
-| Composable                        | Purpose                   | SSR-Safe               |
-| --------------------------------- | ------------------------- | ---------------------- |
-| `useLocalStorage`                 | Persistent reactive state | Yes (via @vueuse/nuxt) |
-| `useDark` / `usePreferredDark`    | Dark mode detection       | Yes                    |
-| `useIntersectionObserver`         | Viewport visibility       | Yes (no-op on server)  |
-| `useDebounceFn` / `useThrottleFn` | Rate-limit function calls | Yes                    |
-| `useMediaQuery`                   | Responsive breakpoints    | No-op on server — **do not use with `v-if` for layout** (causes hydration mismatch). Use CSS breakpoints or `useBreakpoints` with `ssrWidth` instead |
-| `useBreakpoints`                  | JS breakpoint logic       | Yes (with `ssrWidth` option for SSR-safe initial value) |
-| `useMagicKeys`                    | Keyboard shortcuts        | Yes (no-op on server)  |
-| `useElementBounding`              | Element position/size     | Yes (no-op on server)  |
-| `useWindowSize`                   | Window dimensions         | Yes (no-op on server)  |
-| `onClickOutside`                  | Detect outside clicks     | Yes (no-op on server)  |
-| `useRefHistory`                   | Undo/redo for refs        | Yes                    |
-
-
 ## Common Pitfalls
 
-
-| Pitfall                                     | Fix                                                           |
-| ------------------------------------------- | ------------------------------------------------------------- |
-| Using `localStorage` directly in setup      | Use `useCookie` or `useLocalStorage` from VueUse              |
-| `v-if` based on `window` / `document`       | Use CSS media queries for layout; `useBreakpoints` with `ssrWidth` for JS logic. **Avoid `useMediaQuery` with `v-if`** — it causes hydration mismatch |
-| `Math.random()` / `Date.now()` in templates | Wrap in `useState` to sync SSR/client                         |
-| Too many plugins with expensive init        | Convert to composables; set `parallel: true` on async plugins |
-| All components loaded eagerly               | Add `Lazy` prefix for below-the-fold components               |
-| No route rules configured                   | Use `prerender`, `swr`, `isr` per route                       |
-| Unoptimized images                          | Use `<NuxtImg>` with `format="webp"` and priority hints       |
-| Third-party scripts blocking render         | Use `useScript` with manual trigger                           |
-| Deep reactivity on large objects            | Use `shallowRef` for collections not needing deep tracking    |
-| Ignoring hydration warnings in console      | Every warning is a bug — fix immediately                      |
+- **`localStorage` in setup** — use `useCookie` or `useLocalStorage` from VueUse
+- **`v-if` on `window`/`document`** — use CSS media queries for layout; `useBreakpoints` with `ssrWidth` for JS logic. Avoid `useMediaQuery` with `v-if` (hydration mismatch)
+- **`Math.random()`/`Date.now()` in templates** — wrap in `useState` to sync SSR/client
+- **Too many plugins with expensive init** — convert to composables; set `parallel: true` on async plugins
+- **All components loaded eagerly** — add `Lazy` prefix for below-the-fold components
+- **No route rules configured** — use `prerender`, `swr`, `isr` per route
+- **Unoptimized images** — use `<NuxtImg>` with `format="webp"` and priority hints
+- **Third-party scripts blocking render** — use `useScript` with manual trigger
+- **Deep reactivity on large objects** — use `shallowRef` for collections not needing deep tracking
+- **Ignoring hydration warnings** — every warning is a bug; fix immediately
 
 
