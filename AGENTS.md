@@ -23,6 +23,9 @@ This is a **production-ready AI coding plugin** providing 26 specialized agents,
 | e2e-runner | End-to-end Playwright testing | Critical user flows |
 | refactor-cleaner | Dead code cleanup | Code maintenance |
 | doc-updater | Documentation and codemaps | Updating docs |
+| docs-lookup | Documentation and API reference research | Library/API documentation questions |
+| cpp-reviewer | C++ code review | C++ projects |
+| cpp-build-resolver | C++ build errors | C++ build failures |
 | go-reviewer | Go code review | Go projects |
 | go-build-resolver | Go build errors | Go build failures |
 | kotlin-reviewer | Kotlin code review | Kotlin/Android/KMP projects |
