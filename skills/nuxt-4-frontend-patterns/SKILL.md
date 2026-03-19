@@ -420,7 +420,7 @@ let searchVersion = 0
 const debouncedSearch = useDebounceFn(async (term: string) => {
   if (!term) { results.value = []; return }
   const version = ++searchVersion
-  const data = await $fetch(`/api/search?q=${encodeURIComponent(term)}`) ?? []
+  const data = await $fetch<Array<{ id: string; title: string }>>(`/api/search?q=${encodeURIComponent(term)}`) ?? []
   if (version === searchVersion) results.value = data
 }, 300)
 
