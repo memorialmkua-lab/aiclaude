@@ -46,9 +46,6 @@ Hydration mismatches are not just warnings — they break interactivity, cause l
 ### Use SSR-Safe State
 
 ```typescript
-// Not good: localStorage doesn't exist on server
-const theme = localStorage.getItem('theme') || 'light'
-
 // Good: useCookie works on both server and client
 const theme = useCookie('theme', { default: () => 'light' })
 
@@ -59,9 +56,6 @@ const count = useState('count', () => 0)
 ### Avoid Non-Deterministic Rendering
 
 ```typescript
-// Not good: different value on server vs client
-const id = Math.random().toString(36)
-
 // Good: useState ensures same value on both sides
 const id = useState('id', () => Math.random().toString(36))
 ```
@@ -70,9 +64,6 @@ const id = useState('id', () => Math.random().toString(36))
 
 ```vue
 <script setup lang="ts">
-// Not good: window doesn't exist on server
-const width = window.innerWidth
-
 // Good: defer to onMounted
 const width = ref(0)
 onMounted(() => {
@@ -85,9 +76,6 @@ onMounted(() => {
 
 ```vue
 <template>
-  <!-- Not good: causes hydration mismatch -->
-  <div v-if="window?.innerWidth > 768">Desktop</div>
-
   <!-- Good: CSS handles responsiveness without mismatch -->
   <div class="hidden md:block">Desktop content</div>
   <div class="md:hidden">Mobile content</div>
@@ -329,14 +317,6 @@ const { data: user } = await useAsyncData('user', () => {
 ### Prefer Composables Over Plugins
 
 ```typescript
-// Not good: plugin for simple utility
-// plugins/format-date.ts
-export default defineNuxtPlugin(() => {
-  return {
-    provide: { formatDate: (d: Date) => d.toLocaleDateString() },
-  }
-})
-
 // Good: composable — auto-imported, tree-shakeable, no init cost
 // composables/useFormatDate.ts
 export function useFormatDate() {
@@ -388,9 +368,6 @@ All VueUse composables are auto-imported — no manual imports needed.
 
 ```vue
 <script setup lang="ts">
-// Not good: raw localStorage causes hydration mismatch
-// const theme = ref(localStorage.getItem('theme') || 'light')
-
 // Good: useLocalStorage is SSR-safe via @vueuse/nuxt
 const theme = useLocalStorage('theme', 'light')
 const session = useSessionStorage('session-data', { loggedIn: false })
