@@ -192,7 +192,7 @@ For manual install instructions see the README in the `rules/` folder.
 /plugin list everything-claude-code@everything-claude-code
 ```
 
-✨ **That's it!** You now have access to 25 agents, 108 skills, and 57 commands.
+✨ **That's it!** You now have access to 25 agents, 112 skills, and 57 commands.
 
 ---
 
@@ -334,6 +334,7 @@ everything-claude-code/
 |   |-- csharp-patterns/           # C# 12 / .NET 8+ idioms and best practices (NEW)
 |   |-- csharp-security/           # C# / ASP.NET Core security patterns (NEW)
 |   |-- csharp-testing/            # C# TDD with xUnit, NSubstitute, Coverlet (NEW)
+|   |-- csharp-data-access/        # EF Core and Dapper data access patterns (NEW)
 |   |-- autonomous-loops/           # Autonomous loop patterns: sequential pipelines, PR loops, DAG orchestration (NEW)
 |   |-- plankton-code-quality/      # Write-time code quality enforcement with Plankton hooks (NEW)
 |
@@ -1052,7 +1053,7 @@ The configuration is automatically detected from `.opencode/opencode.json`.
 |---------|-------------|----------|--------|
 | Agents | ✅ 25 agents | ✅ 12 agents | **Claude Code leads** |
 | Commands | ✅ 57 commands | ✅ 31 commands | **Claude Code leads** |
-| Skills | ✅ 108 skills | ✅ 37 skills | **Claude Code leads** |
+| Skills | ✅ 112 skills | ✅ 37 skills | **Claude Code leads** |
 | Hooks | ✅ 8 event types | ✅ 11 events | **OpenCode has more!** |
 | Rules | ✅ 29 rules | ✅ 13 instructions | **Claude Code leads** |
 | MCP Servers | ✅ 14 servers | ✅ Full | **Full parity** |
