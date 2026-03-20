@@ -1135,52 +1135,6 @@ def cmd_projects(args) -> int:
 
 
 # ─────────────────────────────────────────────
-# Prune Command
-# ─────────────────────────────────────────────
-
-def _collect_pending_dirs() -> list[Path]:
-    """Collect all pending instinct directories (global + per-project)."""
-    dirs = []
-    global_pending = GLOBAL_INSTINCTS_DIR / "pending"
-    if global_pending.is_dir():
-        dirs.append(global_pending)
-    if PROJECTS_DIR.is_dir():
-        for project_dir in PROJECTS_DIR.iterdir():
-            if not project_dir.is_dir():
-                continue
-            pending = project_dir / "instincts" / "pending"
-            if pending.is_dir():
-                dirs.append(pending)
-    return dirs
-
-
-def _parse_created_date(path: Path) -> Optional[datetime]:
-    """Extract created date from instinct frontmatter, fall back to mtime."""
-    try:
-        raw = path.read_text(encoding="utf-8")
-    except Exception:
-        return None
-
-    if raw.startswith("---"):
-        parts = raw.split("---", 2)
-        if len(parts) >= 3:
-            for line in parts[1].strip().split("\n"):
-                if line.strip().startswith("created:"):
-                    date_str = line.split(":", 1)[1].strip().strip('"').strip("'")
-                    try:
-                        return datetime.strptime(date_str, "%Y-%m-%d")
-                    except ValueError:
-                        break
-
-    # Fallback: file modification time
-    try:
-        mtime = path.stat().st_mtime
-        return datetime.fromtimestamp(mtime)
-    except Exception:
-        return None
-
-
-# ─────────────────────────────────────────────
 # Generate Evolved Structures
 # ─────────────────────────────────────────────
 
@@ -1331,7 +1285,7 @@ def _collect_pending_instincts() -> list[dict]:
     for pending_dir in _collect_pending_dirs():
         files = [
             f for f in sorted(pending_dir.iterdir())
-            if f.is_file() and f.suffix.lower() == ".md"
+            if f.is_file() and f.suffix.lower() in ALLOWED_INSTINCT_EXTENSIONS
         ]
         for file_path in files:
             created = _parse_created_date(file_path)
@@ -1375,10 +1329,12 @@ def cmd_prune(args) -> int:
         return 0
 
     pruned = 0
+    pruned_items = []
     for item in expired:
         try:
             item["path"].unlink()
             pruned += 1
+            pruned_items.append(item)
         except OSError as e:
             if not quiet:
                 print(f"Warning: Failed to delete {item['path']}: {e}", file=sys.stderr)
@@ -1386,11 +1342,13 @@ def cmd_prune(args) -> int:
     if not quiet:
         if pruned > 0:
             print(f"\nPruned {pruned} pending instinct(s) older than {max_age} days.")
-            for item in expired:
+            for item in pruned_items:
                 print(f"  - {item['name']} (age: {item['age_days']}d)")
         else:
             print(f"No pending instincts older than {max_age} days.")
-        print(f"\nSummary: {pruned} pruned, {len(remaining)} remaining")
+        failed = len(expired) - pruned
+        remaining_total = len(remaining) + failed
+        print(f"\nSummary: {pruned} pruned, {remaining_total} remaining")
 
     return 0
 
