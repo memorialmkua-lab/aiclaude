@@ -32,7 +32,7 @@ function runScript(input, envOverrides = {}) {
   const inputStr = typeof input === 'string' ? input : JSON.stringify(input);
   // Mirror HOME to USERPROFILE for Windows (os.homedir() checks USERPROFILE on Windows)
   const env = { ...process.env, ...envOverrides };
-  if (envOverrides.HOME && !envOverrides.USERPROFILE) {
+  if ('HOME' in envOverrides && !('USERPROFILE' in envOverrides)) {
     env.USERPROFILE = envOverrides.HOME;
   }
   const result = spawnSync('node', [script], {
@@ -52,14 +52,17 @@ function runTests() {
 
   // 1. Passes through input on stdout
   test('passes through input on stdout', () => {
+    const tmpHome = makeTempDir();
     const input = {
       model: 'claude-sonnet-4-20250514',
       usage: { input_tokens: 100, output_tokens: 50 }
     };
     const inputStr = JSON.stringify(input);
-    const result = runScript(input);
+    const result = runScript(input, { HOME: tmpHome });
     assert.strictEqual(result.code, 0, `Expected exit code 0, got ${result.code}`);
     assert.strictEqual(result.stdout, inputStr, 'Expected stdout to match original input');
+
+    fs.rmSync(tmpHome, { recursive: true, force: true });
   })
     ? passed++
     : failed++;
