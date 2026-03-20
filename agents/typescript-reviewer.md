@@ -16,7 +16,7 @@ When invoked:
    - If required checks are failing or pending, stop and report that review should wait for green CI.
    - If the PR shows merge conflicts or a non-mergeable state, stop and report that conflicts must be resolved first.
    - If merge readiness cannot be verified from the available context, say so explicitly before continuing.
-3. If a `tsconfig.json` exists for the review target, run `tsc --noEmit -p tsconfig.json`. If only `tsconfig.*.json` files exist, run `tsc --noEmit -p <relevant-config>` (or the project's equivalent TypeScript check script). Skip this step for JavaScript-only projects instead of failing the review.
+3. Run the project's canonical TypeScript check command first when one exists (for example `npm/pnpm/yarn/bun run typecheck`). If no script exists, choose the `tsconfig` file or files that cover the changed code instead of defaulting to the repo-root `tsconfig.json`; for project references, prefer `tsc -b <solution-config>`, otherwise use `tsc --noEmit -p <relevant-config>`. Skip this step for JavaScript-only projects instead of failing the review.
 4. Run `eslint . --ext .ts,.tsx,.js,.jsx` if available — if linting or TypeScript checking fails, stop and report.
 5. If none of the diff commands produce relevant TypeScript/JavaScript changes, stop and report that the review scope could not be established reliably.
 6. Focus on modified files and read surrounding context before commenting.
@@ -88,7 +88,9 @@ You DO NOT refactor or rewrite code — you report findings only.
 ## Diagnostic Commands
 
 ```bash
-tsc --noEmit -p tsconfig.json        # Type checking (or point -p at the relevant tsconfig.*.json)
+npm run typecheck --if-present       # Canonical TypeScript check when the project defines one
+tsc --noEmit -p <relevant-config>    # Fallback type check for the tsconfig that owns the changed files
+tsc -b <solution-config>             # Project references / solution-style type checking
 eslint . --ext .ts,.tsx,.js,.jsx    # Linting
 prettier --check .                  # Format check
 npm audit                           # Dependency vulnerabilities (or the equivalent yarn/pnpm/bun audit command)
