@@ -143,7 +143,7 @@ Troubleshoot failures: check test isolation → verify mocks → fix implementat
 ```
 agents/          — 28 specialized subagents
 skills/          — 115 workflow skills and domain knowledge
-commands/        — 59 slash commands
+commands/        — 60 slash commands
 hooks/           — Trigger-based automations
 rules/           — Always-follow guidelines (common + per-language)
 scripts/         — Cross-platform Node.js utilities
