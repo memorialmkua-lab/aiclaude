@@ -403,42 +403,41 @@ def cmd_status(args) -> int:
         print(f"\nProject: {project['name']} ({project['id']})")
         print(f"  Project instincts:  {project['instincts_personal']}")
         print(f"  Global instincts:   {GLOBAL_PERSONAL_DIR}")
-        return 0
+    else:
+        # Split by scope
+        project_instincts = [i for i in instincts if i.get('_scope_label') == 'project']
+        global_instincts = [i for i in instincts if i.get('_scope_label') == 'global']
 
-    # Split by scope
-    project_instincts = [i for i in instincts if i.get('_scope_label') == 'project']
-    global_instincts = [i for i in instincts if i.get('_scope_label') == 'global']
+        # Print header
+        print(f"\n{'='*60}")
+        print(f"  INSTINCT STATUS - {len(instincts)} total")
+        print(f"{'='*60}\n")
 
-    # Print header
-    print(f"\n{'='*60}")
-    print(f"  INSTINCT STATUS - {len(instincts)} total")
-    print(f"{'='*60}\n")
-
-    print(f"  Project:  {project['name']} ({project['id']})")
-    print(f"  Project instincts: {len(project_instincts)}")
-    print(f"  Global instincts:  {len(global_instincts)}")
-    print()
-
-    # Print project-scoped instincts
-    if project_instincts:
-        print(f"## PROJECT-SCOPED ({project['name']})")
+        print(f"  Project:  {project['name']} ({project['id']})")
+        print(f"  Project instincts: {len(project_instincts)}")
+        print(f"  Global instincts:  {len(global_instincts)}")
         print()
-        _print_instincts_by_domain(project_instincts)
 
-    # Print global instincts
-    if global_instincts:
-        print(f"## GLOBAL (apply to all projects)")
-        print()
-        _print_instincts_by_domain(global_instincts)
+        # Print project-scoped instincts
+        if project_instincts:
+            print(f"## PROJECT-SCOPED ({project['name']})")
+            print()
+            _print_instincts_by_domain(project_instincts)
 
-    # Observations stats
-    obs_file = project.get("observations_file")
-    if obs_file and Path(obs_file).exists():
-        with open(obs_file, encoding="utf-8") as f:
-            obs_count = sum(1 for _ in f)
-        print(f"-" * 60)
-        print(f"  Observations: {obs_count} events logged")
-        print(f"  File: {obs_file}")
+        # Print global instincts
+        if global_instincts:
+            print(f"## GLOBAL (apply to all projects)")
+            print()
+            _print_instincts_by_domain(global_instincts)
+
+        # Observations stats
+        obs_file = project.get("observations_file")
+        if obs_file and Path(obs_file).exists():
+            with open(obs_file, encoding="utf-8") as f:
+                obs_count = sum(1 for _ in f)
+            print(f"-" * 60)
+            print(f"  Observations: {obs_count} events logged")
+            print(f"  File: {obs_file}")
 
     # Pending instinct stats
     pending = _collect_pending_instincts()
@@ -452,7 +451,8 @@ def cmd_status(args) -> int:
 
         # Show instincts expiring within PENDING_EXPIRY_WARNING_DAYS
         expiry_threshold = PENDING_TTL_DAYS - PENDING_EXPIRY_WARNING_DAYS
-        expiring_soon = [p for p in pending if p["age_days"] >= expiry_threshold]
+        expiring_soon = [p for p in pending
+                         if p["age_days"] >= expiry_threshold and p["age_days"] < PENDING_TTL_DAYS]
         if expiring_soon:
             print(f"\n  Expiring within {PENDING_EXPIRY_WARNING_DAYS} days:")
             for item in expiring_soon:
@@ -1287,6 +1287,7 @@ def _collect_pending_instincts() -> list[dict]:
         for file_path in files:
             created = _parse_created_date(file_path)
             if created is None:
+                print(f"Warning: could not parse age for pending instinct: {file_path.name}", file=sys.stderr)
                 continue
             age = now - created
             results.append({

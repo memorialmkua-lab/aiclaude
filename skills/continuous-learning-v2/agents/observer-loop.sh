@@ -175,7 +175,7 @@ echo "[$(date)] Observer started for ${PROJECT_NAME} (PID: $$)" >> "$LOG_FILE"
 
 # Prune expired pending instincts before analysis
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-"${CLV2_PYTHON_CMD:-python3}" "${SCRIPT_DIR}/../scripts/instinct-cli.py" prune --quiet 2>/dev/null || true
+"${CLV2_PYTHON_CMD:-python3}" "${SCRIPT_DIR}/../scripts/instinct-cli.py" prune --quiet >> "$LOG_FILE" 2>&1 || echo "[$(date)] Warning: instinct prune failed (non-fatal)" >> "$LOG_FILE"
 
 while true; do
   sleep "$OBSERVER_INTERVAL_SECONDS" &
