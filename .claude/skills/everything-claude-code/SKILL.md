@@ -34,13 +34,13 @@ Follow these commit message conventions based on 500 analyzed commits.
 ### Prefixes Used
 
 - `fix`
-- `test`
 - `feat`
+- `test`
 - `docs`
 
 ### Message Guidelines
 
-- Average message length: ~65 characters
+- Average message length: ~64 characters
 - Keep first line concise and descriptive
 - Use imperative mood ("Add feature" not "Added feature")
 
@@ -48,19 +48,19 @@ Follow these commit message conventions based on 500 analyzed commits.
 *Commit message example*
 
 ```text
-feat(rules): add C# language support
+feat: add typescript patterns skill
+```
+
+*Commit message example*
+
+```text
+fix: sanitize SessionStart session summaries (#710)
 ```
 
 *Commit message example*
 
 ```text
 chore(deps-dev): bump flatted (#675)
-```
-
-*Commit message example*
-
-```text
-fix: auto-detect ECC root from plugin cache when CLAUDE_PLUGIN_ROOT is unset (#547) (#691)
 ```
 
 *Commit message example*
@@ -78,19 +78,19 @@ merge: PR #529 — feat(skills): add documentation-lookup, bun-runtime, nextjs-t
 *Commit message example*
 
 ```text
-Revert "Add Kiro IDE support (.kiro/) (#548)"
+feat: add MCP health-check hook (#711)
 ```
 
 *Commit message example*
 
 ```text
-Add Kiro IDE support (.kiro/) (#548)
+feat(rules): add C# language support (#704)
 ```
 
 *Commit message example*
 
 ```text
-feat: add block-no-verify hook for Claude Code and Cursor (#649)
+feat: add nuxt 4 patterns skill (#702)
 ```
 
 ## Architecture
@@ -210,7 +210,7 @@ feat(rules): add Rust language rules (rebased #660) (#686)
 
 Standard feature implementation workflow
 
-**Frequency**: ~22 times per month
+**Frequency**: ~20 times per month
 
 **Steps**:
 1. Add feature implementation
@@ -225,21 +225,75 @@ Standard feature implementation workflow
 
 **Example commit sequence**:
 ```
-feat(skills): add documentation-lookup, bun-runtime, nextjs-turbopack; feat(agents): add rust-reviewer
-docs(skills): align documentation-lookup with CONTRIBUTING template; add cross-harness (Codex/Cursor) skill copies
-fix: address PR review — skill template (When to use, How it works, Examples), bun.lock, next build note, rust-reviewer CI note, doc-lookup privacy/uncertainty
+Address review: register rust-reviewer in AGENTS.md and rules, add openai.yaml for Codex skills
+merge: PR #529 — feat(skills): add documentation-lookup, bun-runtime, nextjs-turbopack; feat(agents): add rust-reviewer
+fix: refresh orchestration follow-up after #414 (#430)
 ```
 
-### Add Language Rules
+### Add New Skill
 
-Adds a new programming language to the rules system, including coding style, hooks, patterns, security, and testing guidelines.
+Adds a new skill to the repository, including documentation and (sometimes) Antigravity/Codex harness support.
+
+**Frequency**: ~4 times per month
+
+**Steps**:
+1. Create skills/<skill-name>/SKILL.md with full canonical content.
+2. Optionally, add .agents/skills/<skill-name>/SKILL.md and/or agents/<skill-name>.md for harness compatibility.
+3. Update AGENTS.md and/or README.md to increment skill count and document the new skill.
+4. If needed, add supporting scripts or openai.yaml for agent harness.
+5. Address review feedback by updating SKILL.md, adding examples, or clarifying sections.
+
+**Files typically involved**:
+- `skills/*/SKILL.md`
+- `.agents/skills/*/SKILL.md`
+- `AGENTS.md`
+- `README.md`
+
+**Example commit sequence**:
+```
+Create skills/<skill-name>/SKILL.md with full canonical content.
+Optionally, add .agents/skills/<skill-name>/SKILL.md and/or agents/<skill-name>.md for harness compatibility.
+Update AGENTS.md and/or README.md to increment skill count and document the new skill.
+If needed, add supporting scripts or openai.yaml for agent harness.
+Address review feedback by updating SKILL.md, adding examples, or clarifying sections.
+```
+
+### Add New Agent
+
+Adds a new agent to the repository, with documentation and registration in agent tables.
 
 **Frequency**: ~2 times per month
 
 **Steps**:
-1. Create a new directory under rules/{language}/
-2. Add coding-style.md, hooks.md, patterns.md, security.md, and testing.md files with language-specific content
-3. Optionally reference or link to related skills
+1. Create agents/<agent-name>.md with agent definition and documentation.
+2. Update AGENTS.md and README.md to increment agent count and document the new agent.
+3. Optionally, add docs/COMMAND-AGENT-MAP.md or similar mapping files.
+4. If needed, add .agents/skills/<agent-name>/SKILL.md and agents/<agent-name>/openai.yaml for harness support.
+
+**Files typically involved**:
+- `agents/*.md`
+- `AGENTS.md`
+- `README.md`
+- `docs/COMMAND-AGENT-MAP.md`
+
+**Example commit sequence**:
+```
+Create agents/<agent-name>.md with agent definition and documentation.
+Update AGENTS.md and README.md to increment agent count and document the new agent.
+Optionally, add docs/COMMAND-AGENT-MAP.md or similar mapping files.
+If needed, add .agents/skills/<agent-name>/SKILL.md and agents/<agent-name>/openai.yaml for harness support.
+```
+
+### Add Language Rules
+
+Adds a new language's ruleset (coding style, hooks, patterns, security, testing) to the repository.
+
+**Frequency**: ~2 times per month
+
+**Steps**:
+1. Create rules/<language>/(coding-style.md|hooks.md|patterns.md|security.md|testing.md) files.
+2. Optionally, reference or link to corresponding skills or agents.
+3. Update documentation or rules/common/agents.md as needed.
 
 **Files typically involved**:
 - `rules/*/coding-style.md`
@@ -250,173 +304,109 @@ Adds a new programming language to the rules system, including coding style, hoo
 
 **Example commit sequence**:
 ```
-Create a new directory under rules/{language}/
-Add coding-style.md, hooks.md, patterns.md, security.md, and testing.md files with language-specific content
-Optionally reference or link to related skills
-```
-
-### Add New Skill
-
-Adds a new skill to the system, documenting its workflow, triggers, and usage, often with supporting scripts.
-
-**Frequency**: ~4 times per month
-
-**Steps**:
-1. Create a new directory under skills/{skill-name}/
-2. Add SKILL.md with documentation (When to Use, How It Works, Examples, etc.)
-3. Optionally add scripts or supporting files under skills/{skill-name}/scripts/
-4. Address review feedback and iterate on documentation
-
-**Files typically involved**:
-- `skills/*/SKILL.md`
-- `skills/*/scripts/*.sh`
-- `skills/*/scripts/*.js`
-
-**Example commit sequence**:
-```
-Create a new directory under skills/{skill-name}/
-Add SKILL.md with documentation (When to Use, How It Works, Examples, etc.)
-Optionally add scripts or supporting files under skills/{skill-name}/scripts/
-Address review feedback and iterate on documentation
-```
-
-### Add New Agent
-
-Adds a new agent to the system for code review, build resolution, or other automated tasks.
-
-**Frequency**: ~2 times per month
-
-**Steps**:
-1. Create a new agent markdown file under agents/{agent-name}.md
-2. Register the agent in AGENTS.md
-3. Optionally update README.md and docs/COMMAND-AGENT-MAP.md
-
-**Files typically involved**:
-- `agents/*.md`
-- `AGENTS.md`
-- `README.md`
-- `docs/COMMAND-AGENT-MAP.md`
-
-**Example commit sequence**:
-```
-Create a new agent markdown file under agents/{agent-name}.md
-Register the agent in AGENTS.md
-Optionally update README.md and docs/COMMAND-AGENT-MAP.md
-```
-
-### Add New Command
-
-Adds a new command to the system, often paired with a backing skill.
-
-**Frequency**: ~1 times per month
-
-**Steps**:
-1. Create a new markdown file under commands/{command-name}.md
-2. Optionally add or update a backing skill under skills/{skill-name}/SKILL.md
-
-**Files typically involved**:
-- `commands/*.md`
-- `skills/*/SKILL.md`
-
-**Example commit sequence**:
-```
-Create a new markdown file under commands/{command-name}.md
-Optionally add or update a backing skill under skills/{skill-name}/SKILL.md
-```
-
-### Sync Catalog Counts
-
-Synchronizes the documented counts of agents, skills, and commands in AGENTS.md and README.md with the actual repository state.
-
-**Frequency**: ~3 times per month
-
-**Steps**:
-1. Update agent, skill, and command counts in AGENTS.md
-2. Update the same counts in README.md (quick-start, comparison table, etc.)
-3. Optionally update other documentation files
-
-**Files typically involved**:
-- `AGENTS.md`
-- `README.md`
-
-**Example commit sequence**:
-```
-Update agent, skill, and command counts in AGENTS.md
-Update the same counts in README.md (quick-start, comparison table, etc.)
-Optionally update other documentation files
-```
-
-### Add Cross Harness Skill Copies
-
-Adds skill copies for different agent harnesses (e.g., Codex, Cursor, Antigravity) to ensure compatibility across platforms.
-
-**Frequency**: ~2 times per month
-
-**Steps**:
-1. Copy or adapt SKILL.md to .agents/skills/{skill}/SKILL.md and/or .cursor/skills/{skill}/SKILL.md
-2. Optionally add harness-specific openai.yaml or config files
-3. Address review feedback to align with CONTRIBUTING template
-
-**Files typically involved**:
-- `.agents/skills/*/SKILL.md`
-- `.cursor/skills/*/SKILL.md`
-- `.agents/skills/*/agents/openai.yaml`
-
-**Example commit sequence**:
-```
-Copy or adapt SKILL.md to .agents/skills/{skill}/SKILL.md and/or .cursor/skills/{skill}/SKILL.md
-Optionally add harness-specific openai.yaml or config files
-Address review feedback to align with CONTRIBUTING template
+Create rules/<language>/(coding-style.md|hooks.md|patterns.md|security.md|testing.md) files.
+Optionally, reference or link to corresponding skills or agents.
+Update documentation or rules/common/agents.md as needed.
 ```
 
 ### Add Or Update Hook
 
-Adds or updates git or bash hooks to enforce workflow, quality, or security policies.
+Adds or updates a hook script, registers it, and adds/updates corresponding tests.
 
-**Frequency**: ~1 times per month
+**Frequency**: ~2 times per month
 
 **Steps**:
-1. Add or update hook scripts in hooks/ or scripts/hooks/
-2. Register the hook in hooks/hooks.json or similar config
-3. Optionally add or update tests in tests/hooks/
+1. Add or update scripts/hooks/<hook-name>.js.
+2. Register or update the hook in hooks/hooks.json (and/or .cursor/hooks.json).
+3. Add or update tests in tests/hooks/<hook-name>.test.js and/or tests/integration/hooks.test.js.
+4. Optionally, update related documentation.
 
 **Files typically involved**:
-- `hooks/*.hook`
-- `hooks/hooks.json`
 - `scripts/hooks/*.js`
-- `tests/hooks/*.test.js`
+- `hooks/hooks.json`
 - `.cursor/hooks.json`
+- `tests/hooks/*.test.js`
+- `tests/integration/hooks.test.js`
 
 **Example commit sequence**:
 ```
-Add or update hook scripts in hooks/ or scripts/hooks/
-Register the hook in hooks/hooks.json or similar config
-Optionally add or update tests in tests/hooks/
+Add or update scripts/hooks/<hook-name>.js.
+Register or update the hook in hooks/hooks.json (and/or .cursor/hooks.json).
+Add or update tests in tests/hooks/<hook-name>.test.js and/or tests/integration/hooks.test.js.
+Optionally, update related documentation.
 ```
 
-### Address Review Feedback
+### Sync Catalog Counts
 
-Addresses code review feedback by updating documentation, scripts, or configuration for clarity, correctness, or convention alignment.
+Synchronizes documented counts of agents, skills, and commands with the actual repository state.
 
-**Frequency**: ~4 times per month
+**Frequency**: ~2 times per month
 
 **Steps**:
-1. Edit SKILL.md, agent, or command files to address reviewer comments
-2. Update examples, headings, or configuration as requested
-3. Iterate until all review feedback is resolved
+1. Update AGENTS.md and README.md to reflect the correct counts in summary tables and quick-start sections.
+2. Optionally, update other documentation files (e.g., CHANGELOG.md, docs/zh-CN/README.md).
+3. Commit with a message indicating catalog or documentation count sync.
 
 **Files typically involved**:
-- `skills/*/SKILL.md`
-- `agents/*.md`
-- `commands/*.md`
-- `.agents/skills/*/SKILL.md`
-- `.cursor/skills/*/SKILL.md`
+- `AGENTS.md`
+- `README.md`
+- `CHANGELOG.md`
+- `docs/zh-CN/README.md`
 
 **Example commit sequence**:
 ```
-Edit SKILL.md, agent, or command files to address reviewer comments
-Update examples, headings, or configuration as requested
-Iterate until all review feedback is resolved
+Update AGENTS.md and README.md to reflect the correct counts in summary tables and quick-start sections.
+Optionally, update other documentation files (e.g., CHANGELOG.md, docs/zh-CN/README.md).
+Commit with a message indicating catalog or documentation count sync.
+```
+
+### Add New Command
+
+Adds a new command to the system, typically with a backing skill and documentation.
+
+**Frequency**: ~2 times per month
+
+**Steps**:
+1. Create commands/<command-name>.md with usage, workflow, and documentation.
+2. Optionally, create or update a backing skill in skills/<skill-name>/SKILL.md.
+3. Update AGENTS.md and/or README.md to increment command count and document the new command.
+
+**Files typically involved**:
+- `commands/*.md`
+- `skills/*/SKILL.md`
+- `AGENTS.md`
+- `README.md`
+
+**Example commit sequence**:
+```
+Create commands/<command-name>.md with usage, workflow, and documentation.
+Optionally, create or update a backing skill in skills/<skill-name>/SKILL.md.
+Update AGENTS.md and/or README.md to increment command count and document the new command.
+```
+
+### Fix Windows Or Ci Test Compatibility
+
+Fixes or stabilizes tests and scripts to work on Windows or in CI environments.
+
+**Frequency**: ~2 times per month
+
+**Steps**:
+1. Update tests/hooks/*.test.js, tests/ci/*.test.js, or related test files to skip or adapt for Windows/CI.
+2. Update scripts or utilities to normalize paths, handle CRLF, or resolve environment variables.
+3. Optionally, update documentation to note platform-specific behavior.
+
+**Files typically involved**:
+- `tests/hooks/*.test.js`
+- `tests/ci/*.test.js`
+- `tests/lib/*.test.js`
+- `scripts/hooks/*.js`
+- `scripts/lib/*.js`
+
+**Example commit sequence**:
+```
+Update tests/hooks/*.test.js, tests/ci/*.test.js, or related test files to skip or adapt for Windows/CI.
+Update scripts or utilities to normalize paths, handle CRLF, or resolve environment variables.
+Optionally, update documentation to note platform-specific behavior.
 ```
 
 
