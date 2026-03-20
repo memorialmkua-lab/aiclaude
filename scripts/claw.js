@@ -16,6 +16,7 @@ const readline = require('readline');
 const SESSION_NAME_RE = /^[a-zA-Z0-9][-a-zA-Z0-9]*$/;
 const DEFAULT_MODEL = process.env.CLAW_MODEL || 'sonnet';
 const DEFAULT_COMPACT_KEEP_TURNS = 20;
+const DEFAULT_CLAUDE_TIMEOUT_MS = 30000;
 
 function isValidSessionName(name) {
   return typeof name === 'string' && name.length > 0 && SESSION_NAME_RE.test(name);
@@ -83,6 +84,16 @@ function buildPrompt(systemPrompt, history, userMessage) {
   return parts.join('\n');
 }
 
+function getClaudeTimeoutMs() {
+  const rawValue = Number(process.env.CLAW_TIMEOUT_MS);
+
+  if (Number.isFinite(rawValue) && rawValue > 0) {
+    return rawValue;
+  }
+
+  return DEFAULT_CLAUDE_TIMEOUT_MS;
+}
+
 function askClaude(systemPrompt, history, userMessage, model) {
   const fullPrompt = buildPrompt(systemPrompt, history, userMessage);
   const args = [];
@@ -95,7 +106,7 @@ function askClaude(systemPrompt, history, userMessage, model) {
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
     env: { ...process.env, CLAUDECODE: '' },
-    timeout: 300000,
+    timeout: getClaudeTimeoutMs(),
   });
 
   if (result.error) {

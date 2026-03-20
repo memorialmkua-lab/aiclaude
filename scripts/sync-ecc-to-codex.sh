@@ -404,7 +404,7 @@ if [[ "$MODE" == "apply" ]]; then
     printf '\n[mcp_servers.supabase]\n'
     printf 'command = "pnpm"\n'
     printf 'args = ["dlx", "@supabase/mcp-server-supabase@latest", "--features=account,docs,database,debugging,development,functions,storage,branching"]\n'
-    printf 'startup_timeout_sec = 20.0\n'
+    printf 'startup_timeout_sec = 30.0\n'
     printf 'tool_timeout_sec = 120.0\n'
 
     if [[ -n "$supabase_token" ]]; then
@@ -415,28 +415,34 @@ if [[ "$MODE" == "apply" ]]; then
     printf '\n[mcp_servers.playwright]\n'
     printf 'command = "pnpm"\n'
     printf 'args = ["dlx", "@playwright/mcp@latest"]\n'
+    printf 'startup_timeout_sec = 30.0\n'
 
     if [[ -n "$context7_key" ]]; then
       printf '\n[mcp_servers.context7-mcp]\n'
       printf 'command = "pnpm"\n'
       printf 'args = ["dlx", "@smithery/cli@latest", "run", "@upstash/context7-mcp", "--key", "%s"]\n' "$(toml_escape "$context7_key")"
+      printf 'startup_timeout_sec = 30.0\n'
     else
       printf '\n[mcp_servers.context7-mcp]\n'
       printf 'command = "pnpm"\n'
       printf 'args = ["dlx", "@upstash/context7-mcp"]\n'
+      printf 'startup_timeout_sec = 30.0\n'
     fi
 
     printf '\n[mcp_servers.github]\n'
     printf 'command = "bash"\n'
     printf 'args = ["-lc", "%s"]\n' "$(toml_escape "$github_bootstrap")"
+    printf 'startup_timeout_sec = 30.0\n'
 
     printf '\n[mcp_servers.memory]\n'
     printf 'command = "pnpm"\n'
     printf 'args = ["dlx", "@modelcontextprotocol/server-memory"]\n'
+    printf 'startup_timeout_sec = 30.0\n'
 
     printf '\n[mcp_servers.sequential-thinking]\n'
     printf 'command = "pnpm"\n'
     printf 'args = ["dlx", "@modelcontextprotocol/server-sequential-thinking"]\n'
+    printf 'startup_timeout_sec = 30.0\n'
   } >> "$CONFIG_FILE"
 else
   log "Skipping MCP config normalization in dry-run mode"

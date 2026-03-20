@@ -203,7 +203,7 @@ For manual install instructions see the README in the `rules/` folder.
 /plugin list everything-claude-code@everything-claude-code
 ```
 
-✨ **That's it!** You now have access to 27 agents, 115 skills, and 59 commands.
+✨ **That's it!** You now have access to 27 agents, 116 skills, and 59 commands.
 
 ---
 
@@ -331,6 +331,7 @@ everything-claude-code/
 |   |-- springboot-security/        # Spring Boot security (NEW)
 |   |-- springboot-tdd/             # Spring Boot TDD (NEW)
 |   |-- springboot-verification/    # Spring Boot verification (NEW)
+|   |-- typescript-patterns/        # Type modeling, unions, validation, async boundaries (NEW)
 |   |-- configure-ecc/              # Interactive installation wizard (NEW)
 |   |-- security-scan/              # AgentShield security auditor integration (NEW)
 |   |-- java-coding-standards/     # Java coding standards (NEW)
@@ -1071,7 +1072,7 @@ The configuration is automatically detected from `.opencode/opencode.json`.
 |---------|-------------|----------|--------|
 | Agents | ✅ 27 agents | ✅ 12 agents | **Claude Code leads** |
 | Commands | ✅ 59 commands | ✅ 31 commands | **Claude Code leads** |
-| Skills | ✅ 115 skills | ✅ 37 skills | **Claude Code leads** |
+| Skills | ✅ 116 skills | ✅ 37 skills | **Claude Code leads** |
 | Hooks | ✅ 8 event types | ✅ 11 events | **OpenCode has more!** |
 | Rules | ✅ 29 rules | ✅ 13 instructions | **Claude Code leads** |
 | MCP Servers | ✅ 14 servers | ✅ Full | **Full parity** |
