@@ -33,8 +33,8 @@ Follow these commit message conventions based on 500 analyzed commits.
 
 ### Prefixes Used
 
-- `fix`
 - `feat`
+- `fix`
 - `test`
 - `docs`
 
@@ -48,7 +48,7 @@ Follow these commit message conventions based on 500 analyzed commits.
 *Commit message example*
 
 ```text
-feat: add everything-claude-code ECC bundle (.claude/commands/add-new-agent.md)
+feat: add everything-claude-code ECC bundle (.claude/commands/add-new-skill.md)
 ```
 
 *Commit message example*
@@ -78,7 +78,7 @@ docs(skills): align documentation-lookup with CONTRIBUTING template; add cross-h
 *Commit message example*
 
 ```text
-feat: add everything-claude-code ECC bundle (.claude/commands/add-new-skill.md)
+feat: add everything-claude-code ECC bundle (.claude/commands/add-new-agent.md)
 ```
 
 *Commit message example*
@@ -180,7 +180,7 @@ These workflows were detected from analyzing commit patterns.
 
 Standard feature implementation workflow
 
-**Frequency**: ~26 times per month
+**Frequency**: ~29 times per month
 
 **Steps**:
 1. Add feature implementation
@@ -192,159 +192,159 @@ Standard feature implementation workflow
 
 **Example commit sequence**:
 ```
-docs(skills): align documentation-lookup with CONTRIBUTING template; add cross-harness (Codex/Cursor) skill copies
-fix: address PR review — skill template (When to use, How it works, Examples), bun.lock, next build note, rust-reviewer CI note, doc-lookup privacy/uncertainty
-Address review: register rust-reviewer in AGENTS.md and rules, add openai.yaml for Codex skills
+fix(clv2): add --allowedTools to observer Haiku invocation (#661)
+fix(clv2): use -e instead of -d for .git check in detect-project.sh
+Merge pull request #665 from ymdvsymd/fix/worktree-project-id-mismatch
 ```
 
-### Add New Agent
+### Add Command Documentation
 
-Adds a new agent to the project, including documentation and registration.
+Adds a new command documentation file for everything-claude-code ECC bundle.
 
 **Frequency**: ~3 times per month
 
 **Steps**:
-1. Create a new agent documentation file in agents/ (e.g., agents/agent-name.md)
-2. Register the agent in AGENTS.md
-3. Update README.md with agent count or agent list
-4. Optionally update docs/COMMAND-AGENT-MAP.md if mapping is needed
+1. Create or update a markdown file in .claude/commands/ with the command name.
+2. Commit the new or updated command documentation file.
 
 **Files typically involved**:
-- `agents/*.md`
-- `AGENTS.md`
-- `README.md`
-- `docs/COMMAND-AGENT-MAP.md`
+- `.claude/commands/add-new-skill.md`
+- `.claude/commands/add-new-agent.md`
+- `.claude/commands/feature-development.md`
 
 **Example commit sequence**:
 ```
-Create a new agent documentation file in agents/ (e.g., agents/agent-name.md)
-Register the agent in AGENTS.md
-Update README.md with agent count or agent list
-Optionally update docs/COMMAND-AGENT-MAP.md if mapping is needed
+Create or update a markdown file in .claude/commands/ with the command name.
+Commit the new or updated command documentation file.
 ```
 
-### Add New Skill
+### Add Skill Documentation
 
-Adds a new skill to the project, including documentation and agent harnesses.
-
-**Frequency**: ~3 times per month
-
-**Steps**:
-1. Create SKILL.md in skills/skill-name/
-2. Create SKILL.md in .agents/skills/skill-name/ and/or .cursor/skills/skill-name/ for cross-harness support
-3. Add agents/openai.yaml in .agents/skills/skill-name/ if applicable
-
-**Files typically involved**:
-- `skills/*/SKILL.md`
-- `.agents/skills/*/SKILL.md`
-- `.agents/skills/*/agents/openai.yaml`
-- `.cursor/skills/*/SKILL.md`
-
-**Example commit sequence**:
-```
-Create SKILL.md in skills/skill-name/
-Create SKILL.md in .agents/skills/skill-name/ and/or .cursor/skills/skill-name/ for cross-harness support
-Add agents/openai.yaml in .agents/skills/skill-name/ if applicable
-```
-
-### Add Language Rules
-
-Adds coding, security, and testing rules for a new programming language.
+Adds or updates documentation for a skill in both .agents/skills and .claude/skills directories.
 
 **Frequency**: ~2 times per month
 
 **Steps**:
-1. Create rules/language/coding-style.md
-2. Create rules/language/hooks.md
-3. Create rules/language/patterns.md
-4. Create rules/language/security.md
-5. Create rules/language/testing.md
+1. Create or update SKILL.md in .agents/skills/everything-claude-code/
+2. Create or update SKILL.md in .claude/skills/everything-claude-code/
+3. Commit both files together.
 
 **Files typically involved**:
-- `rules/*/coding-style.md`
-- `rules/*/hooks.md`
-- `rules/*/patterns.md`
-- `rules/*/security.md`
-- `rules/*/testing.md`
+- `.agents/skills/everything-claude-code/SKILL.md`
+- `.claude/skills/everything-claude-code/SKILL.md`
 
 **Example commit sequence**:
 ```
-Create rules/language/coding-style.md
-Create rules/language/hooks.md
-Create rules/language/patterns.md
-Create rules/language/security.md
-Create rules/language/testing.md
+Create or update SKILL.md in .agents/skills/everything-claude-code/
+Create or update SKILL.md in .claude/skills/everything-claude-code/
+Commit both files together.
 ```
 
-### Feature Bundle Ecc Command
+### Add Agent Configuration
 
-Adds or updates ECC command documentation and configuration files.
+Adds or updates agent configuration files in .codex/agents and/or .agents/skills directories.
 
 **Frequency**: ~2 times per month
 
 **Steps**:
-1. Add or update .claude/commands/*.md for the new command
-2. Optionally update .claude/ecc-tools.json, .claude/identity.json, .claude/team/*.json, .claude/rules/*.md, .claude/research/*.md
+1. Create or update a TOML file in .codex/agents/ (e.g., docs-researcher.toml, reviewer.toml, explorer.toml).
+2. Optionally, create or update a YAML file in .agents/skills/everything-claude-code/agents/ (e.g., openai.yaml).
+3. Commit the new or updated configuration files.
 
 **Files typically involved**:
-- `.claude/commands/*.md`
-- `.claude/ecc-tools.json`
+- `.codex/agents/docs-researcher.toml`
+- `.codex/agents/reviewer.toml`
+- `.codex/agents/explorer.toml`
+- `.agents/skills/everything-claude-code/agents/openai.yaml`
+
+**Example commit sequence**:
+```
+Create or update a TOML file in .codex/agents/ (e.g., docs-researcher.toml, reviewer.toml, explorer.toml).
+Optionally, create or update a YAML file in .agents/skills/everything-claude-code/agents/ (e.g., openai.yaml).
+Commit the new or updated configuration files.
+```
+
+### Update Meta And Team Config
+
+Updates project-level configuration and metadata files such as identity, team config, tools, and guardrails.
+
+**Frequency**: ~2 times per month
+
+**Steps**:
+1. Edit .claude/identity.json as needed.
+2. Edit .claude/team/everything-claude-code-team-config.json as needed.
+3. Edit .claude/ecc-tools.json as needed.
+4. Edit .claude/rules/everything-claude-code-guardrails.md as needed.
+5. Commit the updated files.
+
+**Files typically involved**:
 - `.claude/identity.json`
-- `.claude/team/*.json`
-- `.claude/rules/*.md`
-- `.claude/research/*.md`
+- `.claude/team/everything-claude-code-team-config.json`
+- `.claude/ecc-tools.json`
+- `.claude/rules/everything-claude-code-guardrails.md`
 
 **Example commit sequence**:
 ```
-Add or update .claude/commands/*.md for the new command
-Optionally update .claude/ecc-tools.json, .claude/identity.json, .claude/team/*.json, .claude/rules/*.md, .claude/research/*.md
+Edit .claude/identity.json as needed.
+Edit .claude/team/everything-claude-code-team-config.json as needed.
+Edit .claude/ecc-tools.json as needed.
+Edit .claude/rules/everything-claude-code-guardrails.md as needed.
+Commit the updated files.
 ```
 
-### Catalog Count Sync
+### Release Version Bump
 
-Synchronizes agent and skill counts in documentation after new additions.
+Prepares a new release by bumping version numbers, updating changelogs, and refreshing documentation.
 
-**Frequency**: ~2 times per month
+**Frequency**: ~1 times per month
 
 **Steps**:
-1. Update agent and skill counts in README.md (quick-start and comparison table)
-2. Update agent and skill counts in AGENTS.md (summary and project structure)
+1. Update version numbers in package.json, package-lock.json, and .opencode/package.json.
+2. Add or update CHANGELOG.md with release notes.
+3. Update README.md and docs/zh-CN/README.md with new release information.
+4. Update AGENTS.md and other documentation as needed.
+5. Commit all related files together.
 
 **Files typically involved**:
+- `package.json`
+- `package-lock.json`
+- `.opencode/package.json`
+- `CHANGELOG.md`
 - `README.md`
+- `docs/zh-CN/README.md`
 - `AGENTS.md`
 
 **Example commit sequence**:
 ```
-Update agent and skill counts in README.md (quick-start and comparison table)
-Update agent and skill counts in AGENTS.md (summary and project structure)
+Update version numbers in package.json, package-lock.json, and .opencode/package.json.
+Add or update CHANGELOG.md with release notes.
+Update README.md and docs/zh-CN/README.md with new release information.
+Update AGENTS.md and other documentation as needed.
+Commit all related files together.
 ```
 
-### Feature Development With Tests And Docs
+### Bugfix With Test Update
 
-Implements a new feature (agent, skill, or command) along with tests and documentation.
+Fixes a bug in a script or agent and updates/creates a corresponding test file.
 
 **Frequency**: ~2 times per month
 
 **Steps**:
-1. Add implementation files (e.g., agents/, skills/, commands/)
-2. Add or update documentation (README.md, AGENTS.md, rules/...)
-3. Add or update relevant test files in tests/
+1. Edit the script or agent file to fix the bug.
+2. Edit or add the corresponding test file in tests/hooks/.
+3. Commit both the fix and the test together.
 
 **Files typically involved**:
-- `agents/*.md`
-- `skills/*/SKILL.md`
-- `commands/*.md`
-- `README.md`
-- `AGENTS.md`
-- `rules/**/*.md`
-- `tests/**/*.js`
+- `skills/continuous-learning-v2/scripts/detect-project.sh`
+- `skills/continuous-learning-v2/agents/observer-loop.sh`
+- `tests/hooks/detect-project-worktree.test.js`
+- `tests/hooks/observer-memory.test.js`
 
 **Example commit sequence**:
 ```
-Add implementation files (e.g., agents/, skills/, commands/)
-Add or update documentation (README.md, AGENTS.md, rules/...)
-Add or update relevant test files in tests/
+Edit the script or agent file to fix the bug.
+Edit or add the corresponding test file in tests/hooks/.
+Commit both the fix and the test together.
 ```
 
 
