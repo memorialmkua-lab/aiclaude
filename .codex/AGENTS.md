@@ -51,8 +51,10 @@ Treat the project-local `.codex/config.toml` as the default Codex baseline for E
 The sync script (`scripts/sync-ecc-to-codex.sh`) uses a Node-based TOML parser to safely merge ECC MCP servers into `~/.codex/config.toml`:
 
 - **Add-only by default** — missing ECC servers are appended; existing servers are never modified or removed.
+- **7 managed servers** — Supabase, Playwright, Context7, Exa, GitHub, Memory, Sequential Thinking.
+- **Package-manager aware** — uses the project's configured package manager (npm/pnpm/yarn/bun) instead of hardcoding `pnpm`.
 - **Drift warnings** — if an existing server's config differs from the ECC recommendation, the script logs a warning.
-- **`--update-mcp`** — explicitly replaces all ECC-managed servers with the latest recommended config.
+- **`--update-mcp`** — explicitly replaces all ECC-managed servers with the latest recommended config (safely removes subtables like `[mcp_servers.supabase.env]`).
 - **User config is always preserved** — custom servers, args, env vars, and credentials outside ECC-managed sections are never touched.
 
 ## Multi-Agent Support

@@ -10,11 +10,15 @@
  *   - Log warnings when an existing server's config differs from the ECC recommendation.
  *   - With --update-mcp, also replace existing ECC-managed servers.
  *
+ * Uses the repo's package-manager abstraction (scripts/lib/package-manager.js)
+ * so MCP launcher commands respect the user's configured package manager.
+ *
  * Usage:
  *   node merge-mcp-config.js <config.toml> [--dry-run] [--update-mcp]
  */
 
 const fs = require('fs');
+const path = require('path');
 
 let TOML;
 try {
@@ -26,75 +30,78 @@ try {
 }
 
 // ---------------------------------------------------------------------------
+// Package manager detection
+// ---------------------------------------------------------------------------
+
+let pmConfig;
+try {
+  const { getPackageManager } = require(path.join(__dirname, '..', 'lib', 'package-manager.js'));
+  pmConfig = getPackageManager();
+} catch {
+  // Fallback: if package-manager.js isn't available, default to npx
+  pmConfig = { name: 'npm', config: { name: 'npm', execCmd: 'npx' } };
+}
+
+// Yarn 1.x doesn't support `yarn dlx` — fall back to npx for classic Yarn.
+let resolvedExecCmd = pmConfig.config.execCmd;
+if (pmConfig.name === 'yarn' && resolvedExecCmd === 'yarn dlx') {
+  try {
+    const { execFileSync } = require('child_process');
+    const ver = execFileSync('yarn', ['--version'], { encoding: 'utf8', timeout: 5000 }).trim();
+    if (ver.startsWith('1.')) {
+      resolvedExecCmd = 'npx';
+    }
+  } catch {
+    // Can't detect version — keep yarn dlx and let it fail visibly
+  }
+}
+
+const PM_NAME = pmConfig.config.name || pmConfig.name;
+const PM_EXEC = resolvedExecCmd; // e.g. "pnpm dlx", "npx", "bunx", "yarn dlx"
+const PM_EXEC_PARTS = PM_EXEC.split(/\s+/); // ["pnpm", "dlx"] or ["npx"] or ["bunx"]
+
+// ---------------------------------------------------------------------------
 // ECC-recommended MCP servers
 // ---------------------------------------------------------------------------
 
-const GH_BOOTSTRAP = 'token=$(gh auth token 2>/dev/null || true); if [ -n "$token" ]; then export GITHUB_PERSONAL_ACCESS_TOKEN="$token"; fi; exec pnpm dlx @modelcontextprotocol/server-github';
+// GitHub bootstrap uses bash for token forwarding — this is intentionally
+// shell-based regardless of package manager, since Codex runs on macOS/Linux.
+const GH_BOOTSTRAP = `token=$(gh auth token 2>/dev/null || true); if [ -n "$token" ]; then export GITHUB_PERSONAL_ACCESS_TOKEN="$token"; fi; exec ${PM_EXEC} @modelcontextprotocol/server-github`;
 
-/** Each entry: key = section name under mcp_servers, value = { toml, fields }
- *  - toml:   raw TOML text appended to the file (preserves formatting)
- *  - fields: parsed object used for drift detection
+/**
+ * Build a server spec with the detected package manager.
+ * Returns { fields, toml } where fields is for drift detection and
+ * toml is the raw text appended to the file.
  */
+function dlxServer(name, pkg, extraFields, extraToml) {
+  const args = [...PM_EXEC_PARTS.slice(1), pkg];
+  const fields = { command: PM_EXEC_PARTS[0], args, ...extraFields };
+  const argsStr = JSON.stringify(args).replace(/,/g, ', ');
+  let toml = `[mcp_servers.${name}]\ncommand = "${PM_EXEC_PARTS[0]}"\nargs = ${argsStr}`;
+  if (extraToml) toml += '\n' + extraToml;
+  return { fields, toml };
+}
+
+/** Each entry: key = section name under mcp_servers, value = { toml, fields } */
 const ECC_SERVERS = {
-  supabase: {
-    fields: {
-      command: 'pnpm',
-      args: ['dlx', '@supabase/mcp-server-supabase@latest', '--features=account,docs,database,debugging,development,functions,storage,branching'],
-      startup_timeout_sec: 20.0,
-      tool_timeout_sec: 120.0
-    },
-    toml: `[mcp_servers.supabase]
-command = "pnpm"
-args = ["dlx", "@supabase/mcp-server-supabase@latest", "--features=account,docs,database,debugging,development,functions,storage,branching"]
-startup_timeout_sec = 20.0
-tool_timeout_sec = 120.0`
-  },
-  playwright: {
-    fields: {
-      command: 'pnpm',
-      args: ['dlx', '@playwright/mcp@latest']
-    },
-    toml: `[mcp_servers.playwright]
-command = "pnpm"
-args = ["dlx", "@playwright/mcp@latest"]`
-  },
-  'context7-mcp': {
-    fields: {
-      command: 'pnpm',
-      args: ['dlx', '@upstash/context7-mcp']
-    },
-    toml: `[mcp_servers.context7-mcp]
-command = "pnpm"
-args = ["dlx", "@upstash/context7-mcp"]`
+  supabase: dlxServer('supabase', '@supabase/mcp-server-supabase@latest', { startup_timeout_sec: 20.0, tool_timeout_sec: 120.0 }, 'startup_timeout_sec = 20.0\ntool_timeout_sec = 120.0'),
+  playwright: dlxServer('playwright', '@playwright/mcp@latest'),
+  'context7-mcp': dlxServer('context7-mcp', '@upstash/context7-mcp'),
+  exa: {
+    fields: { url: 'https://mcp.exa.ai/mcp' },
+    toml: `[mcp_servers.exa]\nurl = "https://mcp.exa.ai/mcp"`
   },
   github: {
-    fields: {
-      command: 'bash',
-      args: ['-lc', GH_BOOTSTRAP]
-    },
-    toml: `[mcp_servers.github]
-command = "bash"
-args = ["-lc", ${JSON.stringify(GH_BOOTSTRAP)}]`
+    fields: { command: 'bash', args: ['-lc', GH_BOOTSTRAP] },
+    toml: `[mcp_servers.github]\ncommand = "bash"\nargs = ["-lc", ${JSON.stringify(GH_BOOTSTRAP)}]`
   },
-  memory: {
-    fields: {
-      command: 'pnpm',
-      args: ['dlx', '@modelcontextprotocol/server-memory']
-    },
-    toml: `[mcp_servers.memory]
-command = "pnpm"
-args = ["dlx", "@modelcontextprotocol/server-memory"]`
-  },
-  'sequential-thinking': {
-    fields: {
-      command: 'pnpm',
-      args: ['dlx', '@modelcontextprotocol/server-sequential-thinking']
-    },
-    toml: `[mcp_servers.sequential-thinking]
-command = "pnpm"
-args = ["dlx", "@modelcontextprotocol/server-sequential-thinking"]`
-  }
+  memory: dlxServer('memory', '@modelcontextprotocol/server-memory'),
+  'sequential-thinking': dlxServer('sequential-thinking', '@modelcontextprotocol/server-sequential-thinking')
 };
+
+// Append --features arg for supabase after dlxServer builds the base
+ECC_SERVERS.supabase.fields.args.push('--features=account,docs,database,debugging,development,functions,storage,branching');
+ECC_SERVERS.supabase.toml = ECC_SERVERS.supabase.toml.replace(/^(args = \[.*)\]$/m, '$1, "--features=account,docs,database,debugging,development,functions,storage,branching"]');
 
 // Legacy section names that should be treated as an existing ECC server.
 // e.g. old configs shipped [mcp_servers.context7] instead of [mcp_servers.context7-mcp].
@@ -130,15 +137,19 @@ function configDiffers(existing, recommended) {
 
 /**
  * Remove a TOML section and its key-value pairs from raw text.
+ * Matches the section header even if followed by inline comments or whitespace
+ * (e.g. `[mcp_servers.github] # comment`).
  * Returns the text with the section removed.
  */
 function removeSectionFromText(text, sectionHeader) {
+  const escaped = sectionHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const headerPattern = new RegExp(`^${escaped}(\\s*(#.*)?)?$`);
   const lines = text.split('\n');
   const result = [];
   let skipping = false;
   for (const line of lines) {
     const trimmed = line.replace(/\r$/, '');
-    if (trimmed === sectionHeader) {
+    if (headerPattern.test(trimmed)) {
       skipping = true;
       continue;
     }
@@ -150,6 +161,41 @@ function removeSectionFromText(text, sectionHeader) {
     }
   }
   return result.join('\n');
+}
+
+/**
+ * Collect all TOML sub-section headers for a given server name.
+ * @iarna/toml nests subtables, so `[mcp_servers.supabase.env]` appears as
+ * `parsed.mcp_servers.supabase.env` (nested), NOT as a flat dotted key.
+ * Walk the nested object to find sub-objects that represent TOML sub-tables.
+ */
+function findSubSections(serverObj, prefix) {
+  const sections = [];
+  if (!serverObj || typeof serverObj !== 'object') return sections;
+  for (const key of Object.keys(serverObj)) {
+    const val = serverObj[key];
+    if (val && typeof val === 'object' && !Array.isArray(val)) {
+      const subPath = `${prefix}.${key}`;
+      sections.push(subPath);
+      sections.push(...findSubSections(val, subPath));
+    }
+  }
+  return sections;
+}
+
+/**
+ * Remove a server and all its sub-sections from raw TOML text.
+ * Uses findSubSections to walk the parsed nested object (not flat keys).
+ */
+function removeServerFromText(raw, serverName, existing) {
+  let result = removeSectionFromText(raw, `[mcp_servers.${serverName}]`);
+  const serverObj = existing[serverName];
+  if (serverObj) {
+    for (const sub of findSubSections(serverObj, serverName)) {
+      result = removeSectionFromText(result, `[mcp_servers.${sub}]`);
+    }
+  }
+  return result;
 }
 
 // ---------------------------------------------------------------------------
@@ -172,6 +218,8 @@ function main() {
     process.exit(1);
   }
 
+  log(`Package manager: ${PM_NAME} (exec: ${PM_EXEC})`);
+
   let raw = fs.readFileSync(configPath, 'utf8');
   let parsed;
   try {
@@ -183,38 +231,35 @@ function main() {
 
   const existing = parsed.mcp_servers || {};
   const toAppend = [];
+  const toRemoveLog = [];
 
   for (const [name, spec] of Object.entries(ECC_SERVERS)) {
-    // A subtable-only entry (e.g. mcp_servers.supabase.env without
-    // mcp_servers.supabase) appears as a nested object without 'command'.
-    // Treat it as missing — the server block itself doesn't exist.
-    // Also check legacy aliases (e.g. 'context7' → 'context7-mcp').
     const entry = existing[name];
     const aliases = LEGACY_ALIASES[name] || [];
     const legacyName = aliases.find(a => existing[a] && typeof existing[a].command === 'string');
-    const resolvedEntry = entry && typeof entry.command === 'string' ? entry : legacyName ? existing[legacyName] : null;
-    const resolvedLabel = legacyName || name;
 
-    if (resolvedEntry) {
+    // Prefer canonical entry over legacy alias
+    const hasCanonical = entry && typeof entry.command === 'string';
+    const resolvedEntry = hasCanonical ? entry : legacyName ? existing[legacyName] : null;
+    // For URL-based servers (exa), check for url field instead of command
+    const urlEntry = !resolvedEntry && entry && typeof entry.url === 'string' ? entry : null;
+    const finalEntry = resolvedEntry || urlEntry;
+    const resolvedLabel = hasCanonical ? name : legacyName || name;
+
+    if (finalEntry) {
       if (updateMcp) {
         // --update-mcp: remove existing section (and legacy alias), will re-add below
-        log(`  [update] mcp_servers.${resolvedLabel} → ${name}`);
-        raw = removeSectionFromText(raw, `[mcp_servers.${resolvedLabel}]`);
+        toRemoveLog.push(`mcp_servers.${resolvedLabel}`);
+        raw = removeServerFromText(raw, resolvedLabel, existing);
         if (resolvedLabel !== name) {
-          raw = removeSectionFromText(raw, `[mcp_servers.${name}]`);
-        }
-        // Also remove sub-sections (e.g., mcp_servers.supabase.env)
-        for (const key of Object.keys(existing)) {
-          if (key.startsWith(name + '.') || key.startsWith(resolvedLabel + '.')) {
-            raw = removeSectionFromText(raw, `[mcp_servers.${key}]`);
-          }
+          raw = removeServerFromText(raw, name, existing);
         }
         toAppend.push(spec.toml);
       } else {
         // Add-only mode: skip, but warn about drift
-        if (legacyName) {
+        if (legacyName && !hasCanonical) {
           warn(`mcp_servers.${legacyName} is a legacy name for ${name} (run with --update-mcp to migrate)`);
-        } else if (configDiffers(resolvedEntry, spec.fields)) {
+        } else if (configDiffers(finalEntry, spec.fields)) {
           warn(`mcp_servers.${name} differs from ECC recommendation (run with --update-mcp to refresh)`);
         } else {
           log(`  [ok] mcp_servers.${name}`);
@@ -234,6 +279,10 @@ function main() {
   const appendText = '\n' + toAppend.join('\n\n') + '\n';
 
   if (dryRun) {
+    if (toRemoveLog.length > 0) {
+      log('Dry run — would remove and re-add:');
+      for (const label of toRemoveLog) log(`  [remove] ${label}`);
+    }
     log('Dry run — would append:');
     console.log(appendText);
     return;
@@ -242,7 +291,7 @@ function main() {
   // Write: for add-only, append to preserve existing content byte-for-byte.
   // For --update-mcp, we modified `raw` above, so write the full file + appended sections.
   if (updateMcp) {
-    // Remove trailing whitespace from modified raw, then append
+    for (const label of toRemoveLog) log(`  [update] ${label}`);
     const cleaned = raw.replace(/\n+$/, '\n');
     fs.writeFileSync(configPath, cleaned + appendText, 'utf8');
   } else {

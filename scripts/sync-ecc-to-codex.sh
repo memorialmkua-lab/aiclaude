@@ -198,11 +198,10 @@ else
     log "WARNING: found BEGIN marker but no END marker — replacing file (backup saved)"
     compose_ecc_block > "$AGENTS_FILE"
   else
-    # Existing file without markers — append ECC block, preserve user content.
-    # Note: legacy ECC-only files (from old '>' overwrite) will get a second copy
-    # on this first run. This is intentional — the alternative (heading-match
-    # heuristic) risks false-positive overwrites of user-authored files. The next
-    # run deduplicates via markers, and a timestamped backup was saved above.
+    # Existing file without markers — append ECC block, preserving existing content.
+    # Legacy ECC-only files will have duplicate content after this first run, but
+    # subsequent runs use marker-based replacement so only the marked section updates.
+    # A timestamped backup was already saved above for recovery if needed.
     log "No ECC markers found — appending managed block (backup saved)"
     {
       printf '\n\n'

@@ -983,6 +983,9 @@ codex
 
 # Automatic setup: sync ECC assets (AGENTS.md, skills, MCP servers) into ~/.codex
 npm install && bash scripts/sync-ecc-to-codex.sh
+# or: pnpm install && bash scripts/sync-ecc-to-codex.sh
+# or: yarn install && bash scripts/sync-ecc-to-codex.sh
+# or: bun install && bash scripts/sync-ecc-to-codex.sh
 
 # Or manually: copy the reference config to your home directory
 cp .codex/config.toml ~/.codex/config.toml
@@ -1189,7 +1192,7 @@ ECC is the **first plugin to maximize every major AI coding tool**. Here's how e
 | **Hook Scripts** | 20+ scripts | 16 scripts (DRY adapter) | N/A | Plugin hooks |
 | **Rules** | 34 (common + lang) | 34 (YAML frontmatter) | Instruction-based | 13 instructions |
 | **Custom Tools** | Via hooks | Via hooks | N/A | 6 native tools |
-| **MCP Servers** | 14 | Shared (mcp.json) | 4 (command-based) | Full |
+| **MCP Servers** | 14 | Shared (mcp.json) | 7 (auto-merged via TOML parser) | Full |
 | **Config Format** | settings.json | hooks.json + rules/ | config.toml | opencode.json |
 | **Context File** | CLAUDE.md + AGENTS.md | AGENTS.md | AGENTS.md | AGENTS.md |
 | **Secret Detection** | Hook-based | beforeSubmitPrompt hook | Sandbox-based | Hook-based |
