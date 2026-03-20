@@ -575,9 +575,6 @@ def cmd_import(args) -> int:
         else:
             to_add.append(inst)
 
-    # Count source-level duplicates for reporting
-    source_dupes = len(new_instincts) - len(deduped_instincts)
-
     # Filter by minimum confidence
     min_conf = args.min_confidence if args.min_confidence is not None else 0.0
     to_add = [i for i in to_add if i.get('confidence', 0.5) >= min_conf]
@@ -658,7 +655,7 @@ def cmd_import(args) -> int:
         output_content += f"trigger: {_yaml_quote(inst.get('trigger', 'unknown'))}\n"
         output_content += f"confidence: {inst.get('confidence', 0.5)}\n"
         output_content += f"domain: {inst.get('domain', 'general')}\n"
-        output_content += f"source: inherited\n"
+        output_content += "source: inherited\n"
         output_content += f"scope: {target_scope}\n"
         output_content += f"imported_from: {_yaml_quote(source)}\n"
         if target_scope == "project":
@@ -1220,13 +1217,13 @@ def _collect_pending_dirs() -> list[Path]:
     """Return all pending instinct directories (global + per-project)."""
     dirs = []
     global_pending = GLOBAL_INSTINCTS_DIR / "pending"
-    if global_pending.exists():
+    if global_pending.is_dir():
         dirs.append(global_pending)
-    if PROJECTS_DIR.exists():
+    if PROJECTS_DIR.is_dir():
         for project_dir in sorted(PROJECTS_DIR.iterdir()):
             if project_dir.is_dir():
                 pending = project_dir / "instincts" / "pending"
-                if pending.exists():
+                if pending.is_dir():
                     dirs.append(pending)
     return dirs
 
@@ -1314,8 +1311,8 @@ def cmd_prune(args) -> int:
 
     pending = _collect_pending_instincts()
 
-    expired = [p for p in pending if p["age_days"] > max_age]
-    remaining = [p for p in pending if p["age_days"] <= max_age]
+    expired = [p for p in pending if p["age_days"] >= max_age]
+    remaining = [p for p in pending if p["age_days"] < max_age]
 
     if dry_run:
         if not quiet:
