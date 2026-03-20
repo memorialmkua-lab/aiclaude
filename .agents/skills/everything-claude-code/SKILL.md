@@ -33,8 +33,8 @@ Follow these commit message conventions based on 500 analyzed commits.
 
 ### Prefixes Used
 
-- `fix`
 - `feat`
+- `fix`
 - `test`
 - `docs`
 
@@ -48,7 +48,7 @@ Follow these commit message conventions based on 500 analyzed commits.
 *Commit message example*
 
 ```text
-feat: add everything-claude-code ECC bundle (.claude/commands/add-language-rules.md)
+feat: add everything-claude-code ECC bundle (.claude/commands/add-new-language-rules.md)
 ```
 
 *Commit message example*
@@ -210,7 +210,7 @@ feat(rules): add Rust language rules (rebased #660) (#686)
 
 Standard feature implementation workflow
 
-**Frequency**: ~25 times per month
+**Frequency**: ~28 times per month
 
 **Steps**:
 1. Add feature implementation
@@ -225,95 +225,97 @@ Standard feature implementation workflow
 
 **Example commit sequence**:
 ```
-merge: PR #529 — feat(skills): add documentation-lookup, bun-runtime, nextjs-turbopack; feat(agents): add rust-reviewer
-fix: refresh orchestration follow-up after #414 (#430)
-feat: add C++ language support and hook tests (#539)
+Merge pull request #664 from ymdvsymd/fix/observer-sandbox-access-661
+feat(skills): add agent-eval for head-to-head coding agent comparison (#540)
+feat(skills): add codebase-onboarding skill (#553)
 ```
 
-### Add New Language Rules
+### Add Language Rules
 
-Adds support for a new programming language by introducing language-specific rule files for coding style, hooks, patterns, security, and testing.
+Adds a new programming language's rules (style, hooks, patterns, security, testing) to the rules/ directory.
 
 **Frequency**: ~2 times per month
 
 **Steps**:
-1. Create a new directory under rules/<language>/
-2. Add coding-style.md, hooks.md, patterns.md, security.md, and testing.md files with language-specific content
-3. Optionally update documentation or catalog counts if needed
+1. Create rules/<language>/coding-style.md
+2. Create rules/<language>/hooks.md
+3. Create rules/<language>/patterns.md
+4. Create rules/<language>/security.md
+5. Create rules/<language>/testing.md
 
 **Files typically involved**:
-- `rules/<language>/coding-style.md`
-- `rules/<language>/hooks.md`
-- `rules/<language>/patterns.md`
-- `rules/<language>/security.md`
-- `rules/<language>/testing.md`
+- `rules/*/coding-style.md`
+- `rules/*/hooks.md`
+- `rules/*/patterns.md`
+- `rules/*/security.md`
+- `rules/*/testing.md`
 
 **Example commit sequence**:
 ```
-Create a new directory under rules/<language>/
-Add coding-style.md, hooks.md, patterns.md, security.md, and testing.md files with language-specific content
-Optionally update documentation or catalog counts if needed
+Create rules/<language>/coding-style.md
+Create rules/<language>/hooks.md
+Create rules/<language>/patterns.md
+Create rules/<language>/security.md
+Create rules/<language>/testing.md
 ```
 
-### Add New Skill
+### Add Skill
 
-Adds a new skill module, typically as a SKILL.md file (sometimes with scripts or supporting files), to enhance agent capabilities.
+Adds a new skill to the system, including implementation, documentation, and supporting scripts.
 
-**Frequency**: ~4 times per month
+**Frequency**: ~3 times per month
 
 **Steps**:
-1. Create a new directory under skills/<skill-name>/
-2. Add SKILL.md describing the skill's behavior, triggers, and usage
-3. Optionally add scripts or supporting files under the skill directory
-4. If Antigravity or Codex support is needed, add .agents/skills/<skill-name>/SKILL.md or openai.yaml
+1. Create skills/<skill-name>/SKILL.md
+2. Optionally add scripts in skills/<skill-name>/scripts/
+3. Update README.md and AGENTS.md to increment skill/command counts and document the new skill
 
 **Files typically involved**:
-- `skills/<skill-name>/SKILL.md`
-- `skills/<skill-name>/scripts/*.sh`
-- `.agents/skills/<skill-name>/SKILL.md`
-- `.agents/skills/<skill-name>/agents/openai.yaml`
-
-**Example commit sequence**:
-```
-Create a new directory under skills/<skill-name>/
-Add SKILL.md describing the skill's behavior, triggers, and usage
-Optionally add scripts or supporting files under the skill directory
-If Antigravity or Codex support is needed, add .agents/skills/<skill-name>/SKILL.md or openai.yaml
-```
-
-### Add New Agent
-
-Adds a new agent definition to the system, typically for reviewing, resolving, or automating tasks in a specific domain.
-
-**Frequency**: ~2 times per month
-
-**Steps**:
-1. Create a new agent markdown file under agents/<agent-name>.md
-2. Optionally update AGENTS.md and README.md to include the new agent in tables and documentation
-3. If needed, add agent configuration files (e.g., openai.yaml) under .agents/skills/<agent-name>/agents/
-
-**Files typically involved**:
-- `agents/<agent-name>.md`
-- `AGENTS.md`
+- `skills/*/SKILL.md`
+- `skills/*/scripts/*.sh`
 - `README.md`
-- `.agents/skills/<agent-name>/agents/openai.yaml`
+- `AGENTS.md`
 
 **Example commit sequence**:
 ```
-Create a new agent markdown file under agents/<agent-name>.md
-Optionally update AGENTS.md and README.md to include the new agent in tables and documentation
-If needed, add agent configuration files (e.g., openai.yaml) under .agents/skills/<agent-name>/agents/
+Create skills/<skill-name>/SKILL.md
+Optionally add scripts in skills/<skill-name>/scripts/
+Update README.md and AGENTS.md to increment skill/command counts and document the new skill
+```
+
+### Add Command
+
+Adds a new command to the commands/ directory, often with a corresponding skill.
+
+**Frequency**: ~2 times per month
+
+**Steps**:
+1. Create commands/<command-name>.md
+2. Optionally create a corresponding skill in skills/<command-name>/SKILL.md
+3. Update README.md and AGENTS.md to increment command/skill counts
+
+**Files typically involved**:
+- `commands/*.md`
+- `skills/*/SKILL.md`
+- `README.md`
+- `AGENTS.md`
+
+**Example commit sequence**:
+```
+Create commands/<command-name>.md
+Optionally create a corresponding skill in skills/<command-name>/SKILL.md
+Update README.md and AGENTS.md to increment command/skill counts
 ```
 
 ### Sync Catalog Counts
 
-Synchronizes documentation and catalog files to accurately reflect the current number of agents, skills, and commands.
+Synchronizes documented counts of agents, skills, and commands in README.md and AGENTS.md to match the actual filesystem state.
 
 **Frequency**: ~2 times per month
 
 **Steps**:
-1. Update agent, skill, and command counts in README.md and AGENTS.md
-2. Optionally update related documentation tables or project structure sections
+1. Count actual agents, skills, and commands in the filesystem
+2. Update README.md and AGENTS.md with the correct numbers
 
 **Files typically involved**:
 - `README.md`
@@ -321,54 +323,70 @@ Synchronizes documentation and catalog files to accurately reflect the current n
 
 **Example commit sequence**:
 ```
-Update agent, skill, and command counts in README.md and AGENTS.md
-Optionally update related documentation tables or project structure sections
+Count actual agents, skills, and commands in the filesystem
+Update README.md and AGENTS.md with the correct numbers
 ```
 
-### Add New Command And Backing Skill
+### Add Agent Support For Ide
 
-Introduces a new command (user-facing entry point) and its corresponding backing skill for implementation.
+Adds or removes a full set of agent, hook, skill, and steering files for IDE integration (e.g., Kiro IDE).
 
-**Frequency**: ~2 times per month
+**Frequency**: ~1 times per month
 
 **Steps**:
-1. Create a new command markdown file under commands/<command-name>.md
-2. Create a new skill under skills/<skill-name>/SKILL.md (often matching the command name)
-3. Optionally update documentation or catalog counts
+1. Add or remove .kiro/agents/*.json and .kiro/agents/*.md
+2. Add or remove .kiro/hooks/*.kiro.hook
+3. Add or remove .kiro/skills/*/SKILL.md
+4. Add or remove .kiro/steering/*.md
+5. Add or remove .kiro/scripts/*.sh
+6. Add or remove .kiro/docs/*.md
 
 **Files typically involved**:
-- `commands/<command-name>.md`
-- `skills/<skill-name>/SKILL.md`
+- `.kiro/agents/*.json`
+- `.kiro/agents/*.md`
+- `.kiro/hooks/*.kiro.hook`
+- `.kiro/skills/*/SKILL.md`
+- `.kiro/steering/*.md`
+- `.kiro/scripts/*.sh`
+- `.kiro/docs/*.md`
 
 **Example commit sequence**:
 ```
-Create a new command markdown file under commands/<command-name>.md
-Create a new skill under skills/<skill-name>/SKILL.md (often matching the command name)
-Optionally update documentation or catalog counts
+Add or remove .kiro/agents/*.json and .kiro/agents/*.md
+Add or remove .kiro/hooks/*.kiro.hook
+Add or remove .kiro/skills/*/SKILL.md
+Add or remove .kiro/steering/*.md
+Add or remove .kiro/scripts/*.sh
+Add or remove .kiro/docs/*.md
 ```
 
-### Add Or Update Hook And Tests
+### Add Or Update Ecc Bundle Docs
 
-Adds or updates a git or shell hook and provides corresponding automated tests to ensure correct behavior.
+Adds or updates ECC bundle documentation and configuration files under .claude/, .codex/, or .agents/ directories.
 
-**Frequency**: ~2 times per month
+**Frequency**: ~3 times per month
 
 **Steps**:
-1. Edit or create hook configuration files (e.g., hooks/hooks.json, .cursor/hooks.json)
-2. Add or update hook implementation scripts under scripts/hooks/
-3. Add or update test files under tests/hooks/ to cover new or changed hook logic
+1. Add or update markdown or JSON files in .claude/commands/, .claude/rules/, .claude/skills/, .claude/research/, .claude/team/, .claude/enterprise/
+2. Add or update TOML files in .codex/agents/
+3. Add or update SKILL.md or YAML files in .agents/skills/
 
 **Files typically involved**:
-- `hooks/hooks.json`
-- `.cursor/hooks.json`
-- `scripts/hooks/*.js`
-- `tests/hooks/*.test.js`
+- `.claude/commands/*.md`
+- `.claude/rules/*.md`
+- `.claude/skills/*/SKILL.md`
+- `.claude/research/*.md`
+- `.claude/team/*.json`
+- `.claude/enterprise/*.md`
+- `.codex/agents/*.toml`
+- `.agents/skills/*/SKILL.md`
+- `.agents/skills/*/agents/*.yaml`
 
 **Example commit sequence**:
 ```
-Edit or create hook configuration files (e.g., hooks/hooks.json, .cursor/hooks.json)
-Add or update hook implementation scripts under scripts/hooks/
-Add or update test files under tests/hooks/ to cover new or changed hook logic
+Add or update markdown or JSON files in .claude/commands/, .claude/rules/, .claude/skills/, .claude/research/, .claude/team/, .claude/enterprise/
+Add or update TOML files in .codex/agents/
+Add or update SKILL.md or YAML files in .agents/skills/
 ```
 
 
