@@ -48,7 +48,7 @@ And my CV: [paste your CV as plain text]
 
 Output: `## Tailoring Reasoning` → `## Tailored CV` → `## Match Score`
 
-If the match score is below 5, the agent will flag it. You decide whether to proceed.
+If the match score is below 5, the agent will flag it. Skip unless this is a deliberate stretch application.
 
 ### Step 3 — Write the cover letter
 
