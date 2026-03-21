@@ -294,10 +294,11 @@ def parse_instinct_file(content: str) -> list[dict]:
                 key, value = line.split(':', 1)
                 key = key.strip()
                 value = value.strip()
-                # Unescape quoted YAML strings (handles \" and \\)
-                if (value.startswith('"') and value.endswith('"')) or \
-                   (value.startswith("'") and value.endswith("'")):
+                # Unescape quoted YAML strings
+                if value.startswith('"') and value.endswith('"'):
                     value = value[1:-1].replace('\\"', '"').replace('\\\\', '\\')
+                elif value.startswith("'") and value.endswith("'"):
+                    value = value[1:-1].replace("''", "'")
                 if key == 'confidence':
                     try:
                         current[key] = float(value)
@@ -426,7 +427,7 @@ def cmd_status(args) -> int:
 
         # Print global instincts
         if global_instincts:
-            print(f"## GLOBAL (apply to all projects)")
+            print("## GLOBAL (apply to all projects)")
             print()
             _print_instincts_by_domain(global_instincts)
 
