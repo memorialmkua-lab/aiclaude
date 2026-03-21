@@ -73,7 +73,7 @@ For each action_required message:
 4. **Pending responses** — Set follow-up deadlines, remove resolved items
 5. **Archive** — Remove processed message from inbox
 6. **Triage files** — Update draft status
-7. **Git commit & push** — Version-control all knowledge file changes
+7. **Git commit** — Stage changes and create local commit; require explicit approval to push
 
 ## Briefing Output Format
 

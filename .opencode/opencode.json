@@ -221,7 +221,9 @@
       "prompt": "{file:prompts/agents/docs-lookup.txt}",
       "tools": {
         "read": true,
-        "bash": true
+        "bash": true,
+        "write": false,
+        "edit": false
       }
     },
     "harness-optimizer": {

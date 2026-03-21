@@ -12,16 +12,23 @@ You DO NOT refactor or rewrite code — you fix the build error only.
 
 ## Diagnostic Commands
 
-Run these in order:
+First, detect the build system by checking for `pom.xml` (Maven) or `build.gradle`/`build.gradle.kts` (Gradle). Use the detected build tool's wrapper (mvnw vs mvn, gradlew vs gradle).
 
+### Maven-Only Commands
 ```bash
 ./mvnw compile -q 2>&1 || mvn compile -q 2>&1
 ./mvnw test -q 2>&1 || mvn test -q 2>&1
-./gradlew build 2>&1
 ./mvnw dependency:tree 2>&1 | head -100
-./gradlew dependencies --configuration runtimeClasspath 2>&1 | head -100
 ./mvnw checkstyle:check 2>&1 || echo "checkstyle not configured"
 ./mvnw spotbugs:check 2>&1 || echo "spotbugs not configured"
+```
+
+### Gradle-Only Commands
+```bash
+./gradlew compileJava 2>&1
+./gradlew build 2>&1
+./gradlew test 2>&1
+./gradlew dependencies --configuration runtimeClasspath 2>&1 | head -100
 ```
 
 ## Resolution Workflow
@@ -41,7 +48,7 @@ Run these in order:
 | `cannot find symbol` | Missing import, typo, missing dependency | Add import or dependency |
 | `incompatible types: X cannot be converted to Y` | Wrong type, missing cast | Add explicit cast or fix type |
 | `method X in class Y cannot be applied to given types` | Wrong argument types or count | Fix arguments or check overloads |
-| `variable X might not have been initialized` | Uninitialized local variable | Initialise variable before use |
+| `variable X might not have been initialized` | Uninitialized local variable | Initialize variable before use |
 | `non-static method X cannot be referenced from a static context` | Instance method called statically | Create instance or make method static |
 | `reached end of file while parsing` | Missing closing brace | Add missing `}` |
 | `package X does not exist` | Missing dependency or wrong import | Add dependency to `pom.xml`/`build.gradle` |

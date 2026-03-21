@@ -59,19 +59,35 @@ If any CRITICAL security issue is found, stop and escalate to `security-reviewer
 - **Weak test names**: `testFindUser` gives no information — use `should_return_404_when_user_not_found`
 
 ## Diagnostic Commands
+
+First, determine the build tool by checking for `pom.xml` (Maven) or `build.gradle`/`build.gradle.kts` (Gradle).
+
+### Maven-Only Commands
 ```bash
 git diff -- '*.java'
-mvn verify -q
-./gradlew check
-./mvnw checkstyle:check
-./mvnw spotbugs:check
-./mvnw test
-./mvnw dependency-check:check
+./mvnw compile -q 2>&1 || mvn compile -q 2>&1
+./mvnw verify -q 2>&1 || mvn verify -q 2>&1
+./mvnw checkstyle:check 2>&1 || echo "checkstyle not configured"
+./mvnw spotbugs:check 2>&1 || echo "spotbugs not configured"
+./mvnw dependency-check:check 2>&1 || echo "dependency-check not configured"
+./mvnw test 2>&1
+./mvnw dependency:tree 2>&1 | head -50
+```
+
+### Gradle-Only Commands
+```bash
+git diff -- '*.java'
+./gradlew compileJava 2>&1
+./gradlew check 2>&1
+./gradlew test 2>&1
+./gradlew dependencies --configuration runtimeClasspath 2>&1 | head -50
+```
+
+### Common Checks (Both)
+```bash
 grep -rn "@Autowired" src/main/java --include="*.java"
 grep -rn "FetchType.EAGER" src/main/java --include="*.java"
 ```
-
-Read `pom.xml`, `build.gradle`, or `build.gradle.kts` to determine the build tool and Spring Boot version before reviewing.
 
 ## Approval Criteria
 - **Approve**: No CRITICAL or HIGH issues

@@ -58,7 +58,7 @@ mypy .                                     # Type checking
 ruff check .                               # Fast linting
 black --check .                            # Format check
 bandit -r .                                # Security scan
-pytest --cov=app --cov-report=term-missing # Test coverage
+pytest --cov --cov-report=term-missing # Test coverage (or replace with --cov=<PACKAGE>)
 ```
 
 ## Review Output Format
