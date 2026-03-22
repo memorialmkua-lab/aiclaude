@@ -4,7 +4,7 @@
 
 ## Kullanım
 
-`/checkpoint [create|verify|list] [isim]`
+`/checkpoint [create|verify|list|clear] [isim]`
 
 ## Checkpoint Oluştur
 
