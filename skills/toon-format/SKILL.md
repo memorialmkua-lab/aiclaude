@@ -106,7 +106,7 @@ npm install -g @toon-format/cli@2.1.0
 | Python | `toon` | `pip install toon` (pin in requirements.txt) |
 | Rust | `toon-rust` | `cargo add toon-rust` (pin in Cargo.toml) |
 | Java | `toon-java` | Maven/Gradle (pin in pom.xml / build.gradle) |
-| Go | `toon-go` | `go get github.com/toon-format/toon-go` (pinned via go.sum) |
+| Go | `toon-go` | `go get github.com/toon-format/toon-go` (pin in go.mod) |
 | Swift | `toon-swift` | SPM (pin in Package.swift) |
 
 ## Programmatic Conversion
