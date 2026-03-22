@@ -418,5 +418,5 @@ Hala sorunlar yaşıyorsanız:
 
 - [README.md](./README.md) - Kurulum ve özellikler
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Geliştirme rehberleri
-- [docs/](./docs/) - Detaylı dokümantasyon
+- [docs/](../) - Detaylı dokümantasyon
 - [examples/](./examples/) - Kullanım örnekleri
