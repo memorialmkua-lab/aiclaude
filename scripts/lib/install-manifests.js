@@ -53,7 +53,7 @@ const LEGACY_LANGUAGE_ALIAS_TO_CANONICAL = Object.freeze({
 });
 const LEGACY_LANGUAGE_EXTRA_MODULE_IDS = Object.freeze({
   cpp: ['framework-language'],
-  csharp: [],
+  csharp: ['framework-language'],
   go: ['framework-language'],
   java: ['framework-language'],
   perl: [],
