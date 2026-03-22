@@ -148,6 +148,26 @@
         "hooks": [
           {
             "type": "command",
+            "command": "#!/bin/bash\nmkdir -p ~/.claude && INPUT=$(cat); echo \"$INPUT\" | jq -r '\"[\" + (now | todate) + \"] \" + ((.tool_input.command // \"?\") | gsub(\"\\n\"; \" \") | gsub(\"--token[= ][^ ]*\"; \"--token=<REDACTED>\") | gsub(\"Authorization:[^ ]*\"; \"Authorization:<REDACTED>\") | gsub(\"AKIA[A-Z0-9]{16}\"; \"<REDACTED>\") | gsub(\"password[= ][^ ]*\"; \"password=<REDACTED>\"))' >> ~/.claude/bash-commands.log"
+          }
+        ],
+        "description": "Audit log all bash commands to ~/.claude/bash-commands.log"
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\nmkdir -p ~/.claude && INPUT=$(cat); echo \"$INPUT\" | jq -r '\"[\" + (now | todate) + \"] tool=Bash command=\" + ((.tool_input.command // \"?\") | gsub(\"\\n\"; \" \") | gsub(\"--token[= ][^ ]*\"; \"--token=<REDACTED>\") | gsub(\"Authorization:[^ ]*\"; \"Authorization:<REDACTED>\") | gsub(\"AKIA[A-Z0-9]{16}\"; \"<REDACTED>\") | gsub(\"password[= ][^ ]*\"; \"password=<REDACTED>\"))' >> ~/.claude/cost-tracker.log"
+          }
+        ],
+        "description": "Cost tracker - log bash tool usage with timestamps"
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"post:bash:pr-created\" \"scripts/hooks/post-bash-pr-created.js\" \"standard,strict\""
           }
         ],
