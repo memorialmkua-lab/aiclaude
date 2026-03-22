@@ -85,6 +85,9 @@ function runTests() {
     assert.ok(languages.includes('go'));
     assert.ok(languages.includes('golang'));
     assert.ok(languages.includes('kotlin'));
+    assert.ok(languages.includes('rust'));
+    assert.ok(languages.includes('cpp'));
+    assert.ok(languages.includes('csharp'));
   })) passed++; else failed++;
 
   if (test('resolves a real project profile with target-specific skips', () => {
