@@ -30,4 +30,4 @@ Use a consistent envelope for all API responses:
 - Include an error message field (nullable on success)
 - Include metadata for paginated responses (total, page, limit)
 
-**Agent consumption**: When API response data is consumed by agents (not frontend code), convert to TOON format before injection into prompts. This saves ~40% tokens. For CLI tools that return JSON (`gh api`, `curl`), pipe through `npx @toon-format/cli`. See the `toon-format` skill for details.
+**Agent consumption**: When API response data is consumed by agents (not frontend code), convert to TOON format before injection into prompts. This saves ~40% tokens. For CLI tools that return JSON (`gh api`, `curl`), pipe through `npx @toon-format/cli@<version>` (always pin the version). See the `toon-format` skill for details.

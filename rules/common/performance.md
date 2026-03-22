@@ -33,8 +33,8 @@ Lower context sensitivity tasks:
 ## Data Format for Agent Prompts
 
 When structured data is injected into agent prompts, prefer **TOON** over raw JSON:
-- TOON saves ~40% tokens with higher LLM accuracy (74% vs 70%)
-- Pipe JSON-producing CLI tools through `npx @toon-format/cli` before the agent reads output
+- TOON saves ~40% tokens with higher LLM accuracy (see [benchmarks](https://toonformat.dev/guide/benchmarks.html))
+- Pipe JSON-producing CLI tools through `npx @toon-format/cli@<version>` (pin the version) before the agent reads output
 - Use `encode()` from TOON libraries when programmatically injecting data into prompts
 
 **Boundary**: Config files (`.json`) stay as JSON — tools expect JSON. TOON is for data *consumed by agents*, not data consumed by tooling. If the task is explicitly about JSON (editing, schema work), use JSON.

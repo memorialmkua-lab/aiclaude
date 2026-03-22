@@ -6,7 +6,7 @@ origin: ECC
 
 # TOON Format for Agent Data Consumption
 
-Prefer [TOON](https://toonformat.dev/) over raw JSON when structured data is consumed by AI agents. TOON encodes the same JSON data model with ~40% fewer tokens and higher LLM accuracy (74% vs 70%).
+Prefer [TOON](https://toonformat.dev/) over raw JSON when structured data is consumed by AI agents. TOON encodes the same JSON data model with ~40% fewer tokens and higher LLM accuracy (see [benchmarks](https://toonformat.dev/guide/benchmarks.html) — results vary by dataset).
 
 ## When to Activate
 
@@ -30,7 +30,7 @@ Prefer [TOON](https://toonformat.dev/) over raw JSON when structured data is con
 Key properties:
 - Indentation-based structure (like YAML), no braces or brackets
 - ~39.9% fewer tokens than equivalent JSON on average
-- 74% LLM accuracy vs JSON's 70% at ~40% fewer tokens
+- Higher LLM accuracy at fewer tokens (exact figures vary by dataset — see [benchmarks](https://toonformat.dev/guide/benchmarks.html))
 - Deterministic round-trips (lossless JSON↔TOON conversion)
 - File extension: `.toon`, media type: `text/toon`
 
@@ -65,40 +65,45 @@ items[2]{sku,qty,price}:
 
 ## CLI Piping Patterns
 
-When an agent runs CLI tools that output JSON, pipe through the TOON CLI so the agent reads compact TOON instead of raw JSON:
+When an agent runs CLI tools that output JSON, pipe through the TOON CLI so the agent reads compact TOON instead of raw JSON.
+
+**Security**: Always pin the version to avoid supply-chain risk (matches the project's practice in `hooks/hooks.json`):
 
 ```bash
 # GitHub API
-gh api /repos/{owner}/{repo}/pulls | npx @toon-format/cli
+gh api /repos/{owner}/{repo}/pulls | npx @toon-format/cli@2.1.0
 
 # REST APIs via curl
-curl -s https://api.example.com/data | npx @toon-format/cli
+curl -s https://api.example.com/data | npx @toon-format/cli@2.1.0
 
 # AWS CLI
-aws s3api list-buckets | npx @toon-format/cli
+aws s3api list-buckets | npx @toon-format/cli@2.1.0
 
 # Google Cloud
-gcloud compute instances list --format=json | npx @toon-format/cli
+gcloud compute instances list --format=json | npx @toon-format/cli@2.1.0
 
 # Kubernetes
-kubectl get pods -o json | npx @toon-format/cli
+kubectl get pods -o json | npx @toon-format/cli@2.1.0
 
 # jq output
-cat data.json | npx @toon-format/cli
-
-# With alternative delimiters for data containing commas
-curl -s https://api.example.com/data | npx @toon-format/cli --delimiter=tab
+cat data.json | npx @toon-format/cli@2.1.0
 ```
 
-**Rule**: Any Bash tool call that returns JSON for agent consumption should pipe through `npx @toon-format/cli` (or the installed `toon` binary) before the agent reads the output.
+**Tip**: Install globally once to avoid repeated downloads:
+```bash
+npm install -g @toon-format/cli
+# Then use: gh api ... | toon
+```
+
+**Rule**: Any Bash tool call that returns JSON for agent consumption should pipe through `npx @toon-format/cli@<version>` (or the installed `toon` binary) before the agent reads the output.
 
 ## Library Reference
 
 | Language | Package | Install |
 |---|---|---|
 | TypeScript/JS | `@toon-format/toon` | `npm install @toon-format/toon` |
-| CLI | `@toon-format/cli` | `npx @toon-format/cli` |
-| Python | `toon-python` | `pip install toon-python` |
+| CLI | `@toon-format/cli` | `npx @toon-format/cli@2.1.0` |
+| Python | `toon` | `pip install toon` |
 | Rust | `toon-rust` | `cargo add toon-rust` |
 | Java | `toon-java` | Maven/Gradle |
 | Go | `toon-go` | `go get github.com/toon-format/toon-go` |
@@ -122,7 +127,7 @@ const prompt = `Analyze this data:\n${toonData}`
 ### Python
 
 ```python
-import toon
+import toon  # pip install toon
 
 # Convert API response to TOON before injecting into agent prompt
 api_data = response.json()
@@ -139,10 +144,12 @@ prompt = f"Analyze this data:\n{toon_data}"
 - **Do NOT** pipe through `toon` CLI when the task is about inspecting or editing the JSON itself
 - **Do NOT** use TOON when the user explicitly requests JSON output
 - **Do NOT** convert data that stays within application logic (not injected into prompts)
+- **Do NOT** use unpinned `npx @toon-format/cli` — always pin the version
 
 ## Related
 
 - [toonformat.dev](https://toonformat.dev/) — Official site, spec, playground
+- [Benchmarks](https://toonformat.dev/guide/benchmarks.html) — Token and accuracy comparisons
 - `strategic-compact` skill — Complementary token optimization via context compaction
 - `cost-aware-llm-pipeline` skill — Cost optimization patterns for LLM API usage
 - `rules/common/performance.md` — Data format guidance for agent prompts
