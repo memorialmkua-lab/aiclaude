@@ -103,7 +103,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check for regressions
-        uses: hidai25/eval-view@main
+        uses: hidai25/eval-view@c757b8209a2eacd3cda1044eb26c53b23f8edbf7  # v0.5.3
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 ```
@@ -150,9 +150,10 @@ turns:
 - **Use variants for non-deterministic agents.** `evalview snapshot --variant v2` stores alternate valid behaviors (up to 5).
 - **Monitor in production.** `evalview monitor` catches gradual drift that individual checks miss.
 
-## Links
+## Installation
 
-- [GitHub](https://github.com/hidai25/eval-view)
-- [PyPI](https://pypi.org/project/evalview/)
-- [Documentation](https://github.com/hidai25/eval-view/tree/main/docs)
-- [Starter Template](https://github.com/hidai25/evalview-support-automation-template)
+```bash
+pip install evalview
+```
+
+Package: [evalview on PyPI](https://pypi.org/project/evalview/)
