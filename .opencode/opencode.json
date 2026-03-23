@@ -178,18 +178,6 @@
         "bash": true
       }
     },
-    "chief-of-staff": {
-      "description": "Personal communication chief of staff that triages email, Slack, LINE, and Messenger. Classifies messages into 4 tiers and generates draft replies.",
-      "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
-      "prompt": "{file:prompts/agents/chief-of-staff.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
     "cpp-reviewer": {
       "description": "Expert C++ code reviewer specializing in memory safety, modern C++ idioms, concurrency, and performance. Use for all C++ code changes.",
       "mode": "subagent",

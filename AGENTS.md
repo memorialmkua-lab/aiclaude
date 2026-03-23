@@ -1,6 +1,6 @@
 # Everything Claude Code (ECC) — Agent Instructions
 
-This is a **production-ready AI coding plugin** providing 28 specialized agents, 119 skills, 60 commands, and automated hook workflows for software development.
+This is a **production-ready AI coding plugin** providing 27 specialized agents, 116 skills, 59 commands, and automated hook workflows for software development.
 
 **Version:** 1.9.0
 
@@ -36,7 +36,6 @@ This is a **production-ready AI coding plugin** providing 28 specialized agents,
 | python-reviewer | Python code review | Python projects |
 | java-reviewer | Java and Spring Boot code review | Java/Spring Boot projects |
 | java-build-resolver | Java/Maven/Gradle build errors | Java build failures |
-| chief-of-staff | Communication triage and drafts | Multi-channel email, Slack, LINE, Messenger |
 | loop-operator | Autonomous loop execution | Run loops safely, monitor stalls, intervene |
 | harness-optimizer | Harness config tuning | Reliability, cost, throughput |
 | rust-reviewer | Rust code review | Rust projects |
@@ -52,7 +51,6 @@ Use agents proactively without user prompt:
 - Bug fix or new feature → **tdd-guide**
 - Architectural decision → **architect**
 - Security-sensitive code → **security-reviewer**
-- Multi-channel communication triage → **chief-of-staff**
 - Autonomous loops / loop monitoring → **loop-operator**
 - Harness config reliability and cost → **harness-optimizer**
 
