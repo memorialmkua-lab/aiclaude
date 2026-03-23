@@ -3,6 +3,18 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/skill-tracker.js\"",
+            "async": true,
+            "timeout": 5
+          }
+        ],
+        "description": "Track skill invocations to ~/.claude/metrics/skill-usage.jsonl"
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
