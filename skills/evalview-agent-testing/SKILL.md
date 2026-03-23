@@ -153,7 +153,7 @@ turns:
 ## Installation
 
 ```bash
-pip install evalview
+pip install "evalview>=0.5,<1"
 ```
 
 Package: [evalview on PyPI](https://pypi.org/project/evalview/)
