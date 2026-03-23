@@ -81,7 +81,7 @@ if not gate_or_revert("tests/", quick=True):
 EvalView exposes 8 tools via MCP — works with Claude Code, Cursor, and any MCP client:
 
 ```bash
-claude mcp add --transport stdio evalview -- python3 -m evalview mcp serve
+claude mcp add --transport stdio evalview -- evalview mcp serve
 ```
 
 Tools: `create_test`, `run_snapshot`, `run_check`, `list_tests`, `validate_skill`, `generate_skill_tests`, `run_skill_test`, `generate_visual_report`
