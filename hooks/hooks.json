@@ -148,7 +148,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "#!/bin/bash\nmkdir -p ~/.claude && INPUT=$(cat); echo \"$INPUT\" | jq -r '\"[\" + (now | todate) + \"] \" + ((.tool_input.command // \"?\") | gsub(\"\\n\"; \" \") | gsub(\"--token[= ][^ ]*\"; \"--token=<REDACTED>\") | gsub(\"Authorization:[^ ]*\"; \"Authorization:<REDACTED>\") | gsub(\"AKIA[A-Z0-9]{16}\"; \"<REDACTED>\") | gsub(\"password[= ][^ ]*\"; \"password=<REDACTED>\"))' >> ~/.claude/bash-commands.log"
+            "command": "#!/bin/bash\nmkdir -p ~/.claude && INPUT=$(cat) && echo \"$INPUT\" | jq -r '\"[\" + (now | todate) + \"] \" + ((.tool_input.command // \"?\") | gsub(\"\\n\"; \" \") | gsub(\"--token[= ][^ ]*\"; \"--token=<REDACTED>\") | gsub(\"Authorization:[^ ]*\"; \"Authorization:<REDACTED>\") | gsub(\"AKIA[A-Z0-9]{16}\"; \"<REDACTED>\") | gsub(\"password[= ][^ ]*\"; \"password=<REDACTED>\"))' >> ~/.claude/bash-commands.log && echo \"$INPUT\""
           }
         ],
         "description": "Audit log all bash commands to ~/.claude/bash-commands.log"
@@ -158,7 +158,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "#!/bin/bash\nmkdir -p ~/.claude && INPUT=$(cat); echo \"$INPUT\" | jq -r '\"[\" + (now | todate) + \"] tool=Bash command=\" + ((.tool_input.command // \"?\") | gsub(\"\\n\"; \" \") | gsub(\"--token[= ][^ ]*\"; \"--token=<REDACTED>\") | gsub(\"Authorization:[^ ]*\"; \"Authorization:<REDACTED>\") | gsub(\"AKIA[A-Z0-9]{16}\"; \"<REDACTED>\") | gsub(\"password[= ][^ ]*\"; \"password=<REDACTED>\"))' >> ~/.claude/cost-tracker.log"
+            "command": "#!/bin/bash\nmkdir -p ~/.claude && INPUT=$(cat) && echo \"$INPUT\" | jq -r '\"[\" + (now | todate) + \"] tool=Bash command=\" + ((.tool_input.command // \"?\") | gsub(\"\\n\"; \" \") | gsub(\"--token[= ][^ ]*\"; \"--token=<REDACTED>\") | gsub(\"Authorization:[^ ]*\"; \"Authorization:<REDACTED>\") | gsub(\"AKIA[A-Z0-9]{16}\"; \"<REDACTED>\") | gsub(\"password[= ][^ ]*\"; \"password=<REDACTED>\"))' >> ~/.claude/cost-tracker.log && echo \"$INPUT\""
           }
         ],
         "description": "Cost tracker - log bash tool usage with timestamps"
