@@ -209,7 +209,7 @@ npx ecc-install typescript
 /plugin list everything-claude-code@everything-claude-code
 ```
 
-✨ **搞定！** 你现在可以使用 28 个智能体、116 项技能和 59 个命令了。
+✨ **搞定！** 你现在可以使用 28 个智能体、125 项技能和 60 个命令了。
 
 ***
 
@@ -1095,8 +1095,8 @@ opencode
 | 功能特性 | Claude Code | OpenCode | 状态 |
 |---------|-------------|----------|--------|
 | 智能体 | ✅ 28 个 | ✅ 12 个 | **Claude Code 领先** |
-| 命令 | ✅ 59 个 | ✅ 31 个 | **Claude Code 领先** |
-| 技能 | ✅ 116 项 | ✅ 37 项 | **Claude Code 领先** |
+| 命令 | ✅ 60 个 | ✅ 31 个 | **Claude Code 领先** |
+| 技能 | ✅ 125 项 | ✅ 37 项 | **Claude Code 领先** |
 | 钩子 | ✅ 8 种事件类型 | ✅ 11 种事件 | **OpenCode 更多！** |
 | 规则 | ✅ 29 条 | ✅ 13 条指令 | **Claude Code 领先** |
 | MCP 服务器 | ✅ 14 个 | ✅ 完整 | **完全对等** |
