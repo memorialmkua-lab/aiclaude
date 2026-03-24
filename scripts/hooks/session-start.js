@@ -111,7 +111,8 @@ async function main() {
   // Emit all collected context via the correct hookSpecificOutput format,
   // then exit only after stdout is flushed (avoids race condition)
   if (contextParts.length > 0) {
-    emitSessionStartOutput(contextParts.join('\n\n'), () => {
+    emitSessionStartOutput(contextParts.join('\n\n'), (err) => {
+      if (err) console.error('[SessionStart] stdout write error:', err.message);
       process.exit(0);
     });
   } else {

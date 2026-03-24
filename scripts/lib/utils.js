@@ -28,10 +28,25 @@ function getClaudeDir() {
 }
 
 /**
- * Get the sessions directory
+ * Get the sessions directory.
+ * Prefers 'session-data' (new default) but falls back to legacy 'sessions'
+ * if it exists, so existing users don't lose access to their session files.
  */
 function getSessionsDir() {
-  return path.join(getClaudeDir(), 'session-data');
+  const claudeDir = getClaudeDir();
+  const newDir = path.join(claudeDir, 'session-data');
+  const legacyDir = path.join(claudeDir, 'sessions');
+
+  // If the new directory already exists, prefer it
+  if (fs.existsSync(newDir)) {
+    return newDir;
+  }
+  // Fall back to legacy path if it exists (preserves existing session files)
+  if (fs.existsSync(legacyDir)) {
+    return legacyDir;
+  }
+  // Neither exists yet — use the new default (will be created by ensureDir)
+  return newDir;
 }
 
 /**
