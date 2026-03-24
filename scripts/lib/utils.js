@@ -29,23 +29,31 @@ function getClaudeDir() {
 
 /**
  * Get the sessions directory.
- * Prefers 'session-data' (new default) but falls back to legacy 'sessions'
- * if it exists, so existing users don't lose access to their session files.
+ * Uses ~/.claude/session-data/ for new installs but falls back to
+ * ~/.claude/sessions/ when the legacy directory exists and the new one
+ * does not, so existing session history is never silently lost.
  */
 function getSessionsDir() {
-  const claudeDir = getClaudeDir();
-  const newDir = path.join(claudeDir, 'session-data');
-  const legacyDir = path.join(claudeDir, 'sessions');
+  const newDir = path.join(getClaudeDir(), 'session-data');
+  const legacyDir = path.join(getClaudeDir(), 'sessions');
 
-  // If the new directory already exists, prefer it
+  // If the new directory already exists, always use it
   if (fs.existsSync(newDir)) {
     return newDir;
   }
-  // Fall back to legacy path if it exists (preserves existing session files)
+
+  // If legacy directory exists, try one-time migration (rename)
   if (fs.existsSync(legacyDir)) {
-    return legacyDir;
+    try {
+      fs.renameSync(legacyDir, newDir);
+      return newDir;
+    } catch {
+      // If rename fails (e.g. cross-device), fall back to legacy path
+      return legacyDir;
+    }
   }
-  // Neither exists yet — use the new default (will be created by ensureDir)
+
+  // Fresh install — use new path
   return newDir;
 }
 

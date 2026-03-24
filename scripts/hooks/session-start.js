@@ -37,7 +37,12 @@ function emitSessionStartOutput(context, callback) {
       additionalContext: context,
     },
   });
-  process.stdout.write(payload + '\n', callback);
+  // Guard against 'error' events that bypass the write callback
+  process.stdout.once('error', () => callback());
+  process.stdout.write(payload + '\n', (err) => {
+    if (err) log(`[SessionStart] stdout write error: ${err.message}`);
+    callback();
+  });
 }
 
 async function main() {
@@ -108,16 +113,12 @@ async function main() {
     log('[SessionStart] No specific project type detected');
   }
 
-  // Emit all collected context via the correct hookSpecificOutput format,
-  // then exit only after stdout is flushed (avoids race condition)
-  if (contextParts.length > 0) {
-    emitSessionStartOutput(contextParts.join('\n\n'), (err) => {
-      if (err) console.error('[SessionStart] stdout write error:', err.message);
-      process.exit(0);
-    });
-  } else {
+  // Always emit hookSpecificOutput (even if empty) to satisfy the contract,
+  // then exit only after stdout is flushed
+  const context = contextParts.length > 0 ? contextParts.join('\n\n') : '';
+  emitSessionStartOutput(context, () => {
     process.exit(0);
-  }
+  });
 }
 
 main().catch(err => {
