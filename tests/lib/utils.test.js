@@ -177,6 +177,18 @@ function runTests() {
     assert.ok(/^[a-f0-9]{8}$/.test(cyrillic), `Should be 8-char hex, got: "${cyrillic}"`);
   })) passed++; else failed++;
 
+  if (test('sanitizeSessionId disambiguates mixed-script names from pure ASCII', () => {
+    // '我的app' and 'app' must NOT collide
+    const mixed = utils.sanitizeSessionId('我的app');
+    const pure = utils.sanitizeSessionId('app');
+    assert.strictEqual(pure, 'app', 'Pure ASCII should be unchanged');
+    assert.notStrictEqual(mixed, pure, 'Mixed-script name must differ from pure ASCII');
+    assert.ok(mixed.startsWith('app-'), `Mixed-script should start with ASCII part + hash suffix, got: "${mixed}"`);
+    // Two different mixed-script names with same ASCII part must differ
+    const mixed2 = utils.sanitizeSessionId('他的app');
+    assert.notStrictEqual(mixed, mixed2, 'Different non-ASCII prefixes with same ASCII must produce different results');
+  })) passed++; else failed++;
+
   if (test('sanitizeSessionId hash is stable (same input → same output)', () => {
     const first = utils.sanitizeSessionId('日本語プロジェクト');
     const second = utils.sanitizeSessionId('日本語プロジェクト');

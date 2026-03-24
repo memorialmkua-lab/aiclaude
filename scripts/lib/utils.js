@@ -116,15 +116,23 @@ function getProjectName() {
  */
 function sanitizeSessionId(raw) {
   if (!raw || typeof raw !== 'string') return null;
+  // Check for non-ASCII content before sanitizing (used for disambiguation below)
+  const hasNonAscii = /[^\x00-\x7F]/.test(raw);
   const sanitized = raw
     .replace(/^\.+/, '')              // strip leading dots
     .replace(/[^a-zA-Z0-9_-]/g, '-') // replace invalid chars
     .replace(/-{2,}/g, '-')          // collapse runs of hyphens
     .replace(/^-+|-+$/g, '');        // trim leading/trailing hyphens
-  if (sanitized.length > 0) return sanitized;
-  // Check if the original had meaningful content (non-ASCII characters like CJK,
-  // Cyrillic) vs just whitespace/dots/punctuation. Only hash meaningful content
-  // so distinct project names get distinct IDs instead of colliding on 'default'.
+  if (sanitized.length > 0) {
+    if (!hasNonAscii) return sanitized;
+    // Mixed-script names (e.g., '我的app') retain ASCII part but need
+    // disambiguation — 'app' and '我的app' must not collide.
+    const crypto = require('crypto');
+    const suffix = crypto.createHash('sha256').update(raw).digest('hex').slice(0, 6);
+    return `${sanitized}-${suffix}`;
+  }
+  // Pure non-ASCII names (CJK, Cyrillic, emoji) — generate a stable hash.
+  // Whitespace/punctuation-only inputs have no meaningful content → null.
   const meaningful = raw.replace(/[\s._@#$%^&*()+=\[\]{}<>|\\/?!~`'",:;-]/g, '');
   if (meaningful.length === 0) return null;
   const crypto = require('crypto');
