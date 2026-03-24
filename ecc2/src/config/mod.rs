@@ -2,7 +2,17 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PaneLayout {
+    #[default]
+    Horizontal,
+    Vertical,
+    Grid,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Config {
     pub db_path: PathBuf,
     pub worktree_root: PathBuf,
@@ -12,6 +22,7 @@ pub struct Config {
     pub heartbeat_interval_secs: u64,
     pub default_agent: String,
     pub theme: Theme,
+    pub pane_layout: PaneLayout,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -32,6 +43,7 @@ impl Default for Config {
             heartbeat_interval_secs: 30,
             default_agent: "claude".to_string(),
             theme: Theme::Dark,
+            pane_layout: PaneLayout::Horizontal,
         }
     }
 }
@@ -50,5 +62,30 @@ impl Config {
         } else {
             Ok(Config::default())
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Config, PaneLayout};
+
+    #[test]
+    fn default_config_uses_horizontal_pane_layout() {
+        assert_eq!(Config::default().pane_layout, PaneLayout::Horizontal);
+    }
+
+    #[test]
+    fn missing_pane_layout_deserializes_to_default() {
+        let cfg: Config = toml::from_str(r#"default_agent = "codex""#).unwrap();
+
+        assert_eq!(cfg.pane_layout, PaneLayout::Horizontal);
+        assert_eq!(cfg.default_agent, "codex");
+    }
+
+    #[test]
+    fn pane_layout_deserializes_from_toml() {
+        let cfg: Config = toml::from_str(r#"pane_layout = "grid""#).unwrap();
+
+        assert_eq!(cfg.pane_layout, PaneLayout::Grid);
     }
 }

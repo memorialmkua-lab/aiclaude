@@ -3,6 +3,17 @@ use rusqlite::Connection;
 use std::path::Path;
 
 use super::{Session, SessionMetrics, SessionState};
+use crate::observability::ToolCallEvent;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ToolLogEntry {
+    pub tool_name: String,
+    pub input_summary: String,
+    pub output_summary: String,
+    pub duration_ms: u64,
+    pub risk_score: f64,
+    pub timestamp: String,
+}
 
 pub struct StateStore {
     conn: Connection,
@@ -170,21 +181,98 @@ impl StateStore {
 
     pub fn get_session(&self, id: &str) -> Result<Option<Session>> {
         let sessions = self.list_sessions()?;
-        Ok(sessions.into_iter().find(|s| s.id == id || s.id.starts_with(id)))
+        Ok(sessions
+            .into_iter()
+            .find(|s| s.id == id || s.id.starts_with(id)))
     }
 
-    pub fn send_message(
-        &self,
-        from: &str,
-        to: &str,
-        content: &str,
-        msg_type: &str,
-    ) -> Result<()> {
+    pub fn list_tool_logs(&self, session_id: &str, limit: usize) -> Result<Vec<ToolLogEntry>> {
+        let table_entries = self.list_tool_logs_from_table(session_id, limit)?;
+        if !table_entries.is_empty() {
+            return Ok(table_entries);
+        }
+
+        self.list_tool_logs_from_messages(session_id, limit)
+    }
+
+    pub fn send_message(&self, from: &str, to: &str, content: &str, msg_type: &str) -> Result<()> {
         self.conn.execute(
             "INSERT INTO messages (from_session, to_session, content, msg_type, timestamp)
              VALUES (?1, ?2, ?3, ?4, ?5)",
             rusqlite::params![from, to, content, msg_type, chrono::Utc::now().to_rfc3339()],
         )?;
         Ok(())
+    }
+
+    fn list_tool_logs_from_table(
+        &self,
+        session_id: &str,
+        limit: usize,
+    ) -> Result<Vec<ToolLogEntry>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT tool_name,
+                    COALESCE(input_summary, ''),
+                    COALESCE(output_summary, ''),
+                    COALESCE(duration_ms, 0),
+                    risk_score,
+                    timestamp
+             FROM tool_log
+             WHERE session_id = ?1
+             ORDER BY timestamp DESC
+             LIMIT ?2",
+        )?;
+
+        let entries = stmt
+            .query_map(rusqlite::params![session_id, limit as i64], |row| {
+                Ok(ToolLogEntry {
+                    tool_name: row.get(0)?,
+                    input_summary: row.get(1)?,
+                    output_summary: row.get(2)?,
+                    duration_ms: row.get(3)?,
+                    risk_score: row.get(4)?,
+                    timestamp: row.get(5)?,
+                })
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok(entries)
+    }
+
+    fn list_tool_logs_from_messages(
+        &self,
+        session_id: &str,
+        limit: usize,
+    ) -> Result<Vec<ToolLogEntry>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT content, timestamp
+             FROM messages
+             WHERE from_session = ?1 AND msg_type = 'tool_call'
+             ORDER BY timestamp DESC
+             LIMIT ?2",
+        )?;
+
+        let rows = stmt
+            .query_map(rusqlite::params![session_id, limit as i64], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
+
+        let entries = rows
+            .into_iter()
+            .filter_map(|(content, timestamp)| {
+                serde_json::from_str::<ToolCallEvent>(&content)
+                    .ok()
+                    .map(|event| ToolLogEntry {
+                        tool_name: event.tool_name,
+                        input_summary: event.input_summary,
+                        output_summary: event.output_summary,
+                        duration_ms: event.duration_ms,
+                        risk_score: event.risk_score,
+                        timestamp,
+                    })
+            })
+            .collect();
+
+        Ok(entries)
     }
 }
