@@ -37,12 +37,17 @@ function emitSessionStartOutput(context, callback) {
       additionalContext: context,
     },
   });
-  // Guard against 'error' events that bypass the write callback
-  process.stdout.once('error', () => callback());
-  process.stdout.write(payload + '\n', (err) => {
+  // Guard against double invocation: 'error' event can fire alongside
+  // the write callback, so use a settled flag to ensure single execution.
+  let settled = false;
+  const done = (err) => {
+    if (settled) return;
+    settled = true;
     if (err) log(`[SessionStart] stdout write error: ${err.message}`);
     callback();
-  });
+  };
+  process.stdout.once('error', done);
+  process.stdout.write(payload + '\n', done);
 }
 
 async function main() {

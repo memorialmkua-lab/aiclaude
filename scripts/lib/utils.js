@@ -42,14 +42,31 @@ function getSessionsDir() {
     return newDir;
   }
 
-  // If legacy directory exists, try one-time migration (rename)
+  // If legacy directory exists, try one-time migration
   if (fs.existsSync(legacyDir)) {
     try {
       fs.renameSync(legacyDir, newDir);
       return newDir;
     } catch {
-      // If rename fails (e.g. cross-device), fall back to legacy path
-      return legacyDir;
+      // Rename failed (e.g. cross-device mount). Copy files to new dir
+      // so all future reads/writes use a single consistent path.
+      try {
+        fs.mkdirSync(newDir, { recursive: true });
+        const entries = fs.readdirSync(legacyDir);
+        for (const entry of entries) {
+          const src = path.join(legacyDir, entry);
+          const dst = path.join(newDir, entry);
+          try {
+            fs.copyFileSync(src, dst);
+          } catch {
+            // Skip files that can't be copied (permissions, etc.)
+          }
+        }
+        return newDir;
+      } catch {
+        // If copy also fails, fall back to legacy to avoid data loss
+        return legacyDir;
+      }
     }
   }
 
