@@ -175,6 +175,7 @@ function runTests() {
     // All should be 8-char hex (valid for SESSION_FILENAME_REGEX)
     assert.ok(/^[a-f0-9]{8}$/.test(chinese), `Should be 8-char hex, got: "${chinese}"`);
     assert.ok(/^[a-f0-9]{8}$/.test(cyrillic), `Should be 8-char hex, got: "${cyrillic}"`);
+    assert.ok(/^[a-f0-9]{8}$/.test(emoji), `Should be 8-char hex, got: "${emoji}"`);
   })) passed++; else failed++;
 
   if (test('sanitizeSessionId disambiguates mixed-script names from pure ASCII', () => {
@@ -193,6 +194,19 @@ function runTests() {
     const first = utils.sanitizeSessionId('日本語プロジェクト');
     const second = utils.sanitizeSessionId('日本語プロジェクト');
     assert.strictEqual(first, second, 'Same non-ASCII input must produce identical hash');
+  })) passed++; else failed++;
+
+  if (test('sanitizeSessionId returns null for Unicode-punctuation-only input', () => {
+    // Unicode ellipsis, CJK period, and other non-ASCII punctuation are not meaningful
+    assert.strictEqual(utils.sanitizeSessionId('…'), null);
+    assert.strictEqual(utils.sanitizeSessionId('。'), null);
+    assert.strictEqual(utils.sanitizeSessionId('«»'), null);
+  })) passed++; else failed++;
+
+  if (test('sanitizeSessionId dot-prefixed and non-dot versions hash consistently', () => {
+    // '.foo' and 'foo' should produce the same sanitized result (dots stripped first)
+    assert.strictEqual(utils.sanitizeSessionId('.claude'), utils.sanitizeSessionId('claude'));
+    assert.strictEqual(utils.sanitizeSessionId('..myproject'), utils.sanitizeSessionId('myproject'));
   })) passed++; else failed++;
 
   if (test('sanitizeSessionId is idempotent (applying twice gives same result)', () => {
@@ -247,7 +261,7 @@ function runTests() {
     // Same approach as Round 85 to ensure cross-platform compatibility.
     if (process.platform === 'win32') {
       console.log('    (skipped — root CWD differs on Windows)');
-      return;
+      return true;
     }
     const utilsPath = path.join(__dirname, '..', '..', 'scripts', 'lib', 'utils.js');
     const script = `
@@ -1533,7 +1547,7 @@ function runTests() {
     // Then falls through to sanitized project name (or 'default' at root).
     if (process.platform === 'win32') {
       console.log('    (skipped — root CWD differs on Windows)');
-      return;
+      return true;
     }
     const utilsPath = path.join(__dirname, '..', '..', 'scripts', 'lib', 'utils.js');
     const script = `

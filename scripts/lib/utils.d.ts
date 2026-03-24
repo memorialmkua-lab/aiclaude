@@ -51,7 +51,10 @@ export function getDateTimeString(): string;
  * Sanitize a string for use as a session filename segment.
  * Replaces characters not in [a-zA-Z0-9_-] with hyphens, collapses runs,
  * strips leading dots (e.g., ".claude" → "claude").
- * Returns null if the result is empty after sanitization.
+ * For pure non-ASCII names (CJK, Cyrillic, emoji), returns a stable 8-char
+ * hex hash. For mixed-script names, returns the ASCII part with a 6-char
+ * hash suffix (e.g., "app-a1b2c3"). Returns null for empty, whitespace-only,
+ * or punctuation-only input.
  */
 export function sanitizeSessionId(raw: string | null | undefined): string | null;
 

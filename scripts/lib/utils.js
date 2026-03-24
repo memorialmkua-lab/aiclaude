@@ -118,8 +118,9 @@ function sanitizeSessionId(raw) {
   if (!raw || typeof raw !== 'string') return null;
   // Check for non-ASCII content before sanitizing (used for disambiguation below)
   const hasNonAscii = /[^\x00-\x7F]/.test(raw);
-  const sanitized = raw
-    .replace(/^\.+/, '')              // strip leading dots
+  // Normalize: strip leading dots before all paths (so '.foo' and 'foo' hash identically)
+  const normalized = raw.replace(/^\.+/, '');
+  const sanitized = normalized
     .replace(/[^a-zA-Z0-9_-]/g, '-') // replace invalid chars
     .replace(/-{2,}/g, '-')          // collapse runs of hyphens
     .replace(/^-+|-+$/g, '');        // trim leading/trailing hyphens
@@ -127,16 +128,17 @@ function sanitizeSessionId(raw) {
     if (!hasNonAscii) return sanitized;
     // Mixed-script names (e.g., '我的app') retain ASCII part but need
     // disambiguation — 'app' and '我的app' must not collide.
+    // Hash the normalized input so '.foo' and 'foo' variants are consistent.
     const crypto = require('crypto');
-    const suffix = crypto.createHash('sha256').update(raw).digest('hex').slice(0, 6);
+    const suffix = crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 6);
     return `${sanitized}-${suffix}`;
   }
-  // Pure non-ASCII names (CJK, Cyrillic, emoji) — generate a stable hash.
-  // Whitespace/punctuation-only inputs have no meaningful content → null.
-  const meaningful = raw.replace(/[\s._@#$%^&*()+=\[\]{}<>|\\/?!~`'",:;-]/g, '');
+  // Pure non-ASCII names (CJK, Cyrillic, emoji, symbols like ₿/™/♥) — hash.
+  // Only whitespace + punctuation (\p{P}) is "not meaningful".
+  const meaningful = normalized.replace(/[\s\p{P}]/gu, '');
   if (meaningful.length === 0) return null;
   const crypto = require('crypto');
-  return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 8);
+  return crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 8);
 }
 
 /**
