@@ -1,11 +1,21 @@
 ---
 name: ffmpeg
 description: Complete FFmpeg toolkit for video/audio manipulation, analysis, and production. Covers probing, trim, concat, convert, scale, effects, audio ops, quality metrics, platform encoding, HLS, GIF, hardware acceleration, video analysis with sub-agents, and batch workflows.
+origin: community
 ---
 
 # FFmpeg Toolkit
 
 Production-ready patterns for video and audio manipulation. Combines best practices from 9 community skills into one comprehensive reference.
+
+## When to Activate
+
+- User wants to trim, cut, concat, or re-encode video/audio files
+- Converting between formats (MP4, WebM, ProRes, MKV, etc.)
+- Encoding for a specific platform (YouTube, TikTok, Instagram, LinkedIn)
+- Extracting frames, generating GIFs, or creating thumbnails
+- Analyzing video quality (PSNR, SSIM, VMAF)
+- User says "ffmpeg", "transcode", "trim video", "convert video", or "compress video"
 
 ## Prerequisites
 
@@ -44,10 +54,11 @@ ffprobe -v error -select_streams v:0 -show_entries stream=codec_type -of csv=p=0
 
 ```bash
 # Fast trim (stream copy, keyframe-aligned — not frame-accurate)
-ffmpeg -ss 00:01:30 -i input.mp4 -to 00:01:15 -c copy output.mp4
+# Both -ss and -to before -i so they reference input timestamps
+ffmpeg -ss 00:01:30 -to 00:02:45 -i input.mp4 -c copy output.mp4
 
-# Frame-accurate trim (re-encodes)
-ffmpeg -ss 00:01:30 -i input.mp4 -to 00:01:15 -c:v libx264 -crf 18 -c:a aac output.mp4
+# Frame-accurate trim (re-encodes, -to is duration from start of output)
+ffmpeg -ss 00:01:30 -i input.mp4 -t 00:01:15 -c:v libx264 -crf 18 -c:a aac output.mp4
 
 # Extract by frame range
 ffmpeg -i input.mp4 -vf "select=between(n\,100\,500)" -vsync vfr output.mp4
@@ -377,8 +388,8 @@ ffmpeg -i compressed.mp4 -i original.mp4 -lavfi psnr -f null -
 ffmpeg -i compressed.mp4 -i original.mp4 -lavfi ssim -f null -
 
 # VMAF (Netflix perceptual quality) — 0-100 scale
-ffmpeg -i compressed.mp4 -i original.mp4 \
-  -lavfi libvmaf="model=version=vmaf_v0.6.1" -f null -
+# Default model (FFmpeg 5.0+, uses built-in vmaf_v0.6.1)
+ffmpeg -i compressed.mp4 -i original.mp4 -lavfi libvmaf -f null -
 ```
 
 ### Quality Interpretation

@@ -1,0 +1,104 @@
+{
+  "repo": "everything-claude-code",
+  "repo_owner": "affaan-m",
+  "initialized": "2026-03-14T18:36:55-06:00",
+  "last_heartbeat": "2026-03-21T22:30:00-06:00",
+  "last_wake_reason": "heartbeat",
+  "push_access": false,
+  "ci_status": "green",
+  "ci_failures": [],
+  "local_test_failures": [
+    {
+      "type": "test",
+      "file": "tests/hooks/hooks.test.js",
+      "detail": "observe.sh legacy fallback ENOENT on temp dir",
+      "introduced_by": "#513",
+      "recurring": true,
+      "note": "Environment-specific, not failing in CI"
+    },
+    {
+      "type": "test",
+      "file": "tests/lib/package-manager.test.js",
+      "detail": "defaults to npm returns global-config instead of default",
+      "recurring": true,
+      "note": "Environment-specific, not failing in CI"
+    }
+  ],
+  "health": {
+    "agents": { "count": 28, "status": "healthy" },
+    "skills": { "count": 116, "status": "healthy" },
+    "hooks": { "count": 2, "status": "healthy" },
+    "commands": { "count": 57, "status": "healthy" },
+    "secrets": "clean",
+    "naming": "compliant"
+  },
+  "open_prs": {
+    "count": 12,
+    "flagged": [
+      { "pr": 739, "reason": "Config protection hook — needs revision on 6 issues (missing node prefix, MultiEdit bypass, flat config gap, no description, jq guard, hooks.json reformat)." },
+      { "pr": 736, "reason": "pt-BR translation, touches README.md. Requires Lee's approval." },
+      { "pr": 730, "reason": "C# expansion, touches README.md + AGENTS.md. Requires Lee's approval." },
+      { "pr": 723, "reason": "Touches README.md. Requires Lee's approval." },
+      { "pr": 726, "reason": "Security concerns: chief-of-staff auto-push, Kotlin rm -rf cache. Cubic failing." },
+      { "pr": 640, "reason": "Open 3+ days, needs merge decision. Notable contributor (@Ethan-Arrowood)." }
+    ],
+    "quick_wins": [731, 732, 729, 725, 738],
+    "reviewed_this_heartbeat": [739],
+    "unreviewed_new": []
+  },
+  "recently_merged": [
+    { "pr": 728, "title": "zh-CN docs sync", "merged": "2026-03-21" }
+  ],
+  "local_branches": [
+    { "name": "fix/skill-stocktake-frontmatter", "status": "likely stale", "heartbeat": 1 },
+    { "name": "fix/remove-unused-import-install-lifecycle", "status": "obsolete (fixed by #519)", "heartbeat": 2 },
+    { "name": "fix/orchestrator-slug-validation-and-shell-vars", "status": "resolved upstream", "heartbeat": 3 }
+  ],
+  "dependencies": {
+    "outdated": [
+      { "package": "@eslint/js", "current": "9.39.2", "latest": "9.39.4", "type": "patch" },
+      { "package": "eslint", "current": "9.39.2", "latest": "9.39.4", "type": "patch" },
+      { "package": "globals", "current": "17.1.0", "latest": "17.4.0", "type": "minor" },
+      { "package": "c8", "current": "10.1.3", "latest": "11.0.0", "type": "major" },
+      { "package": "markdownlint-cli", "current": "0.47.0", "latest": "0.48.0", "type": "minor", "note": "fixes minimatch ReDoS" }
+    ],
+    "security": {
+      "high_severity": 2,
+      "detail": "minimatch ReDoS in markdownlint-cli transitive dep",
+      "fix": "markdownlint-cli 0.47→0.48"
+    }
+  },
+  "milestones": {
+    "kiro_decision": "Rejected — added (#548) then reverted. Repo is Claude Code configs only.",
+    "ci_green": "2026-03-21 — CI green on main (all 36 jobs, including previously flaky macOS test)",
+    "security_guide": "2026-03-21 — SECURITY.md and agentic security guide published",
+    "zh_cn_docs": "2026-03-21 — PR #728 merged, Chinese docs synced",
+    "pt_br_pr": "2026-03-21 — PR #736 opened for Brazilian Portuguese translation"
+  },
+  "roadmap": [],
+  "active_reviews": [],
+  "known_issues": [
+    "No push access to origin (affaan-m/everything-claude-code)",
+    "2 local-only test failures (environment-specific, CI passes)",
+    "2 high-severity minimatch ReDoS vulnerabilities (markdownlint-cli 0.47→0.48 fixes)",
+    "PR #726 has security concerns flagged by CodeRabbit",
+    "PR #739 needs revision (6 issues identified)",
+    "PR #640 open 3+ days without merge decision",
+    "GitHub Actions Node.js 20 deprecation — June 2, 2026 deadline",
+    "PR queue growing (12 open, 6 with passing CI)"
+  ],
+  "tech_debt": [
+    "No automated config validation in CI beyond catalog counts",
+    "Beads not initialized",
+    "GitHub Actions Node.js 20 → 24 migration needed by June 2026",
+    "markdownlint-cli update would fix minimatch ReDoS vulnerabilities",
+    "3 stale local fix branches to clean up"
+  ],
+  "stats": {
+    "total_wakes": 12,
+    "total_reviews": 27,
+    "total_prs_created": 0,
+    "total_fixes_committed_locally": 3,
+    "total_messages_processed": 0
+  }
+}
