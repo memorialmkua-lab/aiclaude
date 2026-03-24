@@ -154,12 +154,33 @@ function runTests() {
     assert.strictEqual(utils.sanitizeSessionId(undefined), null);
   })) passed++; else failed++;
 
-  if (test('sanitizeSessionId returns null for dots-only string', () => {
+  if (test('sanitizeSessionId returns null for dots-only string (no meaningful content)', () => {
     assert.strictEqual(utils.sanitizeSessionId('...'), null);
   })) passed++; else failed++;
 
   if (test('sanitizeSessionId strips leading/trailing hyphens after replacement', () => {
     assert.strictEqual(utils.sanitizeSessionId('.@foo@.'), 'foo');
+  })) passed++; else failed++;
+
+  if (test('sanitizeSessionId returns distinct hashes for different non-ASCII names', () => {
+    // P1 fix: CJK/Cyrillic project names must not all collapse to 'default'
+    const chinese = utils.sanitizeSessionId('我的项目');
+    const cyrillic = utils.sanitizeSessionId('проект');
+    const emoji = utils.sanitizeSessionId('🚀🎉');
+    assert.ok(chinese !== null, 'Chinese name should produce a hash, not null');
+    assert.ok(cyrillic !== null, 'Cyrillic name should produce a hash, not null');
+    assert.ok(emoji !== null, 'Emoji name should produce a hash, not null');
+    assert.notStrictEqual(chinese, cyrillic, 'Different non-ASCII names must produce different hashes');
+    assert.notStrictEqual(chinese, emoji, 'Different non-ASCII names must produce different hashes');
+    // All should be 8-char hex (valid for SESSION_FILENAME_REGEX)
+    assert.ok(/^[a-f0-9]{8}$/.test(chinese), `Should be 8-char hex, got: "${chinese}"`);
+    assert.ok(/^[a-f0-9]{8}$/.test(cyrillic), `Should be 8-char hex, got: "${cyrillic}"`);
+  })) passed++; else failed++;
+
+  if (test('sanitizeSessionId hash is stable (same input → same output)', () => {
+    const first = utils.sanitizeSessionId('日本語プロジェクト');
+    const second = utils.sanitizeSessionId('日本語プロジェクト');
+    assert.strictEqual(first, second, 'Same non-ASCII input must produce identical hash');
   })) passed++; else failed++;
 
   if (test('sanitizeSessionId is idempotent (applying twice gives same result)', () => {
@@ -182,7 +203,8 @@ function runTests() {
       const expected = utils.sanitizeSessionId(utils.getProjectName());
       assert.strictEqual(shortId, expected);
     } finally {
-      if (original) process.env.CLAUDE_SESSION_ID = original;
+      if (original !== undefined) process.env.CLAUDE_SESSION_ID = original;
+      else delete process.env.CLAUDE_SESSION_ID;
     }
   })) passed++; else failed++;
 
@@ -224,8 +246,10 @@ function runTests() {
     const result = spawnSync('node', ['-e', script], {
       encoding: 'utf8',
       cwd: '/',
-      env: { ...process.env, CLAUDE_SESSION_ID: '' }
+      env: { ...process.env, CLAUDE_SESSION_ID: '' },
+      timeout: 10000
     });
+    assert.strictEqual(result.status, 0, `Should exit 0, got status ${result.status}. stderr: ${result.stderr}`);
     // fallback should be sanitized: 'my.fallback' → 'my-fallback'
     assert.strictEqual(result.stdout, 'my-fallback');
   })) passed++; else failed++;
@@ -1508,8 +1532,10 @@ function runTests() {
     const result = spawnSync('node', ['-e', script], {
       encoding: 'utf8',
       cwd: '/',
-      env: { ...process.env, CLAUDE_SESSION_ID: '          ' }
+      env: { ...process.env, CLAUDE_SESSION_ID: '          ' },
+      timeout: 10000
     });
+    assert.strictEqual(result.status, 0, `Should exit 0, got status ${result.status}. stderr: ${result.stderr}`);
     // At root: project name is null → fallback 'fallback' is used (already clean)
     assert.strictEqual(result.stdout, 'fallback',
       'Whitespace-only ID should sanitize to null and fall through to fallback');

@@ -53,7 +53,7 @@ export function getDateTimeString(): string;
  * strips leading dots (e.g., ".claude" → "claude").
  * Returns null if the result is empty after sanitization.
  */
-export function sanitizeSessionId(raw: string): string | null;
+export function sanitizeSessionId(raw: string | null | undefined): string | null;
 
 /**
  * Get short session ID from CLAUDE_SESSION_ID environment variable.

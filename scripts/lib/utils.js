@@ -121,7 +121,14 @@ function sanitizeSessionId(raw) {
     .replace(/[^a-zA-Z0-9_-]/g, '-') // replace invalid chars
     .replace(/-{2,}/g, '-')          // collapse runs of hyphens
     .replace(/^-+|-+$/g, '');        // trim leading/trailing hyphens
-  return sanitized.length > 0 ? sanitized : null;
+  if (sanitized.length > 0) return sanitized;
+  // Check if the original had meaningful content (non-ASCII characters like CJK,
+  // Cyrillic) vs just whitespace/dots/punctuation. Only hash meaningful content
+  // so distinct project names get distinct IDs instead of colliding on 'default'.
+  const meaningful = raw.replace(/[\s._@#$%^&*()+=\[\]{}<>|\\/?!~`'",:;-]/g, '');
+  if (meaningful.length === 0) return null;
+  const crypto = require('crypto');
+  return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 8);
 }
 
 /**
