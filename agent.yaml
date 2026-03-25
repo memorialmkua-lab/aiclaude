@@ -1,7 +1,7 @@
 spec_version: "0.1.0"
 name: everything-claude-code
 version: 1.9.0
-description: "The agent harness performance optimization system. 125 skills, 28 agents, 60 commands, and automated hook workflows for Claude Code, Codex, Cursor, and beyond."
+description: "Production-ready AI coding plugin. 125 skills, 28 agents, 60 commands, and automated hook workflows for Claude Code, Codex, Cursor, and beyond."
 author: affaan-m
 license: MIT
 model:
