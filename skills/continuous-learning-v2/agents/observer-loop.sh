@@ -54,13 +54,14 @@ analyze_observations() {
 
   # Sample recent observations instead of loading the entire file (#521).
   # This prevents multi-MB payloads from being passed to the LLM.
+  # Files are created in PROJECT_DIR (not TMPDIR) so the sandboxed Claude agent can read them.
   MAX_ANALYSIS_LINES="${ECC_OBSERVER_MAX_ANALYSIS_LINES:-500}"
-  analysis_file="$(mktemp "${TMPDIR:-/tmp}/ecc-observer-analysis.XXXXXX.jsonl")"
+  analysis_file="${PROJECT_DIR}/analysis-pending.jsonl"
   tail -n "$MAX_ANALYSIS_LINES" "$OBSERVATIONS_FILE" > "$analysis_file"
   analysis_count=$(wc -l < "$analysis_file" 2>/dev/null || echo 0)
   echo "[$(date)] Using last $analysis_count of $obs_count observations for analysis" >> "$LOG_FILE"
 
-  prompt_file="$(mktemp "${TMPDIR:-/tmp}/ecc-observer-prompt.XXXXXX")"
+  prompt_file="${PROJECT_DIR}/observer-prompt.tmp"
   cat > "$prompt_file" <<PROMPT
 Read ${analysis_file} and identify patterns for the project ${PROJECT_NAME} (user corrections, error resolutions, repeated workflows, tool preferences).
 If you find 3+ occurrences of the same pattern, create an instinct file in ${INSTINCTS_DIR}/<id>.md.
@@ -114,7 +115,9 @@ PROMPT
   fi
 
   # Prevent observe.sh from recording this automated Haiku session as observations
+  # --add-dir so the sandbox allows Read/Write to instincts and analysis files
   ECC_SKIP_OBSERVE=1 ECC_HOOK_PROFILE=minimal claude --model haiku --max-turns "$max_turns" --print \
+    --add-dir "$PROJECT_DIR" \
     --allowedTools "Read,Write" \
     < "$prompt_file" >> "$LOG_FILE" 2>&1 &
   claude_pid=$!
