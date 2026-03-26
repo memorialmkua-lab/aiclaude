@@ -1,0 +1,1 @@
+- [hello-world](https://github.com/openclaw/skills/tree/main/hello-world) - A minimal greeting skill for pipeline validation. Responds with a friendly hello. `testing`
