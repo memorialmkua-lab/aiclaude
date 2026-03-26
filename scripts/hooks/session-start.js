@@ -11,6 +11,7 @@
 
 const {
   getSessionsDir,
+  getSessionSearchDirs,
   getLearnedSkillsDir,
   findFiles,
   ensureDir,
@@ -21,34 +22,60 @@ const {
 const { getPackageManager, getSelectionPrompt } = require('../lib/package-manager');
 const { listAliases } = require('../lib/session-aliases');
 const { detectProjectType } = require('../lib/project-detect');
+const path = require('path');
 
-/**
- * Write a single JSON envelope to stdout and exit.
- * Claude Code SessionStart hooks must output exactly one JSON object to stdout —
- * multiple writes or plain strings are silently discarded.
- * See: https://github.com/affaan-m/everything-claude-code/issues/843
- */
-function emitContext(additionalContext) {
-  const payload = { hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext } };
-  process.stdout.write(JSON.stringify(payload, null, 2) + '\n');
-  process.exit(0);
+function dedupeRecentSessions(searchDirs) {
+  const recentSessionsByName = new Map();
+
+  for (const [dirIndex, dir] of searchDirs.entries()) {
+    const matches = findFiles(dir, '*-session.tmp', { maxAge: 7 });
+
+    for (const match of matches) {
+      const basename = path.basename(match.path);
+      const current = {
+        ...match,
+        basename,
+        dirIndex,
+      };
+      const existing = recentSessionsByName.get(basename);
+
+      if (
+        !existing
+        || current.mtime > existing.mtime
+        || (current.mtime === existing.mtime && current.dirIndex < existing.dirIndex)
+      ) {
+        recentSessionsByName.set(basename, current);
+      }
+    }
+  }
+
+  return Array.from(recentSessionsByName.values())
+    .sort((left, right) => right.mtime - left.mtime || left.dirIndex - right.dirIndex);
 }
 
 async function main() {
   const sessionsDir = getSessionsDir();
   const learnedDir = getLearnedSkillsDir();
+  const additionalContextParts = [];
 
   // Ensure directories exist
   ensureDir(sessionsDir);
   ensureDir(learnedDir);
 
   // Check for recent session files (last 7 days)
-  const recentSessions = findFiles(sessionsDir, '*-session.tmp', { maxAge: 7 });
+  const recentSessions = dedupeRecentSessions(getSessionSearchDirs());
 
   if (recentSessions.length > 0) {
     const latest = recentSessions[0];
     log(`[SessionStart] Found ${recentSessions.length} recent session(s)`);
     log(`[SessionStart] Latest: ${latest.path}`);
+
+    // Read and inject the latest session content into Claude's context
+    const content = stripAnsi(readFile(latest.path));
+    if (content && !content.includes('[Session context goes here]')) {
+      // Only inject if the session has actual content (not the blank template)
+      additionalContextParts.push(`Previous session summary:\n${content}`);
+    }
   }
 
   // Check for learned skills
@@ -88,47 +115,49 @@ async function main() {
       parts.push(`frameworks: ${projectInfo.frameworks.join(', ')}`);
     }
     log(`[SessionStart] Project detected — ${parts.join('; ')}`);
+    additionalContextParts.push(`Project type: ${JSON.stringify(projectInfo)}`);
   } else {
     log('[SessionStart] No specific project type detected');
   }
 
-  // Build a single context string from all collected information.
-  // This is emitted as ONE JSON object via hookSpecificOutput so Claude
-  // Code accepts it (plain stdout / multiple writes are silently discarded).
-  const lines = [];
+  await writeSessionStartPayload(additionalContextParts.join('\n\n'));
+}
 
-  if (recentSessions.length > 0) {
-    const latest = recentSessions[0];
-    const content = stripAnsi(readFile(latest.path));
-    if (content && !content.includes('[Session context goes here]')) {
-      lines.push(`Previous session summary:\n${content}`);
-    }
-  }
+function writeSessionStartPayload(additionalContext) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const payload = JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: 'SessionStart',
+        additionalContext
+      }
+    });
 
-  if (learnedSkills.length > 0) {
-    lines.push(`Note: ${learnedSkills.length} learned skill(s) are available in ${learnedDir}`);
-  }
+    const handleError = (err) => {
+      if (settled) return;
+      settled = true;
+      if (err) {
+        log(`[SessionStart] stdout write error: ${err.message}`);
+      }
+      reject(err || new Error('stdout stream error'));
+    };
 
-  if (aliases.length > 0) {
-    const aliasNames = aliases.map(a => a.name).join(', ');
-    lines.push(`Session aliases available: ${aliasNames} — use /sessions load <alias> to continue a previous session`);
-  }
-
-  if (projectInfo.languages.length > 0 || projectInfo.frameworks.length > 0) {
-    lines.push(`Project type: ${JSON.stringify(projectInfo)}`);
-  }
-
-  const additionalContext = lines.length > 0 ? lines.join('\n\n') : null;
-
-  if (additionalContext) {
-    emitContext(additionalContext);
-  } else {
-    // No context to inject — exit silently (don't write anything to stdout)
-    process.exit(0);
-  }
+    process.stdout.once('error', handleError);
+    process.stdout.write(payload, (err) => {
+      process.stdout.removeListener('error', handleError);
+      if (settled) return;
+      settled = true;
+      if (err) {
+        log(`[SessionStart] stdout write error: ${err.message}`);
+        reject(err);
+        return;
+      }
+      resolve();
+    });
+  });
 }
 
 main().catch(err => {
   console.error('[SessionStart] Error:', err.message);
-  process.exit(0); // Don't block on errors
+  process.exitCode = 0; // Don't block on errors
 });
