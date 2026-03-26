@@ -31,7 +31,10 @@ function getClaudeDir() {
  * Get the sessions directory
  */
 function getSessionsDir() {
-  return path.join(getClaudeDir(), 'sessions');
+  // Use 'ecc-sessions' instead of 'sessions' to avoid Claude Code's built-in
+  // session directory cleanup which removes files written by session-end hooks.
+  // See: https://github.com/affaan-m/everything-claude-code/issues/843
+  return path.join(getClaudeDir(), 'ecc-sessions');
 }
 
 /**
