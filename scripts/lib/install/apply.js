@@ -23,7 +23,8 @@ function mergeHooksIntoSettings(plan) {
   let hooksConfig;
   try {
     hooksConfig = JSON.parse(fs.readFileSync(hooksJsonPath, 'utf8'));
-  } catch {
+  } catch (error) {
+    process.stderr.write(`[ECC Install] Warning: failed to parse ${hooksJsonPath}: ${error.message}\n`);
     return;
   }
 
@@ -36,12 +37,13 @@ function mergeHooksIntoSettings(plan) {
   if (fs.existsSync(settingsPath)) {
     try {
       settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-    } catch {
+    } catch (error) {
+      process.stderr.write(`[ECC Install] Warning: failed to parse ${settingsPath}, hooks will be written to a fresh file: ${error.message}\n`);
       settings = {};
     }
   }
 
-  settings.hooks = hooksConfig.hooks;
+  settings.hooks = { ...settings.hooks, ...hooksConfig.hooks };
 
   fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
   fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n', 'utf8');

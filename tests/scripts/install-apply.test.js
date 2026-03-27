@@ -360,7 +360,13 @@ function runTests() {
       fs.mkdirSync(claudeRoot, { recursive: true });
       fs.writeFileSync(
         path.join(claudeRoot, 'settings.json'),
-        JSON.stringify({ effortLevel: 'high', env: { MY_VAR: '1' } }, null, 2)
+        JSON.stringify({
+          effortLevel: 'high',
+          env: { MY_VAR: '1' },
+          hooks: {
+            UserPromptSubmit: [{ matcher: '*', hooks: [{ type: 'command', command: 'echo custom' }] }],
+          },
+        }, null, 2)
       );
 
       const result = run(['--profile', 'core'], { cwd: projectDir, homeDir });
@@ -370,7 +376,13 @@ function runTests() {
       assert.strictEqual(settings.effortLevel, 'high', 'existing effortLevel should be preserved');
       assert.deepStrictEqual(settings.env, { MY_VAR: '1' }, 'existing env should be preserved');
       assert.ok(settings.hooks, 'hooks should be merged in');
-      assert.ok(settings.hooks.PreToolUse, 'PreToolUse hooks should exist');
+      assert.ok(settings.hooks.PreToolUse, 'ECC PreToolUse hooks should exist');
+      assert.ok(settings.hooks.UserPromptSubmit, 'user-defined hook event types should be preserved');
+      assert.deepStrictEqual(
+        settings.hooks.UserPromptSubmit,
+        [{ matcher: '*', hooks: [{ type: 'command', command: 'echo custom' }] }],
+        'user-defined hook entries should be intact'
+      );
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
