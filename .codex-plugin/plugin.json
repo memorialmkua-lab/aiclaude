@@ -1,0 +1,25 @@
+{
+  "name": "everything-claude-code",
+  "version": "1.9.0",
+  "description": "Battle-tested Codex workflows — 125 skills, 28 agent definitions, 60 commands, and production-ready MCP configs for TDD, security scanning, code review, and autonomous development.",
+  "author": {
+    "name": "Affaan Mustafa",
+    "url": "https://x.com/affaanmustafa"
+  },
+  "homepage": "https://github.com/affaan-m/everything-claude-code",
+  "repository": "https://github.com/affaan-m/everything-claude-code",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "agents",
+    "skills",
+    "tdd",
+    "code-review",
+    "security",
+    "workflow",
+    "automation",
+    "best-practices"
+  ],
+  "skills": ["./skills/"],
+  "mcpServers": "./.codex-plugin/.mcp.json"
+}
