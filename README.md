@@ -212,7 +212,7 @@ For manual install instructions see the README in the `rules/` folder.
 /plugin list everything-claude-code@everything-claude-code
 ```
 
-✨ **That's it!** You now have access to 28 agents, 125 skills, and 60 commands.
+✨ **That's it!** You now have access to 28 agents, 126 skills, and 61 commands.
 
 ---
 
@@ -344,6 +344,7 @@ everything-claude-code/
 |   |-- security-scan/              # AgentShield security auditor integration (NEW)
 |   |-- java-coding-standards/     # Java coding standards (NEW)
 |   |-- jpa-patterns/              # JPA/Hibernate patterns (NEW)
+|   |-- jira-integration/           # Integration with Jira ticketing system
 |   |-- postgres-patterns/         # PostgreSQL optimization patterns (NEW)
 |   |-- nutrient-document-processing/ # Document processing with Nutrient API (NEW)
 |   |-- project-guidelines-example/   # Template for project-specific skills
@@ -387,6 +388,7 @@ everything-claude-code/
 |   |-- instinct-status.md  # /instinct-status - View learned instincts (NEW)
 |   |-- instinct-import.md  # /instinct-import - Import instincts (NEW)
 |   |-- instinct-export.md  # /instinct-export - Export instincts (NEW)
+|   |-- jira.md             # /jira - interact with Jira ticketing system
 |   |-- evolve.md           # /evolve - Cluster instincts into skills
 |   |-- prune.md            # /prune - Delete expired pending instincts (NEW)
 |   |-- pm2.md              # /pm2 - PM2 service lifecycle management (NEW)
@@ -1084,8 +1086,8 @@ The configuration is automatically detected from `.opencode/opencode.json`.
 | Feature | Claude Code | OpenCode | Status |
 |---------|-------------|----------|--------|
 | Agents | ✅ 28 agents | ✅ 12 agents | **Claude Code leads** |
-| Commands | ✅ 60 commands | ✅ 31 commands | **Claude Code leads** |
-| Skills | ✅ 125 skills | ✅ 37 skills | **Claude Code leads** |
+| Commands | ✅ 61 commands | ✅ 31 commands | **Claude Code leads** |
+| Skills | ✅ 126 skills | ✅ 37 skills | **Claude Code leads** |
 | Hooks | ✅ 8 event types | ✅ 11 events | **OpenCode has more!** |
 | Rules | ✅ 29 rules | ✅ 13 instructions | **Claude Code leads** |
 | MCP Servers | ✅ 14 servers | ✅ Full | **Full parity** |
