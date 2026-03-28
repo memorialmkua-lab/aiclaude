@@ -22,6 +22,7 @@
 12. [マルチハーネス対応](#12-マルチハーネス対応)
 13. [運用・メンテナンス](#13-運用メンテナンス)
 14. [トラブルシューティング](#14-トラブルシューティング)
+15. [付録: install.sh による一括インストールとアンインストール](#付録-installsh-による一括インストールとアンインストール)
 
 ---
 
@@ -59,7 +60,7 @@ ECC には3つの導入方式がある。プロジェクトの状況と求める
 ```mermaid
 flowchart TD
     START["ECC を導入したい"] --> Q1{"最速で全機能を<br>使いたい？"}
-    Q1 -->|Yes| A["方式A: プラグイン<br>+ install.sh で rules 追加"]
+    Q1 -->|Yes| A["方式A: プラグイン<br>+ rules を手動コピー"]
     Q1 -->|No| Q2{"インストール対象を<br>細かく制御したい？"}
     Q2 -->|Yes| B["方式B: マニフェスト駆動<br>install.sh --profile ..."]
     Q2 -->|No| C["方式C: 手動コピー<br>必要なファイルだけ cp"]
@@ -67,7 +68,7 @@ flowchart TD
 
 | 方式 | 所要時間 | 粒度 | 状態追跡 | 向いているケース |
 |------|---------|------|---------|--------------|
-| A: プラグイン | 2分 | 全部入り + 言語選択 | なし | 素早く全機能を試したい |
+| A: プラグイン | 2分 | 全部入り + rules 手動コピー | なし | 素早く全機能を試したい |
 | B: マニフェスト駆動 | 5分 | プロファイル/モジュール/コンポーネント単位 | install-state.json で追跡 | 本番導入、チーム展開 |
 | C: 手動コピー | 10分 | ファイル単位 | なし | 特定コンポーネントだけ欲しい |
 
@@ -104,52 +105,39 @@ Claude Code のセッション内で以下を実行する。
 }
 ```
 
-この時点で commands, agents, skills, hooks が利用可能になる。ただし、Claude Code のプラグインシステムには rules を配布する機能がないため、rules は別途インストールが必要である。
+この時点で commands, agents, skills, hooks が利用可能になる。ただし、Claude Code のプラグインシステムには rules を配布する機能がないため、rules は別途手動でコピーする必要がある。
 
-### Step 2: Rules のインストール
+### Step 2: Rules の手動コピー
 
-`--target claude`（デフォルト）は `~/.claude/rules/` にインストールされる。これはユーザースコープであり、そのマシン上のすべての Claude Code セッションに適用される。
+ECC リポジトリから、使用する言語の rules をコピーする。`common/` は全言語共通の基盤ルールであり、必ずコピーすること。
 
-**特定プロジェクトだけにインストールしたい場合:** v1.9.0 時点で、Claude Code のプロジェクトスコープ（`<project>/.claude/rules/`）に自動インストールするアダプタは存在しない。`--target claude` はユーザースコープ専用である。
+ルールはサブディレクトリ構造を維持してコピーする。`common/` と各言語ディレクトリには同名のファイル（`coding-style.md`, `hooks.md`, `patterns.md`, `security.md`, `testing.md`）があるため、`/*` でフラット展開すると言語固有ファイルが common を上書きしてしまう。
 
-| ターゲット | スコープ | インストール先 | 適用範囲 |
-|-----------|---------|-------------|---------|
-| `claude`（デフォルト） | ユーザー | `~/.claude/rules/` | 全プロジェクト |
-| `cursor` | プロジェクト | `./.cursor/` | カレントディレクトリのみ |
-| `antigravity` | プロジェクト | `./.agent/` | カレントディレクトリのみ |
-
-たとえば `~/products/novasell-magna` にだけ ECC の rules を適用したい場合、以下の手順で手動コピーする:
+#### ユーザースコープ（全プロジェクトに適用）
 
 ```bash
-# ECC リポジトリからプロジェクトの .claude/rules/ に直接コピー
 cd /path/to/everything-claude-code
+mkdir -p ~/.claude/rules
+
+# 共通ルール（必須）
+cp -r rules/common ~/.claude/rules/common
+
+# 使用する言語だけ追加
+cp -r rules/typescript ~/.claude/rules/typescript
+cp -r rules/python ~/.claude/rules/python
+```
+
+#### プロジェクトスコープ（特定プロジェクトだけに適用）
+
+```bash
+cd /path/to/everything-claude-code
+mkdir -p ~/products/novasell-magna/.claude/rules
+
 cp -r rules/common ~/products/novasell-magna/.claude/rules/common
 cp -r rules/typescript ~/products/novasell-magna/.claude/rules/typescript
 ```
 
-あるいは、`/configure-ecc` スキル（`skills/configure-ecc/SKILL.md`）を使えば、対話的にユーザーレベルかプロジェクトレベルかを選んでコピー先を決定できる。ただしこれもスキルが手順を案内するだけで、install.sh のような自動化されたパイプラインではない。
-
-```bash
-# リポジトリをクローン
-git clone https://github.com/affaan-m/everything-claude-code.git
-cd everything-claude-code
-npm install
-
-# 使用言語の rules をインストール（macOS/Linux）
-./install.sh typescript          # ユーザースコープ（~/.claude/rules/）
-./install.sh typescript python   # 複数言語
-
-# Windows の場合
-.\install.ps1 typescript python
-
-# npm 経由（クロスプラットフォーム）
-npx ecc typescript python            # 正規コマンド
-npx ecc-install typescript python    # 互換エイリアス
-```
-
 対応言語: `typescript`, `python`, `golang`, `swift`, `php`, `java`, `perl`, `kotlin`, `cpp`, `rust`, `csharp`
-
-`kotlin` を指定すると内部的には `java` モジュールにマッピングされるが、`rules/kotlin/` ディレクトリも同時にインストールされる。`golang` は `go` のエイリアス、`javascript` は `typescript` のエイリアスとして扱われる。
 
 ### Step 3: 動作確認
 
@@ -1023,4 +1011,47 @@ claude
 /plan "プロジェクトの概要を教えて"
 /harness-audit
 /instinct-status
+```
+
+---
+
+## 付録: install.sh による一括インストールとアンインストール
+
+### install.sh の注意点
+
+`install.sh` に言語名を渡す方式（レガシーモード）は、**rules だけでなく agents, commands, hooks, scripts, skills, mcp-configs, プラットフォーム設定（.codex, .cursor, .opencode）など全コンポーネントを一括インストールする**（v1.9.0 時点で約498ファイル）。rules だけが必要な場合は方式A の Step 2（手動コピー）または方式C を使うこと。
+
+```bash
+# 以下はすべて全コンポーネントの一括インストールになる
+./install.sh typescript python
+./install.sh --profile developer --target claude
+npx ecc typescript python
+```
+
+インストール結果は `install-state.json` に記録される。
+
+| ターゲット | 状態ファイルのパス |
+|-----------|-----------------|
+| Claude Code | `~/.claude/ecc/install-state.json` |
+| Cursor | `./.cursor/ecc-install-state.json` |
+| Codex | `~/.codex/ecc-install-state.json` |
+| OpenCode | `~/.opencode/ecc-install-state.json` |
+
+### アンインストール
+
+v1.9.0 時点では専用のアンインストールコマンドは提供されていない。`install-state.json` に記録された全ファイルパスを使って手動削除する。
+
+```bash
+node -e "
+const state = require('$HOME/.claude/ecc/install-state.json');
+const fs = require('fs');
+state.operations
+  .filter(op => op.kind === 'copy-file')
+  .forEach(op => { try { fs.unlinkSync(op.destinationPath); } catch {} });
+fs.unlinkSync('$HOME/.claude/ecc/install-state.json');
+"
+# 空ディレクトリを削除
+find ~/.claude/rules ~/.claude/agents ~/.claude/commands ~/.claude/hooks \
+     ~/.claude/scripts ~/.claude/skills ~/.claude/mcp-configs ~/.claude/ecc \
+     -depth -type d -empty -delete 2>/dev/null
 ```
