@@ -93,6 +93,7 @@ function runTests() {
       });
       const parsed = JSON.parse(stdout);
       assert.strictEqual(parsed.overall_score, 0);
+      assert.ok(parsed.checks.length > 0);
       assert.ok(parsed.checks.every(check => check.pass === false));
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });

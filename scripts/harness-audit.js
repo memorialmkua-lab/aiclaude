@@ -119,7 +119,14 @@ function safeRead(relativePath) {
 
 function getChecks() {
   const packageRaw = safeRead('package.json');
-  const packageJson = packageRaw ? JSON.parse(packageRaw) : {};
+  let packageJson = {};
+  if (packageRaw) {
+    try {
+      packageJson = JSON.parse(packageRaw);
+    } catch (_error) {
+      packageJson = {};
+    }
+  }
   const commandPrimary = safeRead('commands/harness-audit.md').trim();
   const commandParity = safeRead('.opencode/commands/harness-audit.md').trim();
   const hooksJson = safeRead('hooks/hooks.json');
